@@ -124,18 +124,34 @@
         #sidebar-menu li a:hover {
             background-color: #34495e;
         }
+
+         /* 新增的關閉按鈕樣式 */
+         #close-menu-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            line-height: 1; /* 確保 "×" 垂直置中 */
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
     <header id="top-banner">
         <button id="menu-toggle-btn">☰</button> 
-        
+
         <h1 id="project-title">興隆社會住宅I區智慧中央監控系統</h1>
         <div id="datetime-container"></div>
     </header>
 
     <nav id="sidebar-menu">
+        <button id="close-menu-btn">&times;</button>
+
         <h2>樓層選單</h2>
         <ul>
             <li><a href="#">1F </a></li>
@@ -307,15 +323,31 @@
         // --- 側邊欄選單功能 ---
 
         // 獲取 HTML 中的元素
-        const menuToggleBtn = document.getElementById('menu-toggle-btn');
+         const menuToggleBtn = document.getElementById('menu-toggle-btn');
         const sidebarMenu = document.getElementById('sidebar-menu');
+        const closeMenuBtn = document.getElementById('close-menu-btn'); // 新增：獲取關閉按鈕
 
         // 為選單切換按鈕新增點擊事件監聽器
         menuToggleBtn.addEventListener('click', () => {
-            // 切換 sidebar-menu 元素的 'open' class
-            // 如果有 'open' class，就移除它；如果沒有，就新增它。
             sidebarMenu.classList.toggle('open');
         });
+
+        // 新增：為「X」關閉按鈕新增點擊事件監聽器
+        closeMenuBtn.addEventListener('click', () => {
+            sidebarMenu.classList.remove('open'); // 明確地移除 'open' class 來關閉選單
+        });
+
+        // 新增：監聽整個文件的點擊事件，以實現點擊外部關閉的功能
+        document.addEventListener('click', (event) => {
+            // 檢查側邊欄是否是打開的，以及點擊的目標是否不在側邊欄內，也不在主選單按鈕上
+            const isClickInsideMenu = sidebarMenu.contains(event.target);
+            const isClickOnToggleButton = menuToggleBtn.contains(event.target);
+
+            if (sidebarMenu.classList.contains('open') && !isClickInsideMenu && !isClickOnToggleButton) {
+                sidebarMenu.classList.remove('open');
+            }
+        });
+
 
     </script>
 </body>
