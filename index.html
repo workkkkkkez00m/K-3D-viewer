@@ -36,9 +36,45 @@
         #ui-container button:hover {
             background-color: rgba(77, 77, 77, 0.736);
         }
+         /* 頂部橫幅的樣式 */
+         #top-banner {
+            position: absolute; /* 絕對定位，浮在畫面上方 */
+            top: 0;
+            left: 0;
+            width: 100%;        /* 寬度佔滿整個畫面 */
+            background-color: rgba(0, 0, 0, 0.7); /* 半透明黑色背景 */
+            color: white;       /* 文字顏色為白色 */
+            display: flex;      /* 使用 Flexbox 進行排版 */
+            justify-content: space-between; /* 讓子元素兩端對齊 */
+            align-items: center; /* 垂直置中 */
+            padding: 10px 20px; /* 內邊距 (上下10px, 左右20px) */
+            box-sizing: border-box; /* 讓 padding 不會影響總寬度 */
+            z-index: 20;        /* 確保橫幅在所有元素的最上方 */
+            font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; /* 使用更適合中文的字體 */
+        }
+
+        /* 專案標題的樣式 */
+        #project-title {
+            margin: 0;          /* 移除 h1 預設的外邊距 */
+            font-size: 22px;    /* 調整字體大小 */
+            font-weight: 500;   /* 調整字體粗細 */
+        }
+
+        /* 日期時間容器的樣式 */
+        #datetime-container {
+            font-size: 18px;    /* 調整字體大小 */
+        }
     </style>
 </head>
 <body>
+
+    <header id="top-banner">
+        <h1 id="project-title">興隆社會住宅I區智慧中央監控系統</h1>
+        <div id="datetime-container"></div>
+    </header>
+
+    <div id="ui-container">
+        </div>
 
     <div id="ui-container">
         <button id="front-view-btn">正視圖</button>
@@ -167,6 +203,33 @@
             animateCameraPosition(new THREE.Vector3(20, 5, 0));
             controls.target.set(0, 0, 0);
         });
+
+        // --- 日期時間功能 ---
+
+        // 獲取 HTML 中的時間日期容器元素
+        const datetimeContainer = document.getElementById('datetime-container');
+
+        // 更新時間的函式
+        function updateDateTime() {
+            const now = new Date();
+            
+            // 格式化日期：年/月/日 星期
+            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' };
+            const dateString = now.toLocaleDateString('zh-TW', dateOptions);
+
+            // 格式化時間：上午/下午 時:分:秒
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const timeString = now.toLocaleTimeString('zh-TW', timeOptions);
+
+            // 將格式化後的字串組合並顯示在網頁上
+            datetimeContainer.textContent = `${dateString} ${timeString}`;
+        }
+
+        // 立即執行一次，避免頁面剛載入時是空白的
+        updateDateTime();
+
+        // 設定一個計時器，每秒鐘 (1000 毫秒) 呼叫一次 updateDateTime 函式
+        setInterval(updateDateTime, 1000);
 
     </script>
 </body>
