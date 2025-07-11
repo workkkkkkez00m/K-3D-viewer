@@ -8,9 +8,43 @@
         /* 讓畫面佔滿整個瀏覽器視窗 */
         body { margin: 0; }
         canvas { display: block; }
+         /* UI 介面容器的樣式 */
+         #ui-container {
+            position: absolute; /* 絕對定位，讓它脫離文件流，浮在畫面上方 */
+            top: 20px;          /* 距離頂部 20 像素 */
+            left: 20px;         /* 距離左側 20 像素 */
+            display: flex;      /* 使用 Flexbox 讓按鈕橫向排列 */
+            flex-direction: column; /* 改為縱向排列 */
+            gap: 10px;          /* 按鈕之間的間距 */
+            z-index: 10;        /* 確保 UI 在 canvas 之上 */
+        }
+
+        /* 按鈕的通用樣式 */
+        #ui-container button {
+            padding: 10px 15px;
+            font-size: 16px;
+            font-family: sans-serif;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.6); /* 半透明黑色背景 */
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            cursor: pointer; /* 滑鼠移上去時顯示為手形 */
+            transition: background-color 0.3s; /* 加入過渡效果 */
+        }
+
+        /* 滑鼠懸停時的樣式 */
+        #ui-container button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
     </style>
 </head>
 <body>
+
+    <div id="ui-container">
+        <button id="front-view-btn">正視圖</button>
+        <button id="top-view-btn">俯視圖</button>
+        <button id="side-view-btn">側視圖</button>
+    </div>
 
     <script type="module">
         // 導入 Three.js 函式庫以及必要的模組
@@ -68,6 +102,30 @@
             }
         );
         
+     /**
+         * 平滑移動相機到目標位置的函式
+         * @param {THREE.Vector3} targetPosition - 相機的目標位置
+         * @param {number} duration - 動畫持續時間 (毫秒)
+         */
+         function animateCameraPosition(targetPosition, duration = 1000) {
+            const startPosition = camera.position.clone();
+            let startTime = null;
+
+            function loop(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const elapsedTime = currentTime - startTime;
+                const progress = Math.min(elapsedTime / duration, 1); // 進度 (0 到 1)
+
+                // 使用線性內插 (lerp) 計算目前位置
+                camera.position.lerpVectors(startPosition, targetPosition, progress);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(loop); // 如果動畫未完成，繼續下一幀
+                }
+            }
+            requestAnimationFrame(loop);
+        }
+
         // 5. 建立動畫迴圈，持續渲染畫面
         function animate() {
             requestAnimationFrame(animate);
@@ -84,6 +142,31 @@
 
         // 啟動動畫！
         animate();
+
+
+        // 獲取 HTML 中的按鈕元素
+        const frontViewBtn = document.getElementById('front-view-btn');
+        const topViewBtn = document.getElementById('top-view-btn');
+        const sideViewBtn = document.getElementById('side-view-btn');
+
+        // 為「正視圖」按鈕新增點擊事件
+        frontViewBtn.addEventListener('click', () => {
+            // 注意：這些座標需要根據您的模型大小和方向進行微調
+            animateCameraPosition(new THREE.Vector3(0, 5, 20)); 
+            controls.target.set(0, 0, 0); // 確保相機始終看向模型中心
+        });
+
+        // 為「俯視圖」按鈕新增點擊事件
+        topViewBtn.addEventListener('click', () => {
+            animateCameraPosition(new THREE.Vector3(0, 25, 0));
+            controls.target.set(0, 0, 0);
+        });
+
+        // 為「側視圖」按鈕新增點擊事件
+        sideViewBtn.addEventListener('click', () => {
+            animateCameraPosition(new THREE.Vector3(20, 5, 0));
+            controls.target.set(0, 0, 0);
+        });
 
     </script>
 </body>
