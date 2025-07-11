@@ -1,90 +1,17 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的 Revit 3D 模型</title>
+    <title>Deployment Test</title>
     <style>
-        /* 讓畫面佔滿整個瀏覽器視窗 */
-        body { margin: 0; }
-        canvas { display: block; }
+        body { font-family: sans-serif; display: grid; place-content: center; height: 100vh; margin: 0; background-color: #f0f8ff; }
+        h1 { color: #333; }
     </style>
 </head>
 <body>
-
-    <script type="module">
-        // 導入 Three.js 函式庫以及必要的模組
-        // 我們直接從 CDN (內容分發網路) 獲取，無需下載任何檔案
-        import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
-        import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
-        import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
-
-        // 1. 初始化場景、相機和渲染器
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xdddddd); // 設定背景顏色為淺灰色
-
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(10, 10, 10); // 設定相機的初始位置
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true }); // antialias: true 開啟抗鋸齒
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio); // 為了在高解析度螢幕上顯示得更清晰
-        document.body.appendChild(renderer.domElement);
-
-        // 2. 加入燈光
-        // 環境光，讓模型整體都有亮度，不會有純黑的陰影
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
-
-        // 平行光，模擬太陽光，可以產生陰影
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        directionalLight.position.set(5, 10, 7.5);
-        scene.add(directionalLight);
-
-        // 3. 加入控制器 (讓滑鼠可以平移、縮放、旋轉)
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true; // 增加慣性，讓轉動更平滑
-
-        // 4. 載入 GLB 模型
-        const loader = new GLTFLoader();
-        loader.load(
-            // **這是您需要確認的檔案路徑！**
-            'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/master/model.glb', 
-            // 模型載入成功後執行的函式
-            function (gltf) {
-                const model = gltf.scene;
-                // 自動調整模型位置與大小，讓它顯示在畫面中央
-                const box = new THREE.Box3().setFromObject(model);
-                const center = box.getCenter(new THREE.Vector3());
-                model.position.sub(center); // 將模型中心移到原點
-                scene.add(model);
-                console.log('模型載入成功！');
-            },
-            // 模型載入過程中的進度回報 (可選)
-            undefined, 
-            // 模型載入失敗後執行的函式
-            function (error) {
-                console.error('模型載入失敗:', error);
-            }
-        );
-        
-        // 5. 建立動畫迴圈，持續渲染畫面
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update(); // 控制器更新
-            renderer.render(scene, camera);
-        }
-
-        // 6. 處理瀏覽器視窗大小改變的事件，避免畫面變形
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        // 啟動動畫！
-        animate();
-
+    <h1>如果看到這行字，代表部署成功了！</h1>
+    <script>
+        console.log("Deployment test page loaded at: " + new Date());
     </script>
 </body>
 </html>
