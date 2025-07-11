@@ -42,7 +42,7 @@
             top: 0;
             left: 0;
             width: 100%;        /* 寬度佔滿整個畫面 */
-            background-color: rgba(55, 55, 55, 0.681); /* 半透明黑色背景 */
+            background-color: rgba(0, 0, 0, 0.681); /* 半透明黑色背景 */
             color: white;       /* 文字顏色為白色 */
             display: flex;      /* 使用 Flexbox 進行排版 */
             justify-content: space-between; /* 讓子元素兩端對齊 */
@@ -180,7 +180,7 @@
 
         // 1. 初始化場景、相機和渲染器
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x000000); // 將背景顏色改為黑色
+        scene.background = new THREE.Color(0x0d1117); // 將背景顏色改為深藍色
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 30, 0); // 設定相機的初始位置
