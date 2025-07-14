@@ -140,49 +140,46 @@
         }
 
         #controls-helper {
-        position: absolute; /* 絕對定位 */
-        bottom: 20px;       /* 距離底部 20 像素 */
-        right: 20px;        /* 距離右側 20 像素 */
-        padding: 8px 15px;  /* 內邊距 */
-        background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
-        color: #cccccc;     /* 淺灰色文字 */
-        font-size: 14px;    /* 字體大小 */
-        border-radius: 5px; /* 圓角 */
-        z-index: 10;        /* 確保它在 3D 場景之上 */
-        pointer-events: none; /* 讓滑鼠可以穿透此元素，不會擋住對 3D 場景的操作 */
+            position: absolute; /* 絕對定位 */
+            bottom: 20px;       /* 距離底部 20 像素 */
+            right: 20px;        /* 距離右側 20 像素 */
+            padding: 8px 15px;  /* 內邊距 */
+            background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+            color: #cccccc;     /* 淺灰色文字 */
+            font-size: 14px;    /* 字體大小 */
+            border-radius: 5px; /* 圓角 */
+            z-index: 10;        /* 確保它在 3D 場景之上 */
+            pointer-events: none; /* 讓滑鼠可以穿透此元素，不會擋住對 3D 場景的操作 */
         }
 
         /* 樓層顯示區塊的樣式 */
         #floor-indicator {
-        position: absolute; /* 絕對定位 */
-        bottom: 20px;       /* 距離底部 20 像素 */
-        left: 20px;         /* 距離左側 20 像素 */
-        padding: 8px 15px;  /* 內邊距 */
-        background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
-        color: #cccccc;     /* 淺灰色文字 */
-        font-size: 16px;    /* 字體大小 */
-        font-weight: bold;  /* 字體加粗 */
-        border-radius: 5px; /* 圓角 */
-        z-index: 10;        /* 確保它在 3D 場景之上 */
-        pointer-events: none; /* 讓滑鼠可以穿透此元素 */
+            position: absolute; /* 絕對定位 */
+            bottom: 20px;       /* 距離底部 20 像素 */
+            left: 20px;         /* 距離左側 20 像素 */
+            padding: 8px 15px;  /* 內邊距 */
+            background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+            color: #cccccc;     /* 淺灰色文字 */
+            font-size: 16px;    /* 字體大小 */
+            font-weight: bold;  /* 字體加粗 */
+            border-radius: 5px; /* 圓角 */
+            z-index: 10;        /* 確保它在 3D 場景之上 */
+            pointer-events: none; /* 讓滑鼠可以穿透此元素 */
         }
 
-        /* 狀態標籤的樣式 */
-        #status-tag {
-        position: absolute;
-        display: none; /* 預設隱藏 */
-        padding: 8px 12px;
-        background-color: rgba(255, 165, 0, 0.9); /* 橘色背景 */
-        color: black;
-        border-radius: 5px;
-        border: 1px solid white;
-        font-size: 14px;
-        font-weight: bold;
-        pointer-events: auto; /* 確保標籤本身可以被點擊 */
-        cursor: pointer;
-        transition: transform 0.1s; /* 讓移動更平滑一點 */
-        user-select: none; /* 防止文字被選取 */
-        }
+        .status-label { /* <-- 將 #status-tag 改為 .status-label */
+            position: absolute;
+            padding: 8px 12px;
+            background-color: rgba(255, 165, 0, 0.9);
+             color: black;
+            border-radius: 5px;
+            border: 1px solid white;
+            font-size: 14px;
+            font-weight: bold;
+            pointer-events: none; /* 我們暂时先禁用標籤的點擊 */
+            user-select: none;
+            /* 注意：我們移除了 display: none; 因為現在要預設顯示 */
+}
     </style>
 </head>
 <body>
@@ -224,7 +221,7 @@
     當前樓層: 5F
     </div>
 
-    <div id="status-tag"></div>
+    <div id="labels-container"></div>
 
     <script type="module">
         // 導入 Three.js 函式庫以及必要的模組
@@ -246,6 +243,7 @@
         text: "窗戶狀態",
         status: "關閉", // 初始狀態
         targetObject: null // 稍後會找到並存入
+        element: null
     }
         // 未來可以繼續增加更多監控點
         // { name: "Door_05", text: "門禁狀態", status: "鎖定", targetObject: null }
@@ -253,7 +251,6 @@
 
         // 2. 獲取狀態標籤的 HTML 元素
         const statusTag = document.getElementById('status-tag');
-        let activePoint = null; // 用來追蹤目前是哪個點正在顯示標籤
         
         // 1. 初始化場景、相機和渲染器
         const scene = new THREE.Scene();
@@ -304,6 +301,10 @@
                 for (const point of monitoringPoints) {
                 if (object.name === point.name) {
                     point.targetObject = object; // 找到了！將 3D 物件存起來
+                    const label = document.createElement('div');
+                    label.className = 'status-label'; // 套用我們設計好的 CSS class
+                    labelsContainer.appendChild(label); // 將標籤加入容器
+                    point.element = label; // 將標籤元素存回我們的資料中
                     console.log(`成功找到監控物件: ${point.name}`);
                         }
                     }
@@ -352,12 +353,15 @@
             requestAnimationFrame(animate);
             controls.update(); // 控制器更新
             // --- 新增：更新狀態標籤的位置 ---
-            if (activePoint && activePoint.targetObject) {
-            const targetObject = activePoint.targetObject;
+            // --- ★★★ 修改：更新所有監控點標籤的位置 ★★★ ---
+            for (const point of monitoringPoints) {
+            // 確保物件和標籤元素都已準備好
+            if (point.targetObject && point.element) {
 
             // 計算物件中心點在 3D 世界中的位置
             const position = new THREE.Vector3();
-            targetObject.getWorldPosition(position);
+            // 我們從物件的邊界框中心取點，會比物件原點更準確
+            new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
 
             // 將 3D 座標轉換為 2D 螢幕座標
             position.project(camera);
@@ -366,12 +370,10 @@
             const y = (position.y * -0.5 + 0.5) * window.innerHeight;
 
             // 更新標籤的位置和內容
-            statusTag.style.display = 'block';
-            statusTag.style.transform = `translate(${x}px, ${y}px)`;
-            statusTag.innerHTML = `${activePoint.text}: <span style="color:red;">${activePoint.status}</span>`;
-            } else {
-            statusTag.style.display = 'none'; // 如果沒有作用中的點，就隱藏標籤
+            point.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+            point.element.innerHTML = `${point.text}: <span style="color:red;">${point.status}</span>`;
             }
+        }
             renderer.render(scene, camera);
         }
 
@@ -384,46 +386,6 @@
 
         const raycasterForClick = new THREE.Raycaster();
         const mouseForClick = new THREE.Vector2();
-
-        window.addEventListener('click', (event) => {
-        // 只在側邊欄關閉時才觸發點擊查詢
-        if (!sidebarMenu.classList.contains('open')) {
-        mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
-        if (model) {
-        raycasterForClick.setFromCamera(mouseForClick, camera);
-        const intersects = raycasterForClick.intersectObjects(model, true);
-
-        if (intersects.length > 0) {
-            let clickedTarget = intersects[0].object;
-            let foundPoint = null;
-            
-             // --- ★★★ 新增：向上遍歷父物件來尋找目標 ★★★ ---
-                while (clickedTarget) {
-                    // 檢查當前物件是否為我們的監控目標
-                    foundPoint = monitoringPoints.find(p => p.targetObject && p.targetObject.uuid === clickedTarget.uuid);
-                    
-                    if (foundPoint) {
-                        break; // 如果找到了，就跳出迴圈
-                    }
-                    
-                    // 如果沒找到，就將目標設為其父物件，繼續向上查找
-                    clickedTarget = clickedTarget.parent;
-                }
-            // --- 新增：檢查點擊的物件是否為監控點 ---
-            const foundPoint = monitoringPoints.find(p => p.targetObject && p.targetObject.uuid === clickedObject.uuid);
-
-            if (foundPoint) {
-                activePoint = foundPoint; // 設為作用中的點，讓 animate 迴圈去更新它
-            } else {
-                activePoint = null; // 如果點擊到其他地方，就取消作用中的點
-            }
-        } else {
-            activePoint = null; // 如果點擊到空白處，也取消
-        }    
-        }
-        }
-        });
 
         // 啟動動畫！
         animate();
