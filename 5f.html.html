@@ -166,6 +166,23 @@
         z-index: 10;        /* 確保它在 3D 場景之上 */
         pointer-events: none; /* 讓滑鼠可以穿透此元素 */
         }
+
+        /* 狀態標籤的樣式 */
+        #status-tag {
+        position: absolute;
+        display: none; /* 預設隱藏 */
+        padding: 8px 12px;
+        background-color: rgba(255, 165, 0, 0.9); /* 橘色背景 */
+        color: black;
+        border-radius: 5px;
+        border: 1px solid white;
+        font-size: 14px;
+        font-weight: bold;
+        pointer-events: auto; /* 確保標籤本身可以被點擊 */
+        cursor: pointer;
+        transition: transform 0.1s; /* 讓移動更平滑一點 */
+        user-select: none; /* 防止文字被選取 */
+        }
     </style>
 </head>
 <body>
@@ -207,6 +224,8 @@
     當前樓層: 5F
     </div>
 
+    <div id="status-tag"></div>
+
     <script type="module">
         // 導入 Three.js 函式庫以及必要的模組
         // 我們直接從 CDN (內容分發網路) 獲取，無需下載任何檔案
@@ -214,6 +233,28 @@
         import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
         import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
 
+        // --- ★★★ 新增：監控功能 ★★★ ---
+
+        // 1. 定義我們的監控點
+        //    - name: 對應您在模型中找到的物件名稱
+        //    - text: 要顯示的文字
+        //    - status: 目前狀態
+        //    - targetObject: 用來存放找到的 3D 物件
+        const monitoringPoints = [
+    {
+        name: "AW2037_1", // 窗戶名稱
+        text: "窗戶狀態",
+        status: "關閉", // 初始狀態
+        targetObject: null // 稍後會找到並存入
+    }
+        // 未來可以繼續增加更多監控點
+        // { name: "Door_05", text: "門禁狀態", status: "鎖定", targetObject: null }
+        ];
+
+        // 2. 獲取狀態標籤的 HTML 元素
+        const statusTag = document.getElementById('status-tag');
+        let activePoint = null; // 用來追蹤目前是哪個點正在顯示標籤
+        
         // 1. 初始化場景、相機和渲染器
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0d1117); // 將背景顏色改為深藍色
@@ -254,7 +295,16 @@
             'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/5f_model.glb', 
             // 模型載入成功後執行的函式
             function (gltf) {
-                const model = gltf.scene;
+                // --- 新增：遍歷模型以尋找監控物件 ---
+                model.traverse((object) => {
+                // 檢查場景中的物件名稱是否符合我們監控列表中的名稱
+                for (const point of monitoringPoints) {
+                if (object.name === point.name) {
+                    point.targetObject = object; // 找到了！將 3D 物件存起來
+                    console.log(`成功找到監控物件: ${point.name}`);
+                }
+                }
+                });
                 // 自動調整模型位置與大小，讓它顯示在畫面中央
                 const box = new THREE.Box3().setFromObject(model);
                 const center = box.getCenter(new THREE.Vector3());
@@ -298,6 +348,27 @@
         function animate() {
             requestAnimationFrame(animate);
             controls.update(); // 控制器更新
+            // --- 新增：更新狀態標籤的位置 ---
+            if (activePoint && activePoint.targetObject) {
+            const targetObject = activePoint.targetObject;
+
+            // 計算物件中心點在 3D 世界中的位置
+            const position = new THREE.Vector3();
+            targetObject.getWorldPosition(position);
+
+            // 將 3D 座標轉換為 2D 螢幕座標
+            position.project(camera);
+
+            const x = (position.x * 0.5 + 0.5) * window.innerWidth;
+            const y = (position.y * -0.5 + 0.5) * window.innerHeight;
+
+            // 更新標籤的位置和內容
+            statusTag.style.display = 'block';
+            statusTag.style.transform = `translate(${x}px, ${y}px)`;
+            statusTag.innerHTML = `${activePoint.text}: <span style="color:red;">${activePoint.status}</span>`;
+            } else {
+            statusTag.style.display = 'none'; // 如果沒有作用中的點，就隱藏標籤
+            }
             renderer.render(scene, camera);
         }
 
@@ -316,19 +387,26 @@
         if (!sidebarMenu.classList.contains('open')) {
         mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
-
         raycasterForClick.setFromCamera(mouseForClick, camera);
         const intersects = raycasterForClick.intersectObjects(scene.children, true);
 
         if (intersects.length > 0) {
             const clickedObject = intersects[0].object;
-            console.log('您點擊了:', clickedObject);
-            console.log('物件名稱:', clickedObject.name);
-            console.log('物件位置:', clickedObject.position);
+
+            // --- 新增：檢查點擊的物件是否為監控點 ---
+            const foundPoint = monitoringPoints.find(p => p.targetObject && p.targetObject.uuid === clickedObject.uuid);
+
+            if (foundPoint) {
+                activePoint = foundPoint; // 設為作用中的點，讓 animate 迴圈去更新它
+            } else {
+                activePoint = null; // 如果點擊到其他地方，就取消作用中的點
+            }
+        } else {
+            activePoint = null; // 如果點擊到空白處，也取消
         }
         }
         });
-        
+
         // 啟動動畫！
         animate();
 
@@ -411,6 +489,17 @@
             }
         });
 
+        // --- 新增：為狀態標籤新增點擊事件 ---
+        statusTag.addEventListener('click', () => {
+        if (activePoint) {
+        // 切換狀態
+        if (activePoint.status === "關閉") {
+            activePoint.status = "開啟";
+        } else {
+            active.status = "關閉";
+        }
+        }
+        });
 
     </script>
 </body>
