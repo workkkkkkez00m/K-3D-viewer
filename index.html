@@ -138,29 +138,6 @@
             line-height: 1; /* 確保 "×" 垂直置中 */
             cursor: pointer;
         }
-
-         /* 新增的指標鎖定提示畫面樣式 */
-        #blocker {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #instructions {
-            width: 100%;
-            color: #ffffff;
-            text-align: center;
-            font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif;
-        }
-
-        #instructions p {
-            font-size: 24px;
-            margin: 0 0 20px 0;
-        }
     </style>
 </head>
 <body>
@@ -194,19 +171,12 @@
         <button id="side-view-btn">側視圖</button>
     </div>
 
-    <div id="blocker">
-        <div id="instructions">
-            <p>點擊畫面開始</p>
-            <p>W, A, S, D = 移動 | 滑鼠 = 環顧四周 | ESC = 解除鎖定</p>
-        </div>
-    </div>
-    
     <script type="module">
         // 導入 Three.js 函式庫以及必要的模組
         // 我們直接從 CDN (內容分發網路) 獲取，無需下載任何檔案
         import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
         import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
-        import { PointerLockControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/PointerLockControls.js';
+        import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
 
         // 1. 初始化場景、相機和渲染器
         const scene = new THREE.Scene();
@@ -230,7 +200,11 @@
         directionalLight.position.set(5, 10, 7.5);
         scene.add(directionalLight);
 
-        // 3. 載入 GLB 模型
+        // 3. 加入控制器 (讓滑鼠可以平移、縮放、旋轉)
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; // 增加慣性，讓轉動更平滑
+
+        // 4. 載入 GLB 模型
         const loader = new GLTFLoader();
         loader.load(
             // **這是您需要確認的檔案路徑！**
@@ -252,123 +226,48 @@
                 console.error('模型載入失敗:', error);
             }
         );
+        
+     /**
+         * 平滑移動相機到目標位置的函式
+         * @param {THREE.Vector3} targetPosition - 相機的目標位置
+         * @param {number} duration - 動畫持續時間 (毫秒)
+         */
+         function animateCameraPosition(targetPosition, duration = 1000) {
+            const startPosition = camera.position.clone();
+            let startTime = null;
 
- // --- 新增：第一人稱操控 (WASD) ---
+            function loop(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const elapsedTime = currentTime - startTime;
+                const progress = Math.min(elapsedTime / duration, 1); // 進度 (0 到 1)
 
-        // 4. 初始化 PointerLockControls
-        const controls = new PointerLockControls(camera, document.body);
-        const blocker = document.getElementById('blocker');
-        const instructions = document.getElementById('instructions');
-
-        instructions.addEventListener('click', function () {
-            controls.lock(); // 點擊提示畫面時鎖定指標
-        });
-
-        controls.addEventListener('lock', function () {
-            instructions.style.display = 'none';
-            blocker.style.display = 'none';
-        });
-
-        controls.addEventListener('unlock', function () {
-            blocker.style.display = 'block';
-            instructions.style.display = '';
-        });
-
-        scene.add(controls.getObject()); // 將控制器加入場景
-
-        // 5. 設定鍵盤事件監聽
-        let moveForward = false;
-        let moveBackward = false;
-        let moveLeft = false;
-        let moveRight = false;
-
-        const onKeyDown = function (event) {
-            switch (event.code) {
-                case 'ArrowUp':
-                case 'KeyW':
-                    moveForward = true;
-                    break;
-                case 'ArrowLeft':
-                case 'KeyA':
-                    moveLeft = true;
-                    break;
-                case 'ArrowDown':
-                case 'KeyS':
-                    moveBackward = true;
-                    break;
-                case 'ArrowRight':
-                case 'KeyD':
-                    moveRight = true;
-                    break;
+                // 使用線性內插 (lerp) 計算目前位置
+                camera.position.lerpVectors(startPosition, targetPosition, progress);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(loop); // 如果動畫未完成，繼續下一幀
+                }
             }
-        };
+            requestAnimationFrame(loop);
+        }
 
-        const onKeyUp = function (event) {
-            switch (event.code) {
-                case 'ArrowUp':
-                case 'KeyW':
-                    moveForward = false;
-                    break;
-                case 'ArrowLeft':
-                case 'KeyA':
-                    moveLeft = false;
-                    break;
-                case 'ArrowDown':
-                case 'KeyS':
-                    moveBackward = false;
-                    break;
-                case 'ArrowRight':
-                case 'KeyD':
-                    moveRight = false;
-                    break;
-            }
-        };
-
-        document.addEventListener('keydown', onKeyDown);
-        document.addEventListener('keyup', onKeyUp);
-
-        // 6. 動畫迴圈
-        let prevTime = performance.now();
-        const velocity = new THREE.Vector3();
-        const direction = new THREE.Vector3();
-
+        // 5. 建立動畫迴圈，持續渲染畫面
         function animate() {
             requestAnimationFrame(animate);
-
-            const time = performance.now();
-            
-            // 只有在指標鎖定時才進行移動計算
-            if (controls.isLocked === true) {
-                const delta = (time - prevTime) / 1000; // 計算時間差，並轉換為秒
-
-                velocity.x -= velocity.x * 10.0 * delta; // 模擬摩擦力
-                velocity.z -= velocity.z * 10.0 * delta;
-
-                direction.z = Number(moveForward) - Number(moveBackward);
-                direction.x = Number(moveRight) - Number(moveLeft);
-                direction.normalize(); // 確保在所有方向上的速度一致
-
-                if (moveForward || moveBackward) velocity.z -= direction.z * 40.0 * delta;
-                if (moveLeft || moveRight) velocity.x -= direction.x * 40.0 * delta;
-
-                controls.moveRight(-velocity.x * delta);
-                controls.moveForward(-velocity.z * delta);
-            }
-
-            prevTime = time;
-
+            controls.update(); // 控制器更新
             renderer.render(scene, camera);
         }
-        
-        // 啟動動畫
-        animate();
 
-        // 7. 處理視窗大小改變事件 (不變)
+        // 6. 處理瀏覽器視窗大小改變的事件，避免畫面變形
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
+
+        // 啟動動畫！
+        animate();
+
 
         // 獲取 HTML 中的按鈕元素
         const frontViewBtn = document.getElementById('front-view-btn');
