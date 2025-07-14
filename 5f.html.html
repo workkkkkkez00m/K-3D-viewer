@@ -6,63 +6,178 @@
     <title>興隆社會住宅I區智慧中央監控系統</title>
     <style>
         /* --- 基本樣式 --- */
-        body { margin: 0; font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; overflow: hidden; }
+        body { margin: 0; }
         canvas { display: block; }
+         /* UI 介面容器的樣式 */
+         #ui-container {
+            position: absolute; /* 絕對定位，讓它脫離文件流，浮在畫面上方 */
+            top: 70px;          /* 距離頂部 70 像素 */
+            right: 20px;         /* 距離右側 20 像素 */
+            display: flex;      /* 使用 Flexbox 讓按鈕橫向排列 */
+            flex-direction: column; /* 改為縱向排列 */
+            gap: 10px;          /* 按鈕之間的間距 */
+            z-index: 10;        /* 確保 UI 在 canvas 之上 */
+        }
 
-        /* --- UI 元素樣式 (整合) --- */
-        #top-banner {
-            position: absolute; top: 0; left: 0; width: 100%;
-            background-color: rgba(0, 0, 0, 0.7); color: white;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 20px; box-sizing: border-box; z-index: 20;
-        }
-        #project-title { margin: 0; font-size: 22px; font-weight: 500; margin-left: 15px; }
-        #datetime-container { font-size: 18px; }
-        #menu-toggle-btn {
-            background: none; border: none; color: white; font-size: 24px;
-            cursor: pointer; padding: 0 10px;
-        }
-        #sidebar-menu {
-            position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
-            background-color: #2c3e50; padding: 20px; box-sizing: border-box;
-            z-index: 1000; transition: left 0.3s ease-in-out;
-        }
-        #sidebar-menu.open { left: 0; }
-        #sidebar-menu h2 { color: white; margin-top: 50px; border-bottom: 1px solid #465a70; padding-bottom: 10px; }
-        #sidebar-menu ul { list-style: none; padding: 0; margin-top: 20px;}
-        #sidebar-menu li a {
-            display: block; color: #ecf0f1; text-decoration: none;
-            padding: 15px 10px; border-radius: 4px; transition: background-color 0.2s;
-        }
-        #sidebar-menu li a:hover { background-color: #34495e; }
-        #close-menu-btn {
-            position: absolute; top: 15px; right: 15px; background: none; border: none;
-            color: white; font-size: 30px; font-weight: bold; line-height: 1; cursor: pointer;
-        }
-        #ui-container {
-            position: absolute; top: 80px; right: 20px; display: flex;
-            flex-direction: column; gap: 10px; z-index: 10;
-        }
+        /* 按鈕的通用樣式 */
         #ui-container button {
-            padding: 10px 15px; font-size: 16px; color: white;
-            background-color: rgba(59, 57, 57, 0.6); border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 5px; cursor: pointer; transition: background-color 0.3s;
+            padding: 10px 15px;
+            font-size: 16px;
+            font-family: sans-serif;
+            color: white;
+            background-color: rgba(59, 57, 57, 0.6); /* 半透明黑色背景 */
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            cursor: pointer; /* 滑鼠移上去時顯示為手形 */
+            transition: background-color 0.3s; /* 加入過渡效果 */
         }
-        #ui-container button:hover { background-color: rgba(77, 77, 77, 0.736); }
+
+        /* 滑鼠懸停時的樣式 */
+        #ui-container button:hover {
+            background-color: rgba(77, 77, 77, 0.736);
+        }
+         /* 頂部橫幅的樣式 */
+         #top-banner {
+            position: absolute; /* 絕對定位，浮在畫面上方 */
+            top: 0;
+            left: 0;
+            width: 100%;        /* 寬度佔滿整個畫面 */
+            background-color: rgba(0, 0, 0, 0.681); /* 半透明黑色背景 */
+            color: white;       /* 文字顏色為白色 */
+            display: flex;      /* 使用 Flexbox 進行排版 */
+            justify-content: space-between; /* 讓子元素兩端對齊 */
+            align-items: center; /* 垂直置中 */
+            padding: 10px 20px; /* 內邊距 (上下10px, 左右20px) */
+            box-sizing: border-box; /* 讓 padding 不會影響總寬度 */
+            z-index: 20;        /* 確保橫幅在所有元素的最上方 */
+            font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; /* 使用更適合中文的字體 */
+        }
+
+        /* 專案標題的樣式 */
+        #project-title {
+            margin: 0;          /* 移除 h1 預設的外邊距 */
+            font-size: 24px;    /* 調整字體大小 */
+            font-weight: 500;   /* 調整字體粗細 */
+            margin-left: 100px; /* 增加左邊的空白 */
+        }
+
+        /* 日期時間容器的樣式 */
+        #datetime-container {
+            font-size: 18px;    /* 調整字體大小 */
+        }
+
+         /* 新增的選單切換按鈕樣式 */
+         #menu-toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px; /* 調整圖示大小 */
+            cursor: pointer;
+            padding: 0 10px;
+            margin-right: 15px; /* 和標題之間的間距 */
+        }
+
+        /* 側邊欄選單的樣式 (預設隱藏) */
+        #sidebar-menu {
+            position: fixed; /* 固定定位，不隨頁面滾動 */
+            top: 0;
+            left: -300px; /* 預設將其藏在畫面的左邊外面 (-300px) */
+            width: 280px;  /* 側邊欄寬度 */
+            height: 100%;  /* 側邊欄高度佔滿整個畫面 */
+            background-color: #2c3e50; /* 深藍灰色背景 */
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 1000; /* 確保它在最上層 */
+            transition: left 0.3s ease-in-out; /* 針對 left 屬性加入平滑過渡動畫 */
+            font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif;
+        }
+
+        /* 當側邊欄擁有 'open' class 時的樣式 (顯示) */
+        #sidebar-menu.open {
+            left: 0; /* 將其移動到畫面左側邊緣，實現滑入效果 */
+        }
+
+        /* 側邊欄內的標題樣式 */
+        #sidebar-menu h2 {
+            color: white;
+            margin-top: 50px; /* 讓標題離頂部橫幅有一些距離 */
+            border-bottom: 1px solid #465a70;
+            padding-bottom: 10px;
+        }
+
+        /* 側邊欄內的列表樣式 */
+        #sidebar-menu ul {
+            list-style: none; /* 移除項目符號 */
+            padding: 0;
+        }
+
+        #sidebar-menu li a {
+            display: block; /* 讓整個區域都可以點擊 */
+            color: #ecf0f1; /* 淺灰色文字 */
+            text-decoration: none; /* 移除底線 */
+            padding: 15px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        /* 滑鼠懸停在樓層連結上的效果 */
+        #sidebar-menu li a:hover {
+            background-color: #34495e;
+        }
+
+         /* 新增的關閉按鈕樣式 */
+         #close-menu-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            line-height: 1; /* 確保 "×" 垂直置中 */
+            cursor: pointer;
+        }
+
         #controls-helper {
-            position: absolute; bottom: 20px; right: 20px; padding: 8px 15px;
-            background-color: rgba(0, 0, 0, 0.5); color: #cccccc; font-size: 14px;
-            border-radius: 5px; z-index: 10; pointer-events: none;
+            position: absolute; /* 絕對定位 */
+            bottom: 20px;       /* 距離底部 20 像素 */
+            right: 20px;        /* 距離右側 20 像素 */
+            padding: 8px 15px;  /* 內邊距 */
+            background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+            color: #cccccc;     /* 淺灰色文字 */
+            font-size: 14px;    /* 字體大小 */
+            border-radius: 5px; /* 圓角 */
+            z-index: 10;        /* 確保它在 3D 場景之上 */
+            pointer-events: none; /* 讓滑鼠可以穿透此元素，不會擋住對 3D 場景的操作 */
         }
+
+        /* 樓層顯示區塊的樣式 */
         #floor-indicator {
-            position: absolute; bottom: 20px; left: 20px; padding: 8px 15px;
-            background-color: rgba(0, 0, 0, 0.5); color: #cccccc; font-size: 16px;
-            font-weight: bold; border-radius: 5px; z-index: 10; pointer-events: none;
+            position: absolute; /* 絕對定位 */
+            bottom: 20px;       /* 距離底部 20 像素 */
+            left: 20px;         /* 距離左側 20 像素 */
+            padding: 8px 15px;  /* 內邊距 */
+            background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+            color: #cccccc;     /* 淺灰色文字 */
+            font-size: 16px;    /* 字體大小 */
+            font-weight: bold;  /* 字體加粗 */
+            border-radius: 5px; /* 圓角 */
+            z-index: 10;        /* 確保它在 3D 場景之上 */
+            pointer-events: none; /* 讓滑鼠可以穿透此元素 */
         }
+
         .status-label {
-            position: absolute; padding: 8px 12px; background-color: rgba(255, 165, 0, 0.9);
-            color: black; border-radius: 5px; border: 1px solid white; font-size: 14px;
-            font-weight: bold; user-select: none; pointer-events: none;
+            position: absolute; 
+            padding: 8px 12px; 
+            background-color: rgba(255, 165, 0, 0.9);
+            color: black; 
+            border-radius: 5px; 
+            border: 1px solid white; 
+            font-size: 14px;
+            font-weight: bold; 
+            user-select: none; 
+            pointer-events: none;
         }
     </style>
 </head>
