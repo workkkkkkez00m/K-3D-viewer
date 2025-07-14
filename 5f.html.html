@@ -395,15 +395,21 @@
         const intersects = raycasterForClick.intersectObjects(model, true);
 
         if (intersects.length > 0) {
-            const clickedObject = intersects[0].object;
-            console.log('您點擊了:', clickedObject);
-            console.log('物件名稱:', clickedObject.name);
-            console.log('物件位置:', clickedObject.position);
-        }
-
-        if (intersects.length > 0) {
-            const clickedObject = intersects[0].object;
-
+            let clickedTarget = intersects[0].object;
+            let foundPoint = null;
+            
+             // --- ★★★ 新增：向上遍歷父物件來尋找目標 ★★★ ---
+                while (clickedTarget) {
+                    // 檢查當前物件是否為我們的監控目標
+                    foundPoint = monitoringPoints.find(p => p.targetObject && p.targetObject.uuid === clickedTarget.uuid);
+                    
+                    if (foundPoint) {
+                        break; // 如果找到了，就跳出迴圈
+                    }
+                    
+                    // 如果沒找到，就將目標設為其父物件，繼續向上查找
+                    clickedTarget = clickedTarget.parent;
+                }
             // --- 新增：檢查點擊的物件是否為監控點 ---
             const foundPoint = monitoringPoints.find(p => p.targetObject && p.targetObject.uuid === clickedObject.uuid);
 
