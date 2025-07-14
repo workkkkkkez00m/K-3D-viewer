@@ -151,6 +151,21 @@
         z-index: 10;        /* 確保它在 3D 場景之上 */
         pointer-events: none; /* 讓滑鼠可以穿透此元素，不會擋住對 3D 場景的操作 */
         }
+
+        /* 樓層顯示區塊的樣式 */
+        #floor-indicator {
+        position: absolute; /* 絕對定位 */
+        bottom: 20px;       /* 距離底部 20 像素 */
+        left: 20px;         /* 距離左側 20 像素 */
+        padding: 8px 15px;  /* 內邊距 */
+        background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+        color: #cccccc;     /* 淺灰色文字 */
+        font-size: 16px;    /* 字體大小 */
+        font-weight: bold;  /* 字體加粗 */
+        border-radius: 5px; /* 圓角 */
+        z-index: 10;        /* 確保它在 3D 場景之上 */
+        pointer-events: none; /* 讓滑鼠可以穿透此元素 */
+        }
     </style>
 </head>
 <body>
@@ -186,6 +201,10 @@
 
     <div id="controls-helper">
     左鍵: 旋轉 | 右鍵: 平移 | 滾輪: 縮放
+    </div>
+
+    <div id="floor-indicator">
+    當前樓層: 2F
     </div>
 
     <script type="module">
@@ -346,7 +365,7 @@
         // --- 側邊欄選單功能 ---
 
         // 獲取 HTML 中的元素
-         const menuToggleBtn = document.getElementById('menu-toggle-btn');
+        const menuToggleBtn = document.getElementById('menu-toggle-btn');
         const sidebarMenu = document.getElementById('sidebar-menu');
         const closeMenuBtn = document.getElementById('close-menu-btn'); // 新增：獲取關閉按鈕
 
