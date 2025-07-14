@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>興隆社會住宅I區智慧中央監控系統</title>
+    <style>
+        /* 讓畫面佔滿整個瀏覽器視窗 */
+        body { margin: 0; }
+        canvas { display: block; }
+         /* UI 介面容器的樣式 */
+         #ui-container {
+            position: absolute; /* 絕對定位，讓它脫離文件流，浮在畫面上方 */
+            top: 70px;          /* 距離頂部 70 像素 */
+            right: 20px;         /* 距離右側 20 像素 */
+            display: flex;      /* 使用 Flexbox 讓按鈕橫向排列 */
+            flex-direction: column; /* 改為縱向排列 */
+            gap: 10px;          /* 按鈕之間的間距 */
+            z-index: 10;        /* 確保 UI 在 canvas 之上 */
+        }
+
+        /* 按鈕的通用樣式 */
+        #ui-container button {
+            padding: 10px 15px;
+            font-size: 16px;
+            font-family: sans-serif;
+            color: white;
+            background-color: rgba(59, 57, 57, 0.6); /* 半透明黑色背景 */
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            cursor: pointer; /* 滑鼠移上去時顯示為手形 */
+            transition: background-color 0.3s; /* 加入過渡效果 */
+        }
+
+        /* 滑鼠懸停時的樣式 */
+        #ui-container button:hover {
+            background-color: rgba(77, 77, 77, 0.736);
+        }
+         /* 頂部橫幅的樣式 */
+         #top-banner {
+            position: absolute; /* 絕對定位，浮在畫面上方 */
+            top: 0;
+            left: 0;
+            width: 100%;        /* 寬度佔滿整個畫面 */
+            background-color: rgba(0, 0, 0, 0.681); /* 半透明黑色背景 */
+            color: white;       /* 文字顏色為白色 */
+            display: flex;      /* 使用 Flexbox 進行排版 */
+            justify-content: space-between; /* 讓子元素兩端對齊 */
+            align-items: center; /* 垂直置中 */
+            padding: 10px 20px; /* 內邊距 (上下10px, 左右20px) */
+            box-sizing: border-box; /* 讓 padding 不會影響總寬度 */
+            z-index: 20;        /* 確保橫幅在所有元素的最上方 */
+            font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; /* 使用更適合中文的字體 */
+        }
+
+        /* 專案標題的樣式 */
+        #project-title {
+            margin: 0;          /* 移除 h1 預設的外邊距 */
+            font-size: 24px;    /* 調整字體大小 */
+            font-weight: 500;   /* 調整字體粗細 */
+            margin-left: 100px; /* 增加左邊的空白 */
+        }
+
+        /* 日期時間容器的樣式 */
+        #datetime-container {
+            font-size: 18px;    /* 調整字體大小 */
+        }
+
+         /* 新增的選單切換按鈕樣式 */
+         #menu-toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px; /* 調整圖示大小 */
+            cursor: pointer;
+            padding: 0 10px;
+            margin-right: 15px; /* 和標題之間的間距 */
+        }
+
+        /* 側邊欄選單的樣式 (預設隱藏) */
+        #sidebar-menu {
+            position: fixed; /* 固定定位，不隨頁面滾動 */
+            top: 0;
+            left: -300px; /* 預設將其藏在畫面的左邊外面 (-300px) */
+            width: 280px;  /* 側邊欄寬度 */
+            height: 100%;  /* 側邊欄高度佔滿整個畫面 */
+            background-color: #2c3e50; /* 深藍灰色背景 */
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 1000; /* 確保它在最上層 */
+            transition: left 0.3s ease-in-out; /* 針對 left 屬性加入平滑過渡動畫 */
+            font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif;
+        }
+
+        /* 當側邊欄擁有 'open' class 時的樣式 (顯示) */
+        #sidebar-menu.open {
+            left: 0; /* 將其移動到畫面左側邊緣，實現滑入效果 */
+        }
+
+        /* 側邊欄內的標題樣式 */
+        #sidebar-menu h2 {
+            color: white;
+            margin-top: 50px; /* 讓標題離頂部橫幅有一些距離 */
+            border-bottom: 1px solid #465a70;
+            padding-bottom: 10px;
+        }
+
+        /* 側邊欄內的列表樣式 */
+        #sidebar-menu ul {
+            list-style: none; /* 移除項目符號 */
+            padding: 0;
+        }
+
+        #sidebar-menu li a {
+            display: block; /* 讓整個區域都可以點擊 */
+            color: #ecf0f1; /* 淺灰色文字 */
+            text-decoration: none; /* 移除底線 */
+            padding: 15px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        /* 滑鼠懸停在樓層連結上的效果 */
+        #sidebar-menu li a:hover {
+            background-color: #34495e;
+        }
+
+         /* 新增的關閉按鈕樣式 */
+         #close-menu-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            line-height: 1; /* 確保 "×" 垂直置中 */
+            cursor: pointer;
+        }
+
+        #controls-helper {
+        position: absolute; /* 絕對定位 */
+        bottom: 20px;       /* 距離底部 20 像素 */
+        right: 20px;        /* 距離右側 20 像素 */
+        padding: 8px 15px;  /* 內邊距 */
+        background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+        color: #cccccc;     /* 淺灰色文字 */
+        font-size: 14px;    /* 字體大小 */
+        border-radius: 5px; /* 圓角 */
+        z-index: 10;        /* 確保它在 3D 場景之上 */
+        pointer-events: none; /* 讓滑鼠可以穿透此元素，不會擋住對 3D 場景的操作 */
+        }
+    </style>
+</head>
+<body>
+
+    <header id="top-banner">
+        <button id="menu-toggle-btn" title="展開選單">☰</button>  
+
+        <h1 id="project-title">興隆社會住宅I區智慧中央監控系統</h1>
+        <div id="datetime-container"></div>
+    </header>
+
+    <nav id="sidebar-menu">
+        <button id="close-menu-btn">&times;</button>
+
+        <h2>樓層選單</h2>
+        <ul>
+            <li><a href="./1f.html">1F </a></li>
+            <li><a href="./2f.html">2F </a></li>
+            <li><a href="./3f.html">3F </a></li>
+            <li><a href="./4f.html">4F </a></li>
+            <li><a href="./5f.html">5F </a></li>
+            </ul>
+    </nav>
+
+    <div id="ui-container">
+        </div>
+
+    <div id="ui-container">
+        <button id="front-view-btn">正視圖</button>
+        <button id="top-view-btn">俯視圖</button>
+        <button id="side-view-btn">側視圖</button>
+    </div>
+
+    <div id="controls-helper">
+    左鍵: 旋轉 | 右鍵: 平移 | 滾輪: 縮放
+    </div>
+
+    <script type="module">
+        // 導入 Three.js 函式庫以及必要的模組
+        // 我們直接從 CDN (內容分發網路) 獲取，無需下載任何檔案
+        import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
+        import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
+
+        // 1. 初始化場景、相機和渲染器
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0d1117); // 將背景顏色改為深藍色
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 30, 0); // 設定相機的初始位置
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true }); // antialias: true 開啟抗鋸齒
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio); // 為了在高解析度螢幕上顯示得更清晰
+        document.body.appendChild(renderer.domElement);
+
+        // 加入燈光
+        // 環境光，讓模型整體都有亮度，不會有純黑的陰影
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        // 平行光，模擬太陽光，可以產生陰影
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        directionalLight.position.set(5, 10, 7.5);
+        scene.add(directionalLight);
+
+        // 加入控制器 (讓滑鼠可以平移、縮放、旋轉)
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        controls.mouseButtons = {
+	    LEFT: THREE.MOUSE.ROTATE, // 左鍵 = 旋轉
+	    MIDDLE: null,             // 中鍵 = 不指定功能 (滾輪縮放是獨立的事件)
+	    RIGHT: THREE.MOUSE.PAN      // 右鍵 = 平移
+        }
+
+        // 載入 GLB 模型
+        const loader = new GLTFLoader();
+        loader.load(
+            // **這是您需要確認的檔案路徑！**
+            'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/5f_model.glb', 
+            // 模型載入成功後執行的函式
+            function (gltf) {
+                const model = gltf.scene;
+                // 自動調整模型位置與大小，讓它顯示在畫面中央
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                model.position.sub(center); // 將模型中心移到原點
+                scene.add(model);
+                console.log('模型載入成功！');
+            },
+            // 模型載入過程中的進度回報 (可選)
+            undefined, 
+            // 模型載入失敗後執行的函式
+            function (error) {
+                console.error('模型載入失敗:', error);
+            }
+        );
+        
+     /**
+         * 平滑移動相機到目標位置的函式
+         * @param {THREE.Vector3} targetPosition - 相機的目標位置
+         * @param {number} duration - 動畫持續時間 (毫秒)
+         */
+         function animateCameraPosition(targetPosition, duration = 1000) {
+            const startPosition = camera.position.clone();
+            let startTime = null;
+
+            function loop(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const elapsedTime = currentTime - startTime;
+                const progress = Math.min(elapsedTime / duration, 1); // 進度 (0 到 1)
+
+                // 使用線性內插 (lerp) 計算目前位置
+                camera.position.lerpVectors(startPosition, targetPosition, progress);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(loop); // 如果動畫未完成，繼續下一幀
+                }
+            }
+            requestAnimationFrame(loop);
+        }
+
+        // 5. 建立動畫迴圈，持續渲染畫面
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update(); // 控制器更新
+            renderer.render(scene, camera);
+        }
+
+        // 6. 處理瀏覽器視窗大小改變的事件，避免畫面變形
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // 啟動動畫！
+        animate();
+
+        // 獲取 HTML 中的按鈕元素
+        const frontViewBtn = document.getElementById('front-view-btn');
+        const topViewBtn = document.getElementById('top-view-btn');
+        const sideViewBtn = document.getElementById('side-view-btn');
+
+        // 為「正視圖」按鈕新增點擊事件
+        frontViewBtn.addEventListener('click', () => {
+            // 注意：這些座標需要根據您的模型大小和方向進行微調
+            animateCameraPosition(new THREE.Vector3(0, 5, 40)); 
+            controls.target.set(0, 0, 0); // 確保相機始終看向模型中心
+        });
+
+        // 為「俯視圖」按鈕新增點擊事件
+        topViewBtn.addEventListener('click', () => {
+            animateCameraPosition(new THREE.Vector3(0, 25, 0));
+            controls.target.set(0, 0, 0);
+        });
+
+        // 為「側視圖」按鈕新增點擊事件
+        sideViewBtn.addEventListener('click', () => {
+            animateCameraPosition(new THREE.Vector3(20, 5, 0));
+            controls.target.set(0, 0, 0);
+        });
+
+        // --- 日期時間功能 ---
+
+        // 獲取 HTML 中的時間日期容器元素
+        const datetimeContainer = document.getElementById('datetime-container');
+
+        // 更新時間的函式
+        function updateDateTime() {
+            const now = new Date();
+            
+            // 格式化日期：年/月/日 星期
+            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' };
+            const dateString = now.toLocaleDateString('zh-TW', dateOptions);
+
+            // 格式化時間：上午/下午 時:分:秒
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const timeString = now.toLocaleTimeString('zh-TW', timeOptions);
+
+            // 將格式化後的字串組合並顯示在網頁上
+            datetimeContainer.textContent = `${dateString} ${timeString}`;
+        }
+
+        // 立即執行一次，避免頁面剛載入時是空白的
+        updateDateTime();
+
+        // 設定一個計時器，每秒鐘 (1000 毫秒) 呼叫一次 updateDateTime 函式
+        setInterval(updateDateTime, 1000);
+
+        // --- 側邊欄選單功能 ---
+
+        // 獲取 HTML 中的元素
+         const menuToggleBtn = document.getElementById('menu-toggle-btn');
+        const sidebarMenu = document.getElementById('sidebar-menu');
+        const closeMenuBtn = document.getElementById('close-menu-btn'); // 新增：獲取關閉按鈕
+
+        // 為選單切換按鈕新增點擊事件監聽器
+        menuToggleBtn.addEventListener('click', () => {
+            sidebarMenu.classList.toggle('open');
+        });
+
+        // 新增：為「X」關閉按鈕新增點擊事件監聽器
+        closeMenuBtn.addEventListener('click', () => {
+            sidebarMenu.classList.remove('open'); // 明確地移除 'open' class 來關閉選單
+        });
+
+        // 新增：監聽整個文件的點擊事件，以實現點擊外部關閉的功能
+        document.addEventListener('click', (event) => {
+            // 檢查側邊欄是否是打開的，以及點擊的目標是否不在側邊欄內，也不在主選單按鈕上
+            const isClickInsideMenu = sidebarMenu.contains(event.target);
+            const isClickOnToggleButton = menuToggleBtn.contains(event.target);
+
+            if (sidebarMenu.classList.contains('open') && !isClickInsideMenu && !isClickOnToggleButton) {
+                sidebarMenu.classList.remove('open');
+            }
+        });
+
+
+    </script>
+</body>
+</html>
