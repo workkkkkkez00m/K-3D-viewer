@@ -190,7 +190,7 @@
         renderer.setPixelRatio(window.devicePixelRatio); // 為了在高解析度螢幕上顯示得更清晰
         document.body.appendChild(renderer.domElement);
 
-        // 2. 加入燈光
+        // 加入燈光
         // 環境光，讓模型整體都有亮度，不會有純黑的陰影
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambientLight);
@@ -200,11 +200,37 @@
         directionalLight.position.set(5, 10, 7.5);
         scene.add(directionalLight);
 
-        // 3. 加入控制器 (讓滑鼠可以平移、縮放、旋轉)
+        // 加入控制器 (讓滑鼠可以平移、縮放、旋轉)
         const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true; // 增加慣性，讓轉動更平滑
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
 
-        // 4. 載入 GLB 模型
+        // 1. 設定預設的滑鼠按鈕行為
+        controls.mouseButtons = {
+        // LEFT: THREE.MOUSE.ROTATE, // 預設是左鍵旋轉，我們先把它關掉
+        MIDDLE: THREE.MOUSE.PAN, // 中鍵預設為「平移」
+        // RIGHT: THREE.MOUSE.DOLLY, // 預設是右鍵縮放，我們也關掉
+        }
+
+        // 2. 監聽鍵盤的按下事件
+        document.addEventListener('keydown', (event) => {
+        // 如果按下的是 Shift 鍵
+        if (event.key === 'Shift') {
+        // 就將中鍵的功能臨時改為「旋轉」
+        controls.mouseButtons.MIDDLE = THREE.MOUSE.ROTATE;
+        }
+        });
+
+        // 3. 監聽鍵盤的放開事件
+        document.addEventListener('keyup', (event) => {
+        // 如果放開的是 Shift 鍵
+        if (event.key === 'Shift') {
+        // 就將中鍵的功能恢復為預設的「平移」
+        controls.mouseButtons.MIDDLE = THREE.MOUSE.PAN;
+        }
+        });
+
+        // 載入 GLB 模型
         const loader = new GLTFLoader();
         loader.load(
             // **這是您需要確認的檔案路徑！**
@@ -267,31 +293,6 @@
 
         // 啟動動畫！
         animate();
-
-        // --- 新增：滾輪縮放至指標位置功能 ---
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        // 監聽 canvas 上的滾輪事件
-        renderer.domElement.addEventListener('wheel', (event) => {
-        // 計算滑鼠在標準化設備座標中的位置 (-1 to +1 for both axes)
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-
-        // 透過攝影機和滑鼠位置更新射線
-        raycaster.setFromCamera(mouse, camera);
-
-        // 計算射線與場景中可見物件的交點
-        // true 參數代表遞歸檢查所有子物件
-        const intersects = raycaster.intersectObjects(scene.children, true);
-
-        if (intersects.length > 0) {
-        // 如果有交點，將 OrbitControls 的目標（環繞中心）設為第一個交點的位置
-        // 這樣接下來的縮放就會朝著這個新目標點進行
-        controls.target.copy(intersects[0].point);
-        }
-    });
-
 
         // 獲取 HTML 中的按鈕元素
         const frontViewBtn = document.getElementById('front-view-btn');
