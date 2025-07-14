@@ -262,6 +262,8 @@
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 30, 0); // 設定相機的初始位置
 
+        let model;
+
         const renderer = new THREE.WebGLRenderer({ antialias: true }); // antialias: true 開啟抗鋸齒
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio); // 為了在高解析度螢幕上顯示得更清晰
@@ -295,6 +297,7 @@
             'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/5f_model.glb', 
             // 模型載入成功後執行的函式
             function (gltf) {
+                model = gltf.scene; 
                 // --- 新增：遍歷模型以尋找監控物件 ---
                 model.traverse((object) => {
                 // 檢查場景中的物件名稱是否符合我們監控列表中的名稱
@@ -302,8 +305,8 @@
                 if (object.name === point.name) {
                     point.targetObject = object; // 找到了！將 3D 物件存起來
                     console.log(`成功找到監控物件: ${point.name}`);
-                }
-                }
+                        }
+                    }
                 });
                 // 自動調整模型位置與大小，讓它顯示在畫面中央
                 const box = new THREE.Box3().setFromObject(model);
@@ -387,8 +390,9 @@
         if (!sidebarMenu.classList.contains('open')) {
         mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
+        if (model) {
         raycasterForClick.setFromCamera(mouseForClick, camera);
-        const intersects = raycasterForClick.intersectObjects(scene.children, true);
+        const intersects = raycasterForClick.intersectObjects(model, true);
 
         if (intersects.length > 0) {
             const clickedObject = intersects[0].object;
@@ -403,6 +407,7 @@
             }
         } else {
             activePoint = null; // 如果點擊到空白處，也取消
+        }    
         }
         }
         });
