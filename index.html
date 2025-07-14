@@ -138,6 +138,19 @@
             line-height: 1; /* 確保 "×" 垂直置中 */
             cursor: pointer;
         }
+
+        #controls-helper {
+        position: absolute; /* 絕對定位 */
+        bottom: 20px;       /* 距離底部 20 像素 */
+        right: 20px;        /* 距離右側 20 像素 */
+        padding: 8px 15px;  /* 內邊距 */
+        background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+        color: #cccccc;     /* 淺灰色文字 */
+        font-size: 14px;    /* 字體大小 */
+        border-radius: 5px; /* 圓角 */
+        z-index: 10;        /* 確保它在 3D 場景之上 */
+        pointer-events: none; /* 讓滑鼠可以穿透此元素，不會擋住對 3D 場景的操作 */
+        }
     </style>
 </head>
 <body>
@@ -169,6 +182,10 @@
         <button id="front-view-btn">正視圖</button>
         <button id="top-view-btn">俯視圖</button>
         <button id="side-view-btn">側視圖</button>
+    </div>
+
+    <div id="controls-helper">
+    左鍵: 旋轉 | 右鍵: 平移 | 滾輪: 縮放
     </div>
 
     <script type="module">
@@ -204,6 +221,12 @@
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
+
+        controls.mouseButtons = {
+	    LEFT: THREE.MOUSE.ROTATE, // 左鍵 = 旋轉
+	    MIDDLE: null,             // 中鍵 = 不指定功能 (滾輪縮放是獨立的事件)
+	    RIGHT: THREE.MOUSE.PAN      // 右鍵 = 平移
+        }
 
         // 載入 GLB 模型
         const loader = new GLTFLoader();
