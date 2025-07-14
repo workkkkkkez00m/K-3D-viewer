@@ -323,8 +323,6 @@
                 // 距離越遠、標籤越小，所以將進度反轉 (1到0)
                 // 根據反轉的進度，在 [minScale, maxScale] 範圍內計算出最終的縮放值
                 const scale = maxScale - (maxScale - minScale) * distanceProgress;
-                
-                console.log(`距離: ${distance.toFixed(2)}, 縮放值: ${scale.toFixed(2)}`);
 
                 // 2. 將 3D 座標轉換為 2D 螢幕座標 (不變)
                 position.project(camera);
