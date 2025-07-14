@@ -396,6 +396,13 @@
 
         if (intersects.length > 0) {
             const clickedObject = intersects[0].object;
+            console.log('您點擊了:', clickedObject);
+            console.log('物件名稱:', clickedObject.name);
+            console.log('物件位置:', clickedObject.position);
+        }
+
+        if (intersects.length > 0) {
+            const clickedObject = intersects[0].object;
 
             // --- 新增：檢查點擊的物件是否為監控點 ---
             const foundPoint = monitoringPoints.find(p => p.targetObject && p.targetObject.uuid === clickedObject.uuid);
