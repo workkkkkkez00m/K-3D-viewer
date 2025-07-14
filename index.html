@@ -268,6 +268,30 @@
         // 啟動動畫！
         animate();
 
+        // --- 新增：滾輪縮放至指標位置功能 ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        // 監聽 canvas 上的滾輪事件
+        renderer.domElement.addEventListener('wheel', (event) => {
+        // 計算滑鼠在標準化設備座標中的位置 (-1 to +1 for both axes)
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+        // 透過攝影機和滑鼠位置更新射線
+        raycaster.setFromCamera(mouse, camera);
+
+        // 計算射線與場景中可見物件的交點
+        // true 參數代表遞歸檢查所有子物件
+        const intersects = raycaster.intersectObjects(scene.children, true);
+
+        if (intersects.length > 0) {
+        // 如果有交點，將 OrbitControls 的目標（環繞中心）設為第一個交點的位置
+        // 這樣接下來的縮放就會朝著這個新目標點進行
+        controls.target.copy(intersects[0].point);
+        }
+    });
+
 
         // 獲取 HTML 中的按鈕元素
         const frontViewBtn = document.getElementById('front-view-btn');
