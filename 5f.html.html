@@ -222,6 +222,10 @@
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         const controls = new OrbitControls(camera, renderer.domElement);
+        const minDistance = 10;   // 標籤停止變大的最近距離
+        const maxDistance = 100;  // 標籤停止變小的最遠距離
+        const minScale = 0.5;     // 標籤的最小尺寸
+        const maxScale = 1.5;     // 標籤的最大尺寸
         let model; // 將 model 宣告在頂層
 
         const monitoringPoints = [{
@@ -299,19 +303,36 @@
 
         // --- 動畫迴圈 ---
         function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
+        requestAnimationFrame(animate);
+        controls.update();
 
-            // 更新所有監控點標籤的位置
-            for (const point of monitoringPoints) {
-                if (point.targetObject && point.element) {
-                    const position = new THREE.Vector3();
-                    new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
-                    position.project(camera);
-                    const x = (position.x * 0.5 + 0.5) * window.innerWidth;
-                    const y = (position.y * -0.5 + 0.5) * window.innerHeight;
-                    point.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
-                    point.element.innerHTML = `${point.text}: <span style="color:red;">${point.status}</span>`;
+         // 更新所有監控點標籤的位置和大小
+         for (const point of monitoringPoints) {
+            if (point.targetObject && point.element) {
+
+                // 1. 計算物件中心點在 3D 世界中的位置 (不變)
+                const position = new THREE.Vector3();
+                new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
+
+                // --- ★★★ 新增：計算距離並決定縮放比例 ★★★ ---
+                const distance = camera.position.distanceTo(position);
+
+                // 計算當前距離在 [minDistance, maxDistance] 這個範圍內的進度 (0到1)
+                const distanceProgress = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
+
+                // 距離越遠、標籤越小，所以將進度反轉 (1到0)
+                // 根據反轉的進度，在 [minScale, maxScale] 範圍內計算出最終的縮放值
+                const scale = maxScale - (maxScale - minScale) * distanceProgress;
+                // --- ★★★ 修改結束 ★★★ ---
+
+                // 2. 將 3D 座標轉換為 2D 螢幕座標 (不變)
+                position.project(camera);
+                const x = (position.x * 0.5 + 0.5) * window.innerWidth;
+                const y = (position.y * -0.5 + 0.5) * window.innerHeight;
+
+                // 3. 更新標籤的位置、內容，並加入 scale 屬性
+                point.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scale})`;
+                point.element.innerHTML = `${point.text}: <span style="color:red;">${point.status}</span>`;
                 }
             }
             renderer.render(scene, camera);
