@@ -120,7 +120,7 @@
         // --- 模型載入 ---
         const loader = new GLTFLoader();
         loader.load(
-            './models/building_main.glb', // 載入我們新的整棟建築模型
+            'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/building_main.glb',
             (gltf) => {
                 model = gltf.scene;
                 const box = new THREE.Box3().setFromObject(model);
