@@ -1,10 +1,157 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
-    <title>重新導向中...</title>
-    <meta http-equiv="refresh" content="0; url=./theft_prevention/1f.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>興隆社會住宅I區 - 系統總覽</title>
+    <style>
+        /* --- 基礎樣式 --- */
+        body {
+            margin: 0;
+            font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif;
+            overflow: hidden;
+            background-color: #0d1117; /* 背景設為深灰藍色 */
+            color: white;
+            display: flex; /* ★★★ 使用 Flexbox 來創建左右佈局 ★★★ */
+            height: 100vh;
+        }
+
+        /* --- 左側 3D 場景容器 --- */
+        #scene-container {
+            flex: 2; /* 佔據 2/3 的寬度 */
+            position: relative;
+            height: 100%;
+        }
+
+        /* --- 右側 UI 面板 --- */
+        #ui-panel {
+            flex: 1; /* 佔據 1/3 的寬度 */
+            background-color: #161b22; /* 稍微亮一點的深灰色 */
+            padding: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        #ui-panel h1 {
+            font-size: 28px;
+            border-bottom: 2px solid #30363d;
+            padding-bottom: 15px;
+            margin-top: 0;
+        }
+
+        #ui-panel p {
+            font-size: 16px;
+            color: #8b949e;
+            line-height: 1.6;
+        }
+
+        /* --- 系統按鈕容器 --- */
+        #system-buttons {
+            margin-top: 30px;
+            display: grid; /* 使用 Grid 佈局讓按鈕整齊排列 */
+            grid-template-columns: 1fr; /* 單欄 */
+            gap: 15px; /* 按鈕間距 */
+        }
+
+        .system-btn {
+            display: block;
+            padding: 15px 20px;
+            background-color: #21262d;
+            color: #c9d1d9;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .system-btn:hover {
+            background-color: #30363d;
+            border-color: #8b949e;
+            transform: translateY(-2px); /* 滑鼠懸停時輕微上浮 */
+        }
+    </style>
 </head>
 <body>
-    <p>如果您的瀏覽器沒有自動跳轉，請 <a href="./1f.html">點擊這裡</a>。</p>
+
+    <div id="scene-container"></div>
+
+    <div id="ui-panel">
+        <h1>智慧中央監控系統</h1>
+        <p>請選擇您要檢視的子系統，以進入對應樓層的 3D 監控畫面。</p>
+        <div id="system-buttons">
+            <a class="system-btn" href="./theft_prevention/1f.html">防盜及求救系統</a>
+            <a class="system-btn" href="./cctv/1f.html">攝影監視系統</a>
+            <a class="system-btn" href="./access_control/1f.html">門禁保全系統</a>
+            <a class="system-btn" href="./video_intercom/1f.html">影像對講系統</a>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- 導入函式庫 ---
+        import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
+        import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
+
+        // --- 基礎設定 ---
+        const sceneContainer = document.getElementById('scene-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0d1117);
+        
+        const camera = new THREE.PerspectiveCamera(50, sceneContainer.clientWidth / sceneContainer.clientHeight, 0.1, 1000);
+        camera.position.set(50, 40, 50); // ★ 請調整此位置以獲得最佳視角
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        sceneContainer.appendChild(renderer.domElement);
+
+        let model;
+
+        // --- 燈光 ---
+        scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        directionalLight.position.set(20, 50, 30);
+        scene.add(directionalLight);
+
+        // --- 模型載入 ---
+        const loader = new GLTFLoader();
+        loader.load(
+            './models/building_main.glb', // 載入我們新的整棟建築模型
+            (gltf) => {
+                model = gltf.scene;
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                model.position.sub(center); // 將模型置中
+                scene.add(model);
+            },
+            undefined,
+            (error) => console.error('模型載入失敗:', error)
+        );
+
+        // --- 動畫迴圈 (無操控，但有緩慢自轉) ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // ★ 可選：讓模型緩慢自轉，看起來更生動
+            if (model) {
+                model.rotation.y += 0.0005; // 調整這個值可以改變旋轉速度
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // --- 視窗大小改變事件 ---
+        window.addEventListener('resize', () => {
+            camera.aspect = sceneContainer.clientWidth / sceneContainer.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
+        });
+
+    </script>
 </body>
 </html>
