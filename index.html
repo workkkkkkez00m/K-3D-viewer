@@ -94,6 +94,8 @@
         // --- 導入函式庫 ---
         import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
         import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
+        import { DRACOLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/DRACOLoader.js';    
 
         // --- 基礎設定 ---
         const sceneContainer = document.getElementById('scene-container');
@@ -119,6 +121,9 @@
 
         // --- 模型載入 ---
         const loader = new GLTFLoader();
+        const dracoLoader = new DRACOLoader();
+        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+        loader.setDRACOLoader(dracoLoader);
         loader.load(
             'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/building_main.glb',
             (gltf) => {
