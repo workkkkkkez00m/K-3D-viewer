@@ -300,13 +300,68 @@
             element: null
         },
         {
-            name: "ADW4006", 
+            name: "ADW4007", 
             text: "門位狀態", 
             status: "關閉",
             targetObject: null, 
             element: null
         },
-
+        {
+            name: "ADW3011", 
+            text: "門位狀態", 
+            status: "關閉",
+            targetObject: null, 
+            element: null
+        },
+        {
+            name: "ADW3016", 
+            text: "門位狀態", 
+            status: "關閉",
+            targetObject: null, 
+            element: null
+        },
+        {
+            name: "ADW3012", 
+            text: "門位狀態", 
+            status: "關閉",
+            targetObject: null, 
+            element: null
+        },
+        {
+            name: "ADW3013", 
+            text: "門位狀態", 
+            status: "關閉",
+            targetObject: null, 
+            element: null
+        },
+        {
+            name: "ADW4008", 
+            text: "門位狀態", 
+            status: "關閉",
+            targetObject: null, 
+            element: null
+        },
+        {
+            name: "ADW3018", 
+            text: "門位狀態", 
+            status: "關閉",
+            targetObject: null, 
+            element: null
+        },
+        {
+            name: "ADW3014", 
+            text: "門位狀態", 
+            status: "關閉",
+            targetObject: null, 
+            element: null
+        },
+        {
+            name: "ADW4005", 
+            text: "門位狀態", 
+            status: "關閉",
+            targetObject: null, 
+            element: null
+        }
 
         ];
         
@@ -358,11 +413,7 @@
                     model.traverse((object) => {
                         const point = monitoringPoints.find(p => p.name === object.name);
                         if (point) {
-                            point.targetObject = object;
-                            const label = document.createElement('div');
-                            label.className = 'status-label';
-                            labelsContainer.appendChild(label);
-                            point.element = label;
+                            point.targetObject = object; // 找到了，存起來
                             console.log(`成功找到監控物件: ${point.name}`);
                         }
                     });
@@ -408,6 +459,16 @@
          // 更新所有監控點標籤的位置和大小
          for (const point of monitoringPoints) {
             if (point.targetObject && point.element) {
+
+                if (point.targetObject) {
+
+                // 如果標籤還沒被建立，就現在建立它 ★★★
+                    if (!point.element) {
+                        const label = document.createElement('div');
+                        label.className = 'status-label';
+                        labelsContainer.appendChild(label);
+                        point.element = label; // 建立後，存回我們的資料中
+                    }
 
                 // 1. 計算物件中心點在 3D 世界中的位置 (不變)
                 const position = new THREE.Vector3();
