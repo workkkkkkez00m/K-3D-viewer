@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>興隆社會住宅I區智慧中央監控系統 - 5F</title>
+    <title>興隆社會住宅I區智慧中央監控系統 - 2F</title>
     <style>
         /* --- 基本樣式 --- */
         body { margin: 0; font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; overflow: hidden; }
@@ -38,6 +38,30 @@
         #close-menu-btn {
             position: absolute; top: 15px; right: 15px; background: none; border: none;
             color: white; font-size: 30px; font-weight: bold; line-height: 1; cursor: pointer;
+        }
+        /* 系統分類的樣式 */
+        #sidebar-menu .system-category > a {
+            font-weight: bold;
+            background-color: #1abc9c; /* 給系統分類一個不同的底色 */
+            color: white;
+        }
+        /* 在分類後方加上一個箭頭圖示 */
+        #sidebar-menu .system-category > a::after {
+            content: '▼';
+            float: right;
+            transition: transform 0.3s;
+        }
+        /* 當分類被展開時，讓箭頭朝上 */
+        #sidebar-menu .system-category.active > a::after {
+            transform: rotate(180deg);
+        }
+        /* 樓層子選單的樣式 (預設隱藏) */
+        .floor-submenu {
+            list-style: none;
+            padding-left: 20px; /* 增加內縮 */
+            max-height: 0; /* 預設高度為 0 */
+            overflow: hidden; /* 隱藏超出的內容 */
+            transition: max-height 0.4s ease-in-out; /* 平滑的展開/收合動畫 */
         }
         #ui-container {
             position: absolute; top: 80px; right: 20px; display: flex;
@@ -95,12 +119,33 @@
         <button id="close-menu-btn">&times;</button>
         <h2>樓層選單</h2>
         <ul>
-            <li><a href="./1f.html">1F</a></li>
-            <li><a href="./2f.html">2F</a></li>
-            <li><a href="./3f.html">3F</a></li>
-            <li><a href="./4f.html">4F</a></li>
-            <li><a href="./5f.html">5F</a></li>
-        </ul>
+            <li class="system-category">
+                <a href="#">防盜及求救系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../theft_prevention/1f.html">1F</a></li>
+                    <li><a href="../theft_prevention/2f.html">2F</a></li>
+                    <li><a href="../theft_prevention/3f.html">3F</a></li>
+                    <li><a href="../theft_prevention/4f.html">4F</a></li>
+                    <li><a href="../theft_prevention/5f.html">5F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">攝影監視系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../cctv/1f.html">1F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">門禁保全系統</a>
+                <ul class="floor-submenu">
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">影像對講系統</a>
+                <ul class="floor-submenu">
+            </ul>
+    </li>
+</ul>
     </nav>
     <div id="ui-container">
         <button id="front-view-btn">正視圖</button>
@@ -108,7 +153,7 @@
         <button id="side-view-btn">側視圖</button>
     </div>
     <div id="controls-helper">左鍵: 旋轉 | 右鍵: 平移 | 滾輪: 縮放</div>
-    <div id="floor-indicator">當前樓層: 5F</div>
+    <div id="floor-indicator">當前樓層: 防盜及求救系統 - 2F</div>
     <div id="labels-container"></div>
 
     <script type="module">
@@ -124,7 +169,7 @@
         const controls = new OrbitControls(camera, renderer.domElement);
         let model;
         
-        const monitoringPoints = [
+        /*const monitoringPoints = [
             { name: "AW2037_1", text: "窗戶", status: "關閉", targetObject: null, element: null },
             { name: "ADW2001", text: "門位", status: "關閉", targetObject: null, element: null },
             { name: "ADW3021", text: "門位", status: "關閉", targetObject: null, element: null },
@@ -144,7 +189,7 @@
             { name: "ADW3018", text: "門位", status: "關閉", targetObject: null, element: null },
             { name: "ADW3014", text: "門位", status: "關閉", targetObject: null, element: null },
             { name: "ADW4005", text: "門位", status: "關閉", targetObject: null, element: null },
-        ];
+        ];*/
         
         const labelsContainer = document.getElementById('labels-container');
         const datetimeContainer = document.getElementById('datetime-container');
@@ -177,7 +222,7 @@
             
             const loader = new GLTFLoader();
             loader.load(
-                'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/5f_model.glb',
+                'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/theft_prevention/2f_model.glb',
                 (gltf) => {
                     model = gltf.scene;
                     const box = new THREE.Box3().setFromObject(model);
@@ -288,6 +333,31 @@
             topViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(0, 25, 0)));
             sideViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(20, 5, 0)));
         }
+        const systemCategories = document.querySelectorAll('.system-category');
+
+        systemCategories.forEach(category => {
+            const categoryLink = category.querySelector('a'); // 獲取<a>標籤
+            const submenu = category.querySelector('.floor-submenu'); // 獲取子選單<ul>
+
+            // 只為包含子選單的分類新增點擊事件
+            if (submenu) {
+                categoryLink.addEventListener('click', (event) => {
+                    event.preventDefault(); // 阻止<a>標籤的預設跳轉行為
+                
+                    category.classList.toggle('active'); // 切換 active class，讓 CSS 可以旋轉箭頭
+
+                    // 判斷子選單目前是展開還是收合
+                    if (submenu.style.maxHeight) {
+                    // 如果已有 max-height 值，代表是展開的，要收合
+                    submenu.style.maxHeight = null;
+                    } else {
+                    // 如果沒有，代表是收合的，要展開
+                    // scrollHeight 是這個元素內容的完整高度
+                    submenu.style.maxHeight = submenu.scrollHeight + "px";
+                    }
+                });
+            }
+        });
 
         function animateCameraPosition(targetPosition, duration = 1000) {
             const startPosition = camera.position.clone();
