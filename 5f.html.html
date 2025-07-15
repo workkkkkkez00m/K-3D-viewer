@@ -62,7 +62,7 @@
         .status-label {
             position: absolute;
             padding: 8px 12px;
-            color: white; /* 將文字顏色改為白色，在兩種背景上都清晰 */
+            color: rgb(0, 0, 0);
             border-radius: 5px;
             border: 1px solid rgba(255, 255, 255, 0.7);
             font-size: 14px;
@@ -130,9 +130,9 @@
             { name: "ADW2001", text: "門位", status: "關閉", targetObject: null, element: null },
             { name: "ADW3021", text: "門位", status: "關閉", targetObject: null, element: null },
             { name: "ADW3020", text: "門位", status: "關閉", targetObject: null, element: null },
-            { name: "ADW3019", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3019", text: "門位", status: "開啟", targetObject: null, element: null },
             { name: "ADW1001", text: "門位", status: "關閉", targetObject: null, element: null },
-            { name: "ADW4009", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW4009", text: "門位", status: "開啟", targetObject: null, element: null },
             { name: "ADW3015", text: "門位", status: "關閉", targetObject: null, element: null },
             { name: "ADW3017", text: "門位", status: "關閉", targetObject: null, element: null },
             { name: "ADW4006", text: "門位", status: "關閉", targetObject: null, element: null },
@@ -156,7 +156,7 @@
         const topViewBtn = document.getElementById('top-view-btn');
         const sideViewBtn = document.getElementById('side-view-btn');
 
-        const minDistance = 10, maxDistance = 50, minScale = 0.3, maxScale = 0.9;
+        const minDistance = 10, maxDistance = 50, minScale = 0.3, maxScale = 1.0;
 
         // --- 初始化函式 ---
         function init() {
