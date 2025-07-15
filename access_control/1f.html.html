@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>興隆社會住宅I區智慧中央監控系統 - 1F</title>
+    <style>
+        /* --- 基本樣式 --- */
+        body { margin: 0; font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; overflow: hidden; }
+        canvas { display: block; }
+
+        /* --- UI 元素樣式 --- */
+        #top-banner {
+            position: absolute; top: 0; left: 0; width: 100%;
+            background-color: rgba(0, 0, 0, 0.7); color: white;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px; box-sizing: border-box; z-index: 20;
+        }
+        #project-title { margin: 0; font-size: 22px; font-weight: 500; margin-left: 15px; }
+        #datetime-container { font-size: 18px; }
+        #menu-toggle-btn {
+            background: none; border: none; color: white; font-size: 24px;
+            cursor: pointer; padding: 0 10px;
+        }
+        #sidebar-menu {
+            position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
+            background-color: #2c3e50; padding: 20px; box-sizing: border-box;
+            z-index: 1000; transition: left 0.3s ease-in-out;
+        }
+        #sidebar-menu.open { left: 0; }
+        #sidebar-menu h2 { color: white; margin-top: 50px; border-bottom: 1px solid #465a70; padding-bottom: 10px; }
+        #sidebar-menu ul { list-style: none; padding: 0; margin-top: 20px;}
+        #sidebar-menu li a {
+            display: block; color: #ecf0f1; text-decoration: none;
+            padding: 15px 10px; border-radius: 4px; transition: background-color 0.2s;
+        }
+        #sidebar-menu li a:hover { background-color: #34495e; }
+        #close-menu-btn {
+            position: absolute; top: 15px; right: 15px; background: none; border: none;
+            color: white; font-size: 30px; font-weight: bold; line-height: 1; cursor: pointer;
+        }
+        /* 系統分類的樣式 */
+        #sidebar-menu .system-category > a {
+            font-weight: bold;
+            background-color: #1abc9c; /* 給系統分類一個不同的底色 */
+            color: white;
+        }
+        /* 在分類後方加上一個箭頭圖示 */
+        #sidebar-menu .system-category > a::after {
+            content: '▼';
+            float: right;
+            transition: transform 0.3s;
+        }
+        /* 當分類被展開時，讓箭頭朝上 */
+        #sidebar-menu .system-category.active > a::after {
+            transform: rotate(180deg);
+        }
+        /* 樓層子選單的樣式 (預設隱藏) */
+        .floor-submenu {
+            list-style: none;
+            padding-left: 20px; /* 增加內縮 */
+            max-height: 0; /* 預設高度為 0 */
+            overflow: hidden; /* 隱藏超出的內容 */
+            transition: max-height 0.4s ease-in-out; /* 平滑的展開/收合動畫 */
+        }
+        #ui-container {
+            position: absolute; top: 80px; right: 20px; display: flex;
+            flex-direction: column; gap: 10px; z-index: 10;
+        }
+        #ui-container button {
+            padding: 10px 15px; font-size: 16px; color: white;
+            background-color: rgba(59, 57, 57, 0.6); border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px; cursor: pointer; transition: background-color 0.3s;
+        }
+        #ui-container button:hover { background-color: rgba(77, 77, 77, 0.736); }
+        #controls-helper {
+            position: absolute; bottom: 20px; right: 20px; padding: 8px 15px;
+            background-color: rgba(0, 0, 0, 0.5); color: #cccccc; font-size: 14px;
+            border-radius: 5px; z-index: 10; pointer-events: none;
+        }
+        #floor-indicator {
+            position: absolute; bottom: 20px; left: 20px; padding: 8px 15px;
+            background-color: rgba(0, 0, 0, 0.5); color: #cccccc; font-size: 16px;
+            font-weight: bold; border-radius: 5px; z-index: 10; pointer-events: none;
+        }
+        .status-label {
+            position: absolute;
+            padding: 8px 12px;
+            color: rgb(0, 0, 0);
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            font-weight: bold;
+            user-select: none;
+            pointer-events: none; /* 禁止鼠標事件，避免干擾模型交互 */
+            transition: background-color 0.3s, transform 0.1s; /* 加入背景顏色過渡效果 */
+        }
+
+        /* 2. 關閉狀態的樣式 */
+        .status-closed {
+            background-color: rgba(243, 156, 18, 0.9);
+            text-shadow: 1px 1px 1px black;             
+        }
+
+        /* 3. 開啟狀態的樣式 */
+        .status-open {
+            background-color: rgba(46, 204, 113, 0.9); /* 淺綠色 */            
+        }
+    </style>
+</head>
+<body>
+
+    <header id="top-banner">
+        <button id="menu-toggle-btn" title="展開選單">☰</button>
+        <h1 id="project-title">興隆社會住宅I區智慧中央監控系統</h1>
+        <div id="datetime-container"></div>
+    </header>
+    <nav id="sidebar-menu">
+        <button id="close-menu-btn">&times;</button>
+        <h2>樓層選單</h2>
+        <ul>
+            <li class="system-category">
+                <a href="#">防盜及求救系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../theft_prevention/1f.html">1F</a></li>
+                    <li><a href="../theft_prevention/2f.html">2F</a></li>
+                    <li><a href="../theft_prevention/3f.html">3F</a></li>
+                    <li><a href="../theft_prevention/4f.html">4F</a></li>
+                    <li><a href="../theft_prevention/5f.html">5F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">攝影監視系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../cctv/1f.html">1F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">門禁保全系統</a>
+                <ul class="floor-submenu">
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">影像對講系統</a>
+                <ul class="floor-submenu">
+            </ul>
+    </li>
+</ul>
+    </nav>
+    <div id="ui-container">
+        <button id="front-view-btn">正視圖</button>
+        <button id="top-view-btn">俯視圖</button>
+        <button id="side-view-btn">側視圖</button>
+    </div>
+    <div id="controls-helper">左鍵: 旋轉 | 右鍵: 平移 | 滾輪: 縮放</div>
+    <div id="floor-indicator">當前樓層: 門禁保全系統 - 1F</div>
+    <div id="labels-container"></div>
+
+    <script type="module">
+        // --- 導入函式庫 ---
+        import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
+        import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
+
+        // --- 變數宣告區 ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const controls = new OrbitControls(camera, renderer.domElement);
+        let model;
+        
+        /*const monitoringPoints = [
+            { name: "AW2037_1", text: "窗戶", status: "關閉", targetObject: null, element: null },
+            { name: "ADW2001", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3021", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3020", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3019", text: "門位", status: "開啟", targetObject: null, element: null },
+            { name: "ADW1001", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW4009", text: "門位", status: "開啟", targetObject: null, element: null },
+            { name: "ADW3015", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3017", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW4006", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW4007", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3011", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3016", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3012", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3013", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW4008", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3018", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3014", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW4005", text: "門位", status: "關閉", targetObject: null, element: null },
+        ];*/
+        
+        const labelsContainer = document.getElementById('labels-container');
+        const datetimeContainer = document.getElementById('datetime-container');
+        const menuToggleBtn = document.getElementById('menu-toggle-btn');
+        const sidebarMenu = document.getElementById('sidebar-menu');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const frontViewBtn = document.getElementById('front-view-btn');
+        const topViewBtn = document.getElementById('top-view-btn');
+        const sideViewBtn = document.getElementById('side-view-btn');
+
+        const minDistance = 10, maxDistance = 50, minScale = 0.3, maxScale = 1.0;
+
+        // --- 初始化函式 ---
+        function init() {
+            scene.background = new THREE.Color(0x0d1117);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+
+            camera.position.set(0, 10, 25);
+            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            directionalLight.position.set(5, 10, 7.5);
+            scene.add(directionalLight);
+            
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: null, RIGHT: THREE.MOUSE.PAN };
+            
+            const loader = new GLTFLoader();
+            /*loader.load(
+                'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/theft_prevention/1f_model.glb',
+                (gltf) => {
+                    model = gltf.scene;
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    model.position.sub(center);
+                    scene.add(model);
+                    console.log('模型載入成功！');
+
+                    model.traverse((object) => {
+                        const point = monitoringPoints.find(p => p.name === object.name);
+                        if (point) {
+                            point.targetObject = object;
+                            console.log(`成功找到監控物件: ${point.name}`);
+                        }
+                    });
+                },
+                undefined,
+                (error) => console.error('模型載入失敗:', error)
+            );*/
+
+            // --- 點擊模型以查詢物件名稱 ---
+            //const raycasterForClick = new THREE.Raycaster();
+            //const mouseForClick = new THREE.Vector2();
+
+            //window.addEventListener('click', (event) => {
+            // 只在側邊欄關閉時才觸發點擊查詢
+                //if (!sidebarMenu.classList.contains('open')) {
+                    //mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
+                    //mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+                    //raycasterForClick.setFromCamera(mouseForClick, camera);
+                    //const intersects = raycasterForClick.intersectObjects(scene.children, true);
+
+                //if (intersects.length > 0) {
+                    //const clickedObject = intersects[0].object;
+                //console.log('您點擊了:', clickedObject);
+                //console.log('物件名稱:', clickedObject.name);
+                //console.log('物件位置:', clickedObject.position);
+                    //}
+                //}
+            //});
+
+            animate();
+            setupEventListeners();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+        }
+
+        // --- 動畫迴圈 ---
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            for (const point of monitoringPoints) {
+                if (point.targetObject) {
+                    if (!point.element) {
+                        const label = document.createElement('div');
+                        label.className = 'status-label';
+                        labelsContainer.appendChild(label);
+                        point.element = label;
+                    }
+                    
+                    const position = new THREE.Vector3();
+                    new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
+                    
+                    const distance = camera.position.distanceTo(position);
+                    const distanceProgress = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
+                    const scale = maxScale - (maxScale - minScale) * distanceProgress;
+
+                    position.project(camera);
+                    const x = (position.x * 0.5 + 0.5) * window.innerWidth;
+                    const y = (position.y * -0.5 + 0.5) * window.innerHeight;
+                    
+                    point.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scale})`;
+                    point.element.innerHTML = `${point.text}: <span style="color:red;">${point.status}</span>`;
+                    
+                    // --- ★★★ 新增：根據狀態切換 CSS Class ★★★ ---
+                    if (point.status === '開啟') {
+                        point.element.className = 'status-label status-open';
+                    } else {
+                        point.element.className = 'status-label status-closed';
+                    }
+                }
+            }
+            renderer.render(scene, camera);
+        }
+
+        // --- 事件監聽與功能函式 ---
+        function setupEventListeners() {
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            menuToggleBtn.addEventListener('click', () => sidebarMenu.classList.toggle('open'));
+            closeMenuBtn.addEventListener('click', () => sidebarMenu.classList.remove('open'));
+
+            document.addEventListener('click', (event) => {
+                const isClickInsideMenu = sidebarMenu.contains(event.target);
+                const isClickOnToggleButton = menuToggleBtn.contains(event.target);
+                if (sidebarMenu.classList.contains('open') && !isClickInsideMenu && !isClickOnToggleButton) {
+                    sidebarMenu.classList.remove('open');
+                }
+            });
+
+            frontViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(0, 5, 40)));
+            topViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(0, 25, 0)));
+            sideViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(20, 5, 0)));
+        }
+        const systemCategories = document.querySelectorAll('.system-category');
+
+        systemCategories.forEach(category => {
+            const categoryLink = category.querySelector('a'); // 獲取<a>標籤
+            const submenu = category.querySelector('.floor-submenu'); // 獲取子選單<ul>
+
+            // 只為包含子選單的分類新增點擊事件
+            if (submenu) {
+                categoryLink.addEventListener('click', (event) => {
+                    event.preventDefault(); // 阻止<a>標籤的預設跳轉行為
+                
+                    category.classList.toggle('active'); // 切換 active class，讓 CSS 可以旋轉箭頭
+
+                    // 判斷子選單目前是展開還是收合
+                    if (submenu.style.maxHeight) {
+                    // 如果已有 max-height 值，代表是展開的，要收合
+                    submenu.style.maxHeight = null;
+                    } else {
+                    // 如果沒有，代表是收合的，要展開
+                    // scrollHeight 是這個元素內容的完整高度
+                    submenu.style.maxHeight = submenu.scrollHeight + "px";
+                    }
+                });
+            }
+        });
+
+        function animateCameraPosition(targetPosition, duration = 1000) {
+            const startPosition = camera.position.clone();
+            const startTarget = controls.target.clone();
+            const newTarget = new THREE.Vector3(0,0,0);
+            let startTime = null;
+            function loop(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const progress = Math.min((currentTime - startTime) / duration, 1);
+                camera.position.lerpVectors(startPosition, targetPosition, progress);
+                controls.target.lerpVectors(startTarget, newTarget, progress);
+                if (progress < 1) requestAnimationFrame(loop);
+            }
+            requestAnimationFrame(loop);
+        }
+        
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const dateString = now.toLocaleDateString('zh-TW', dateOptions);
+            const timeString = now.toLocaleTimeString('zh-TW', timeOptions);
+            datetimeContainer.textContent = `${dateString} ${timeString}`;
+        }
+
+        <h1>門禁保全系統 - 1F (建置中)</h1>
+
+        // --- 啟動 ---
+        init();
+
+    </script>
+</body>
+</html>
