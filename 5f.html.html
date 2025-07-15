@@ -137,7 +137,7 @@
         const topViewBtn = document.getElementById('top-view-btn');
         const sideViewBtn = document.getElementById('side-view-btn');
 
-        const minDistance = 10, maxDistance = 100, minScale = 0.3, maxScale = 0.9;
+        const minDistance = 10, maxDistance = 50, minScale = 0.3, maxScale = 0.9;
 
         // --- 初始化函式 ---
         function init() {
@@ -179,6 +179,28 @@
                 undefined,
                 (error) => console.error('模型載入失敗:', error)
             );
+
+            // --- 點擊模型以查詢物件名稱 ---
+            //const raycasterForClick = new THREE.Raycaster();
+            //const mouseForClick = new THREE.Vector2();
+
+            //window.addEventListener('click', (event) => {
+            // 只在側邊欄關閉時才觸發點擊查詢
+                //if (!sidebarMenu.classList.contains('open')) {
+                    //mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
+                    //mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+                    //raycasterForClick.setFromCamera(mouseForClick, camera);
+                    //const intersects = raycasterForClick.intersectObjects(scene.children, true);
+
+                //if (intersects.length > 0) {
+                    //const clickedObject = intersects[0].object;
+                //console.log('您點擊了:', clickedObject);
+                //console.log('物件名稱:', clickedObject.name);
+                //console.log('物件位置:', clickedObject.position);
+                    //}
+                //}
+            //});
 
             animate();
             setupEventListeners();
