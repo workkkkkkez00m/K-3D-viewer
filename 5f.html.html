@@ -497,6 +497,29 @@
             renderer.render(scene, camera);
         }
 
+        function setupEventListeners() {
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            menuToggleBtn.addEventListener('click', () => sidebarMenu.classList.toggle('open'));
+            closeMenuBtn.addEventListener('click', () => sidebarMenu.classList.remove('open'));
+
+            document.addEventListener('click', (event) => {
+                const isClickInsideMenu = sidebarMenu.contains(event.target);
+                const isClickOnToggleButton = menuToggleBtn.contains(event.target);
+                if (sidebarMenu.classList.contains('open') && !isClickInsideMenu && !isClickOnToggleButton) {
+                    sidebarMenu.classList.remove('open');
+                }
+            });
+
+            frontViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(0, 5, 40)));
+            topViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(0, 25, 0)));
+            sideViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(20, 5, 0)));
+        }
+
         // --- 事件監聽與功能函式 ---
         function setupEventListeners() {
             window.addEventListener('resize', () => {
@@ -535,7 +558,7 @@
             requestAnimationFrame(loop);
         }
         }
-        
+
         function updateDateTime() {
             const now = new Date();
             const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' };
