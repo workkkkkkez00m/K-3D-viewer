@@ -60,9 +60,28 @@
             font-weight: bold; border-radius: 5px; z-index: 10; pointer-events: none;
         }
         .status-label {
-            position: absolute; padding: 8px 12px; background-color: rgba(255, 165, 0, 0.9);
-            color: black; border-radius: 5px; border: 1px solid white; font-size: 14px;
-            font-weight: bold; user-select: none; pointer-events: none;
+            position: absolute;
+            padding: 8px 12px;
+            color: white; /* 將文字顏色改為白色，在兩種背景上都清晰 */
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            font-weight: bold;
+            user-select: none;
+            pointer-events: none; /* 禁止鼠標事件，避免干擾模型交互 */
+            transition: background-color 0.3s, transform 0.1s; /* 加入背景顏色過渡效果 */
+        }
+
+        /* 2. 關閉狀態的樣式 */
+        .status-closed {
+            background-color: rgba(243, 156, 18, 0.9); 
+            text-shadow: 1px 1px 2px black; /* 為白色文字增加陰影，提高可讀性 */
+        }
+
+        /* 3. 開啟狀態的樣式 */
+        .status-open {
+            background-color: rgba(46, 204, 113, 0.9); /* 淺綠色 */
+            text-shadow: 1px 1px 2px black;
         }
     </style>
 </head>
@@ -235,6 +254,13 @@
                     
                     point.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scale})`;
                     point.element.innerHTML = `${point.text}: <span style="color:red;">${point.status}</span>`;
+                    
+                    // --- ★★★ 新增：根據狀態切換 CSS Class ★★★ ---
+                    if (point.status === '開啟') {
+                        point.element.className = 'status-label status-open';
+                    } else {
+                        point.element.className = 'status-label status-closed';
+                    }
                 }
             }
             renderer.render(scene, camera);
