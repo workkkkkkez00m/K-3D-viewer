@@ -138,11 +138,13 @@
             <li class="system-category">
                 <a href="#">門禁保全系統</a>
                 <ul class="floor-submenu">
+                    <li><a href="../access_control/1f.html">1F</a></li>
                 </ul>
             </li>
             <li class="system-category">
                 <a href="#">影像對講系統</a>
                 <ul class="floor-submenu">
+                   <li><a href="../video_intercom/1f.html">1F</a></li> 
             </ul>
     </li>
 </ul>
@@ -201,8 +203,8 @@
             controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: null, RIGHT: THREE.MOUSE.PAN };
             
             const loader = new GLTFLoader();
-            /*loader.load(
-                'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/theft_prevention/1f_model.glb',
+            loader.load(
+                'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/video_intercom/1f_model.glb',
                 (gltf) => {
                     model = gltf.scene;
                     const box = new THREE.Box3().setFromObject(model);
@@ -221,7 +223,7 @@
                 },
                 undefined,
                 (error) => console.error('模型載入失敗:', error)
-            );*/
+            );
 
             // --- 點擊模型以查詢物件名稱 ---
             //const raycasterForClick = new THREE.Raycaster();
