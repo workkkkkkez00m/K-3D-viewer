@@ -413,7 +413,7 @@
                     model.traverse((object) => {
                         const point = monitoringPoints.find(p => p.name === object.name);
                         if (point) {
-                            point.targetObject = object; // 找到了，存起來
+                            point.targetObject = object;
                             console.log(`成功找到監控物件: ${point.name}`);
                         }
                     });
@@ -458,9 +458,7 @@
 
          // 更新所有監控點標籤的位置和大小
          for (const point of monitoringPoints) {
-            if (point.targetObject && point.element) {
-
-                if (point.targetObject) {
+            if (point.targetObject) {
 
                 // 如果標籤還沒被建立，就現在建立它 ★★★
                     if (!point.element) {
@@ -474,7 +472,7 @@
                 const position = new THREE.Vector3();
                 new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
 
-                // --- ★★★ 新增：計算距離並決定縮放比例 ★★★ ---
+                // --- 計算距離並決定縮放比例 ★★★ ---
                 const distance = camera.position.distanceTo(position);
 
                 // 計算當前距離在 [minDistance, maxDistance] 這個範圍內的進度 (0到1)
