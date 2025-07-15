@@ -82,7 +82,7 @@
             display: none; /* 預設隱藏 */
             position: absolute;
             width: 100%;
-            background-color: #21262d;
+            background-color: #193864;
             border: 1px solid #30363d;
             border-radius: 6px;
             margin-top: 5px;
@@ -138,11 +138,13 @@
             <div class="system-menu-container">
                 <button class="system-btn" data-menu="access-menu">門禁保全系統</button>
                 <ul id="access-menu" class="floor-dropdown-menu">
+                    <li><a href="../access_control/1f.html">1F</a></li>
                     </ul>
             </div>
             <div class="system-menu-container">
                 <button class="system-btn" data-menu="intercom-menu">影像對講系統</button>
                 <ul id="intercom-menu" class="floor-dropdown-menu">
+                    li><a href="../video_intercom/1f.html">1F</a></li>
                     </ul>
             </div>
         </div>
@@ -198,12 +200,12 @@
             renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
         });
 
-        // --- ★★★ 新增：懸浮選單互動功能 ★★★ ---
+        // --- ★★★ 懸浮選單互動功能 ★★★ ---
         const systemButtons = document.querySelectorAll('.system-btn');
 
         systemButtons.forEach(button => {
             button.addEventListener('click', (event) => {
-                event.stopPropagation(); // 防止點擊事件冒泡到 window
+                event.stopPropagation(); 
                 const menuId = button.dataset.menu;
                 const targetMenu = document.getElementById(menuId);
                 
