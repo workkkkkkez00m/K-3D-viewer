@@ -119,13 +119,21 @@
             background-color: #34495e !important; /* 維持懸停效果 */
             color: #1fecff !important; /* 懸停時顏色更亮 */
         }
+
+        /* 移除標題連結的預設樣式 */
+        #home-link-title {
+            color: inherit;
+            text-decoration: none; /* 移除底線 */
+        }
     </style>
 </head>
 <body>
 
     <header id="top-banner">
         <button id="menu-toggle-btn" title="展開選單">☰</button>
-        <h1 id="project-title">興隆社會住宅I區智慧中央監控系統</h1>
+        <a href="https://workkkkkkez00m.github.io/K-3D-viewer/index.html" id="home-link-title">
+            <h1 id="project-title">興隆社會住宅I區智慧中央監控系統</h1>
+        </a>
         <div id="datetime-container"></div>
     </header>
     <nav id="sidebar-menu">
