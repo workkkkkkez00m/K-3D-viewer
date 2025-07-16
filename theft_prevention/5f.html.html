@@ -402,9 +402,27 @@
             const timeString = now.toLocaleTimeString('zh-TW', timeOptions);
             datetimeContainer.textContent = `${dateString} ${timeString}`;
         }
+        // --- ★★★ 模擬從後端 API 獲取並更新數據的函式 ★★★ ---
+        function updateMonitoringData() {
+            console.log("正在模擬從伺服器獲取最新數據...");
 
+            // 遍歷所有監控點
+            for (const point of monitoringPoints) {
+                // 隨機邏輯來模擬狀態變化
+                // 正式上線時，這裡會被替換為 fetch API 的程式碼
+                if (Math.random() > 0.5) {
+                    point.status = "開啟";
+                } else {
+                    point.status = "關閉";
+                }
+            }
+        }
         // --- 啟動 ---
         init();
+
+        // 設定每 5 秒鐘自動更新一次監控數據 +++
+        // 5000 代表 5000 毫秒，也就是 5 秒
+            setInterval(updateMonitoringData, 5000);
 
     </script>
 </body>
