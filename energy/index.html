@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>能源管理儀表板</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* --- 基礎樣式 --- */
+        body { margin: 0; font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; overflow: hidden; background-color: #0d1117; color: #c9d1d9; }
+
+        /* --- 框架 UI 樣式  --- */
+        #top-banner { position: absolute; top: 0; left: 0; width: 100%; background-color: rgba(0, 0, 0, 0.7); color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; box-sizing: border-box; z-index: 20; }
+        #project-title { margin: 0; font-size: 22px; font-weight: 500; margin-left: 15px; }
+        #datetime-container { font-size: 18px; }
+        #menu-toggle-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0 10px; }
+        #sidebar-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background-color: #2c3e50; padding: 20px; box-sizing: border-box; z-index: 1000; transition: left 0.3s ease-in-out; }
+        #sidebar-menu.open { left: 0; }
+        #sidebar-menu h2 { color: white; margin-top: 50px; border-bottom: 1px solid #465a70; padding-bottom: 10px; }
+        #sidebar-menu ul { list-style: none; padding: 0; margin-top: 20px;}
+        #sidebar-menu li a { display: block; color: #ecf0f1; text-decoration: none; padding: 15px 10px; border-radius: 4px; transition: background-color 0.2s; }
+        #sidebar-menu li a:hover { background-color: #34495e; }
+        #close-menu-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: white; font-size: 30px; font-weight: bold; line-height: 1; cursor: pointer; }
+        #sidebar-menu .system-category > a { font-weight: bold; background-color: #1bdbed; color: white; }
+        #sidebar-menu .system-category > a::after { content: '▼'; float: right; transition: transform 0.3s; }
+        #sidebar-menu .system-category.active > a::after { transform: rotate(180deg); }
+        .floor-submenu { list-style: none; padding-left: 20px; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out; }
+        #back-to-home-btn { margin-top: 20px; padding-top: 20px !important; border-top: 1px solid #465a70; font-weight: bold; color: #1bdbed !important; }
+        #back-to-home-btn:hover { background-color: #34495e !important; color: #1fecff !important; }
+        /* 因為此頁面沒有3D操控，所以隱藏不需要的按鈕和提示 */
+        #ui-container, #controls-helper, #floor-indicator { display: none; }
+
+        /* --- ★★★ 儀表板內容區的專屬樣式 ★★★ --- */
+        #content-wrapper {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            padding: 20px;
+            overflow-y: auto; /* ★ 關鍵：當內容超高時，自動顯示垂直滾動條 */
+        }
+
+        /* 數據區塊，讓它有自然的下間距 */
+        .data-section {
+            margin-bottom: 30px;
+        }
+
+        /* 區塊標題樣式 */
+        .section-title {
+            font-size: 25px;
+            font-weight: 500;
+            color: #b7bfc9;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #30363d;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        /* 數據卡片網格的樣式 */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .data-card {
+            background-color: #161b22;
+            border: 1px solid #5d6876;
+            border-radius: 8px;
+            padding: 25px;
+        }
+        .data-card .title { font-size: 20px; color: #d1dff0; margin-bottom: 10px; }
+        .data-card .value { font-size: 32px; font-weight: bold; color: #58a6ff; }
+        .data-card .unit { font-size: 16px; margin-left: 8px; }
+
+        /* 圖表容器的樣式 */
+        .chart-container {
+            margin-top: 20px;
+        }
+
+        /* 水力監控區塊的佈局 */
+        .water-grid {
+            display: grid; /* 使用 Grid 來做左右佈局 */
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        .water-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .pie-chart-container {
+            /* 不再需要特殊樣式 */
+        }
+        
+        /* 圖表尺寸的包裝層 */
+        .chart-wrapper {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+        /* 1. 設定整個滾動條的寬度 */
+        #content-wrapper::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        /* 2. 設定滾動條的軌道 (背景) */
+        #content-wrapper::-webkit-scrollbar-track {
+            background: #161b22; /* 使用與卡片背景一致或稍暗的顏色 */
+            border-radius: 5px;
+        }
+
+        /* 3. 設定滾動條的滑塊 (可以拖動的部分) */
+        #content-wrapper::-webkit-scrollbar-thumb {
+            background-color: #4F565E; /* 一個中性的、不突兀的灰色 */
+            border-radius: 5px;
+            border: 3px solid #161b22; /* 創造一個內邊距的效果，讓滑塊看起來更細 */
+        }
+
+        /* 4. 設定滑鼠懸停在滑塊上時的樣式 */
+        #content-wrapper::-webkit-scrollbar-thumb:hover {
+            background-color: #686E75; /* 懸停時變亮，提供反饋 */
+        }
+        /* --- 針對 Firefox 的相容性設定 --- */
+        #content-wrapper {
+            scrollbar-width: thin; /* 可以是 'auto', 'thin', 'none' */
+            scrollbar-color: #75b3f9 #5e6165; /* 依序是「滑塊顏色」和「軌道顏色」 */
+        }
+    </style>
+</head>
+<body>
+    <header id="top-banner">
+        <button id="menu-toggle-btn" title="展開選單">☰</button>
+        <h1 id="project-title">興隆社會住宅I區智慧中央監控系統</h1>
+        <div id="datetime-container"></div>
+    </header>
+
+    <nav id="sidebar-menu">
+        <button id="close-menu-btn">&times;</button>
+        <h2>系統選單</h2>
+        <ul>
+            <li class="system-category">
+                <a href="#">防盜及求救系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../theft_prevention/1f.html">1F</a></li>
+                    <li><a href="../theft_prevention/2f.html">2F</a></li>
+                    <li><a href="../theft_prevention/3f.html">3F</a></li>
+                    <li><a href="../theft_prevention/4f.html">4F</a></li>
+                    <li><a href="../theft_prevention/5f.html">5F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">攝影監視系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../cctv/1f.html">1F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">門禁保全系統</a>
+                <ul class="floor-submenu">
+                     <li><a href="../access_control/1f.html">1F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">影像對講系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../video_intercom/1f.html">1F</a></li> 
+                </ul>
+            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;">能源管理儀表板</a></li>
+            </li>
+            <li><a id="back-to-home-btn" href="../index.html">‹ 回首頁</a></li>
+        </ul>
+    </nav>
+
+    <main id="content-wrapper">
+        <section class="data-section">
+            <h2 class="section-title">電力監控</h2>
+            <div class="summary-grid">
+                <div class="data-card">
+                    <div class="title">即時用電量</div>
+                    <div><span id="realtime-power" class="value">--</span><span class="unit">kW</span></div>
+                </div>
+                <div class="data-card">
+                    <div class="title">本日用電總量</div>
+                    <div><span id="today-kwh" class="value">--</span><span class="unit">kWh</span></div>
+                </div>
+                <div class="data-card">
+                    <div class="title">本月用電總量</div>
+                    <div><span id="month-kwh" class="value">--</span><span class="unit">kWh</span></div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="hourly-chart"></canvas>
+            </div>
+        </section>
+
+        <section class="data-section">
+            <h2 class="section-title">水力監控</h2>
+            <div class="water-grid">
+                <div class="summary-grid water-summary">
+                    <div class="data-card">
+                        <div class="title">本日總用水度數</div>
+                        <div><span id="today-water" class="value">--</span><span class="unit">度</span></div>
+                    </div>
+                    <div class="data-card">
+                        <div class="title">本月總用水度數</div>
+                        <div><span id="month-water" class="value">--</span><span class="unit">度</span></div>
+                    </div>
+                </div>
+                <div class="chart-container pie-chart-container">
+                    <canvas id="water-pie-chart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // --- 獲取 DOM 元素 ---
+        const realtimePowerEl = document.getElementById('realtime-power');
+        const todayKwhEl = document.getElementById('today-kwh');
+        const monthKwhEl = document.getElementById('month-kwh');
+        const todayWaterEl = document.getElementById('today-water');
+        const monthWaterEl = document.getElementById('month-water');
+        const datetimeContainer = document.getElementById('datetime-container');
+        const menuToggleBtn = document.getElementById('menu-toggle-btn');
+        const sidebarMenu = document.getElementById('sidebar-menu');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const ctxPie = document.getElementById('water-pie-chart').getContext('2d');
+        
+        // --- 初始化圖表 ---
+        const ctx = document.getElementById('hourly-chart').getContext('2d');
+        const energyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+            labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+            datasets: [{
+            label: '每小時用電量 (kWh)',
+            data: [],
+            borderColor: 'rgba(88, 166, 255, 1)',
+            backgroundColor: 'rgba(88, 166, 255, 0.2)',
+            fill: true,
+            tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true, // 確保響應式是開啟的
+            maintainAspectRatio: false, // 允許圖表根據容器大小調整
+            scales: {
+            y: { 
+                beginAtZero: true,
+                ticks: { color: '#8b949e' }, 
+                grid: { color: '#30363d' }   
+                    },
+            x: {
+                ticks: { color: '#8b949e' }, 
+                grid: { color: '#30363d' }   
+                    }
+            },
+            plugins: {
+                legend: {
+                    labels: { color: '#c9d1d9' } // 圖例文字顏色
+                    }
+                }
+            }
+        });
+        // --- 初始化水力圓餅圖 ---
+        const waterPieChart = new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['住宅區', '辦公區'],
+                datasets: [{
+                    label: '本日用水量 (度)',
+                    data: [0, 0],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.8)', // 藍色
+                        'rgba(255, 206, 86, 0.8)'  // 黃色
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)'
+                    ],
+                    borderWidth: 1,                    
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '當日各區用水量分佈',
+                        color: '#c9d1d9',
+                        font: { size: 16 }
+                    },
+                    legend: {
+                        labels: { color: '#c9d1d9' }
+                    }
+                }
+            }
+        });
+
+        // --- 從後端 API 更新儀表板數據 ---
+        async function updateDashboard() {
+            try {
+                const response = await fetch('http://localhost:3000/api/energy');
+                const data = await response.json();
+
+                // 更新數據卡片 
+                realtimePowerEl.textContent = data.realtimePower.toFixed(1);
+                todayKwhEl.textContent = data.todayTotalKWh.toLocaleString('en-US', { maximumFractionDigits: 1 });
+                monthKwhEl.textContent = data.monthTotalKWh.toLocaleString('en-US', { maximumFractionDigits: 1 });
+                todayWaterEl.textContent = data.todayWaterUsage.toFixed(1);
+                monthWaterEl.textContent = data.monthWaterUsage.toFixed(1);
+
+                // 更新折線圖 
+                energyChart.data.datasets[0].data = data.hourlyKWh;
+                energyChart.update('none');
+
+                // 更新圓餅圖數據 
+             waterPieChart.data.datasets[0].data = [
+                    data.waterBreakdown.residential,
+                    data.waterBreakdown.office
+                ];
+                waterPieChart.update('none');
+
+            } catch (error) {
+                console.error("更新儀表板數據失敗:", error);
+            }
+        }
+
+        // --- UI 框架功能函式 ---
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            datetimeContainer.textContent = `${now.toLocaleDateString('zh-TW', dateOptions)} ${now.toLocaleTimeString('zh-TW', timeOptions)}`;
+        }
+
+        function setupSidebarMenu() {
+            menuToggleBtn.addEventListener('click', () => sidebarMenu.classList.toggle('open'));
+            closeMenuBtn.addEventListener('click', () => sidebarMenu.classList.remove('open'));
+            document.addEventListener('click', (event) => {
+                const isClickInsideMenu = sidebarMenu.contains(event.target) || menuToggleBtn.contains(event.target);
+                if (sidebarMenu.classList.contains('open') && !isClickInsideMenu) {
+                    sidebarMenu.classList.remove('open');
+                }
+            });
+            document.querySelectorAll('.system-category > a').forEach(categoryLink => {
+                const submenu = categoryLink.nextElementSibling;
+                if (submenu && submenu.classList.contains('floor-submenu')) {
+                    categoryLink.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        categoryLink.parentElement.classList.toggle('active');
+                        submenu.style.maxHeight = submenu.style.maxHeight ? null : submenu.scrollHeight + "px";
+                    });
+                }
+            });
+        }
+
+        // --- 啟動所有功能 ---
+        updateDashboard();
+        setInterval(updateDashboard, 5000);
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        setupSidebarMenu();
+    </script>
+</body>
+</html>
