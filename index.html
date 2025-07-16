@@ -35,23 +35,23 @@
         }
         
         #ui-panel h1 {
-            font-size: 28px;
-            border-bottom: 2px solid #30363d;
+            font-size: 34px;
+            border-bottom: 2px solid #7b8189;
             padding-bottom: 15px;
             margin-top: 0;
         }
 
         #ui-panel p {
             font-size: 16px;
-            color: #8b949e;
+            color: #a3abb3;
             line-height: 1.6;
         }
 
-        /* --- ★★★ 系統按鈕與選單容器 (新修改) ★★★ --- */
+        /* --- ★★★ 系統按鈕與選單容器 ★★★ --- */
         #system-buttons {
             margin-top: 30px;
-            display: grid;
-            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 15px;
         }
 
@@ -62,11 +62,11 @@
         .system-btn {
             width: 100%; /* 讓按鈕寬度佔滿容器 */
             padding: 15px 20px;
-            background-color: #21262d;
-            color: #c9d1d9;
+            background-color: #2d476a;
+            color: #f6f9fb;
             text-align: center;
             font-size: 18px;
-            border: 1px solid #30363d;
+            border: 1px solid #7d8690;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
@@ -108,6 +108,7 @@
         .floor-dropdown-menu li a:hover {
             background-color: #30363d;
         }
+
     </style>
 </head>
 <body>
@@ -119,6 +120,11 @@
         <p>請選擇您要檢視的子系統，以進入對應樓層的 3D 監控畫面。</p>
         
         <div id="system-buttons">
+
+            <div class="system-menu-container">
+                <button class="system-btn" data-link="./energy/index.html">能源管理儀表板</button>
+            </div>
+
             <div class="system-menu-container">
                 <button class="system-btn" data-menu="theft-menu">防盜及求救系統</button>
                 <ul id="theft-menu" class="floor-dropdown-menu">
@@ -133,20 +139,31 @@
                 <button class="system-btn" data-menu="cctv-menu">攝影監視系統</button>
                 <ul id="cctv-menu" class="floor-dropdown-menu">
                     <li><a href="./cctv/1f.html">1F</a></li>
+                    <li><a href="./cctv/2f.html">2F</a></li>
+                    <li><a href="./cctv/3f.html">3F</a></li>
+                    <li><a href="./cctv/4f.html">4F</a></li>
+                    <li><a href="./cctv/5f.html">5F</a></li>
                     </ul>
             </div>
             <div class="system-menu-container">
                 <button class="system-btn" data-menu="access-menu">門禁保全系統</button>
                 <ul id="access-menu" class="floor-dropdown-menu">
                     <li><a href="./access_control/1f.html">1F</a></li>
-                    </ul>
+                    <li><a href="./access_control/2f.html">2F</a></li>
+                    <li><a href="./access_control/3f.html">3F</a></li>
+                    <li><a href="./access_control/4f.html">4F</a></li>
+                    <li><a href="./access_control/5f.html">5F</a></li>
+                </ul>
             </div>
             <div class="system-menu-container">
                 <button class="system-btn" data-menu="intercom-menu">影像對講系統</button>
                 <ul id="intercom-menu" class="floor-dropdown-menu">
                     <li><a href="./video_intercom/1f.html">1F</a></li>
-                    </ul>
-            </div>
+                    <li><a href="./video_intercom/2f.html">2F</a></li>
+                    <li><a href="./video_intercom/3f.html">3F</a></li>
+                    <li><a href="./video_intercom/4f.html">4F</a></li>
+                    <li><a href="./video_intercom/5f.html">5F</a></li>
+                </ul>                      
         </div>
     </div>
 
@@ -205,21 +222,33 @@
 
         systemButtons.forEach(button => {
             button.addEventListener('click', (event) => {
-                event.stopPropagation(); 
-                const menuId = button.dataset.menu;
-                const targetMenu = document.getElementById(menuId);
-                
-                // 關閉所有其他已開啟的選單
-                document.querySelectorAll('.floor-dropdown-menu.show').forEach(openMenu => {
-                    if (openMenu !== targetMenu) {
-                        openMenu.classList.remove('show');
-                    }
-                });
+                event.stopPropagation(); // 防止點擊事件冒泡到 window
 
-                // 切換目標選單的顯示狀態
-                targetMenu.classList.toggle('show');
+                // ★ 檢查按鈕帶有哪種指令：data-menu 還是 data-link
+                const menuId = button.dataset.menu;
+                const linkUrl = button.dataset.link;
+
+                if (menuId) {
+                    // 如果是帶有 data-menu 的按鈕，執行展開/收合懸浮選單的邏輯
+                    const targetMenu = document.getElementById(menuId);
+
+                    // 關閉所有其他已開啟的選單
+                    document.querySelectorAll('.floor-dropdown-menu.show').forEach(openMenu => {
+                        if (openMenu !== targetMenu) {
+                            openMenu.classList.remove('show');
+                        }
+                    });
+
+                    // 切換目標選單的顯示狀態
+                    targetMenu.classList.toggle('show');
+
+                } else if (linkUrl) {
+                    // 如果是帶有 data-link 的按鈕，執行頁面跳轉
+                    window.location.href = linkUrl;
+                }
             });
         });
+
         // 點擊視窗任何其他地方，關閉所有選單
         window.addEventListener('click', () => {
             document.querySelectorAll('.floor-dropdown-menu.show').forEach(openMenu => {
