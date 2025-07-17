@@ -56,6 +56,10 @@
             margin-top: 0;
                       
         }
+        .data-section:first-of-type .section-title {
+            border-bottom: none; /* ★ 只移除這個標題的底線 */
+            margin-bottom: 10px; /* 稍微縮小與下方頁籤的間距 */
+        }
 
         /* 數據卡片網格的樣式 */
         .summary-grid {
@@ -204,6 +208,51 @@
             color: inherit;
             text-decoration: none; /* 移除底線 */
         }
+
+        /* 頁籤導覽列的樣式 */
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 20px;
+        }
+
+        /* 頁籤連結的樣式 */
+        .tab-link {
+            padding: 10px 20px;
+            color: #8b949e; /* 未選中時的顏色 */
+            text-decoration: none;
+            border-bottom: 2px solid transparent; /* 預設的底線是透明的 */
+            margin-bottom: -1px; /* 讓選中的底線能蓋過容器的底線 */
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .tab-link:hover {
+            color: #c9d1d9; /* 滑鼠懸停時的顏色 */
+        }
+
+        /* 當前選中的頁籤的樣式 */
+        .tab-link.active {
+            color: #ffffff;
+            font-weight: 600;
+            border-bottom-color: #ff5c38; /* 類似 GitHub 的橘色底線 */
+        }
+
+        /* 頁籤內容面板的樣式 */
+        .tab-content {
+            display: none; /* 預設所有內容都隱藏 */
+        }
+
+        /* 當前顯示的內容面板的樣式 */
+        .tab-content.active {
+            display: block; /* 只顯示帶有 active class 的內容 */
+        }
+        .analysis-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
+        .analysis-cards-container { display: flex; flex-direction: column; gap: 15px; }
+        .data-card.small { padding: 15px; }
+        .data-card.small .title { font-size: 15px; }
+        .data-card.small .value { font-size: 26px; }
+        .data-card.small .unit { font-size: 14px; }
+        .pie-chart-container { display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -266,43 +315,75 @@
 
     <main id="content-wrapper">
         <section class="data-section">
-            <!-- 1. 標題獨立一行 -->
             <h2 class="section-title">電力監控</h2>
-            
-            <div class="chart-toggle data-toggle-group">
-                <button id="total-data-btn" class="toggle-btn active" data-zone="total">全區</button>
-                <button id="res-data-btn" class="toggle-btn" data-zone="residential">住宅區</button>
-                <button id="off-data-btn" class="toggle-btn" data-zone="office">辦公區</button>
-            </div>
 
-            <div class="summary-grid">
-                <div class="data-card">
-                    <div class="title">即時用電量</div>
-                    <div><span id="realtime-power" class="value">--</span><span class="unit">kW</span></div>
-                </div>
-                <div class="data-card">
-                    <div class="title">本日用電總量</div>
-                    <div><span id="today-kwh" class="value">--</span><span class="unit">kWh</span></div>
-                </div>
-                <div class="data-card">
-                    <div class="title">本月用電總量</div>
-                    <div><span id="month-kwh" class="value">--</span><span class="unit">kWh</span></div>
-                </div>
-            </div>
+            <nav class="tab-nav">
+                <a href="#realtime-monitoring" class="tab-link active">即時監控</a>
+                <a href="#energy-analysis" class="tab-link">耗能分析</a>
+                <a href="#historical-records" class="tab-link">歷史紀錄</a>
+            </nav>
 
-            <div class="chart-container">
-                <div class="chart-toggle data-toggle-group">
-                    <button id="line-chart-btn" class="toggle-btn">總量趨勢</button>
-                    <button id="bar-chart-btn" class="toggle-btn active">用量分佈</button>
+            <div class="tab-content-container">        
+                <div id="realtime-monitoring" class="tab-content active">
+                    <div class="section-header">                          
+                        <div class="chart-toggle data-toggle-group">
+                            <button id="total-data-btn" class="toggle-btn active" data-zone="total">全區</button>
+                            <button id="res-data-btn" class="toggle-btn" data-zone="residential">住宅區</button>
+                            <button id="off-data-btn" class="toggle-btn" data-zone="office">辦公區</button>
+                        </div>
+                    </div>
+                    <div class="summary-grid">
+                        <div class="data-card">
+                            <div class="title">即時用電量</div>
+                            <div><span id="realtime-power" class="value">--</span><span class="unit">kW</span></div>
+                        </div>
+                        <div class="data-card">
+                            <div class="title">本日用電總量</div>
+                            <div><span id="today-kwh" class="value">--</span><span class="unit">kWh</span></div>
+                        </div>
+                        <div class="data-card">
+                            <div class="title">本月用電總量</div>
+                            <div><span id="month-kwh" class="value">--</span><span class="unit">kWh</span></div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-toggle data-toggle-group">
+                            <button id="line-chart-btn" class="toggle-btn">總量趨勢</button>
+                            <button id="bar-chart-btn" class="toggle-btn active">用量分佈</button>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="hourly-chart"></canvas>
+                        </div>
+                    </div>    
                 </div>
-                <div class="chart-wrapper">
-                    <canvas id="hourly-chart"></canvas>
+
+                <!-- ★★★ 「耗能分析」頁籤的新結構 ★★★ -->
+                <div id="energy-analysis" class="tab-content">
+                    <div class="analysis-grid">
+                        <div class="analysis-cards-container">
+                            <div class="data-card small"><div class="title">電力耗能</div><div><span id="analysis-power" class="value">--</span><span class="unit">kWh</span></div></div>
+                            <div class="data-card small"><div class="title">空調耗能</div><div><span id="analysis-ac" class="value">--</span><span class="unit">kWh</span></div></div>
+                            <div class="data-card small"><div class="title">照明耗能</div><div><span id="analysis-lighting" class="value">--</span><span class="unit">kWh</span></div></div>
+                            <div class="data-card small"><div class="title">機房耗能</div><div><span id="analysis-server" class="value">--</span><span class="unit">kWh</span></div></div>
+                            <div class="data-card small"><div class="title">其他耗能</div><div><span id="analysis-other" class="value">--</span><span class="unit">kWh</span></div></div>
+                        </div>
+                        <div class="chart-container pie-chart-container">
+                            <div class="chart-wrapper">
+                                <canvas id="consumption-pie-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 「歷史紀錄」的內容面板 (預設隱藏) -->
+                <div id="historical-records" class="tab-content">
+                    <h3 style="text-align: center; color: #8b949e; margin-top: 50px;">歷史紀錄功能建置中...</h3>
                 </div>
             </div>
         </section>
 
         <section class="data-section">
-            <h2 class="section-title">水力監控</h2>
+            <h2 class="section-title">水錶監控</h2>
             <div class="water-grid">
                 <div class="water-summary">
                     <div class="data-card">
@@ -367,11 +448,18 @@
         const monthWaterResEl = document.getElementById('month-water-res');
         const monthWaterOffEl = document.getElementById('month-water-off');
         const ctxPie = document.getElementById('water-pie-chart').getContext('2d');
+        const ctxConsumptionPie = document.getElementById('consumption-pie-chart').getContext('2d');
+        const analysisPowerEl = document.getElementById('analysis-power');
+        const analysisAcEl = document.getElementById('analysis-ac');
+        const analysisLightingEl = document.getElementById('analysis-lighting');
+        const analysisServerEl = document.getElementById('analysis-server');
+        const analysisOtherEl = document.getElementById('analysis-other');
         
         // --- 初始化圖表 ---
         const ctx = document.getElementById('hourly-chart').getContext('2d');
         let hourlyChart = null;       
         let currentPowerZone = 'total';
+        let consumptionPieChart = null;
         // --- 圖表設定物件 ---
         const chartLabels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
         const chartOptions = {
@@ -520,7 +608,45 @@
                     ];
                 waterPieChart.update('none');
                 }
-                
+
+                // +++ 5.耗能分析圓餅圖 ★★★ +++
+                if (data.consumptionAnalysis) {
+                        const analysisData = data.consumptionAnalysis;
+                        analysisPowerEl.textContent = analysisData.power.toLocaleString('en-US', { maximumFractionDigits: 1 });
+                        analysisAcEl.textContent = analysisData.ac.toLocaleString('en-US', { maximumFractionDigits: 1 });
+                        analysisLightingEl.textContent = analysisData.lighting.toLocaleString('en-US', { maximumFractionDigits: 1 });
+                        analysisServerEl.textContent = analysisData.serverRoom.toLocaleString('en-US', { maximumFractionDigits: 1 });
+                        analysisOtherEl.textContent = analysisData.other.toLocaleString('en-US', { maximumFractionDigits: 1 });
+
+                        const analysisChartData = Object.values(analysisData);
+                        
+                        if (!consumptionPieChart) {
+                            // ★★★ 初始化一個帶有傳統圖例的標準圓餅圖 ★★★
+                            consumptionPieChart = new Chart(ctxConsumptionPie, {
+                                type: 'pie',
+                                data: {
+                                    labels: ['電力', '空調', '照明', '機房', '其他'],
+                                    datasets: [{
+                                        label: '耗能佔比 (kWh)',
+                                        data: analysisChartData,
+                                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        title: { display: true, text: '本日各項設備耗能佔比', color: '#c9d1d9', font: { size: 28 },padding: { bottom: 20 } },
+                                        legend: { position: 'bottom', labels: { color: '#c9d1d9' },padding: { top: 20 } } // 恢復圖例
+                                    }
+                                }
+                            });
+                        } else {
+                            consumptionPieChart.data.datasets[0].data = analysisChartData;
+                            consumptionPieChart.update('none');
+                        }
+                    }                                
             } catch (error) {
                 console.error("更新儀表板數據失敗:", error);
             }
@@ -544,6 +670,28 @@
                 createStackedBarChart(data.hourlyData);
                 barBtn.classList.add('active');
                 lineBtn.classList.remove('active');
+            });
+        }
+
+        function setupTabNavigation() {
+            const tabLinks = document.querySelectorAll('.tab-link');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault(); // 阻止連結的預設跳轉行為
+
+                    // 移除所有頁籤和內容的 active class
+                    tabLinks.forEach(l => l.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+
+                    // 為被點擊的頁籤和其對應的內容加上 active class
+                    link.classList.add('active');
+                    const targetContent = document.querySelector(link.getAttribute('href'));
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                });
             });
         }
 
@@ -635,6 +783,7 @@
         setupSidebarMenu();
         setupChartToggle();
         setupDataToggle();
+        setupTabNavigation();
         });
     </script>
 </body>
