@@ -27,7 +27,7 @@
         .floor-submenu { list-style: none; padding-left: 20px; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out; }
         #back-to-home-btn { margin-top: 20px; padding-top: 20px !important; border-top: 1px solid #465a70; font-weight: bold; color: #1bdbed !important; }
         #back-to-home-btn:hover { background-color: #34495e !important; color: #1fecff !important; }
-        /* 因為此頁面沒有3D操控，所以隱藏不需要的按鈕和提示 */
+        /* 此頁面沒有3D操控，隱藏不需要的按鈕和提示 */
         #ui-container, #controls-helper, #floor-indicator { display: none; }
 
         /* --- ★★★ 儀表板內容區的專屬樣式 ★★★ --- */
@@ -38,23 +38,23 @@
             right: 20px;
             bottom: 20px;
             padding: 20px;
-            overflow-y: auto; /* ★ 關鍵：當內容超高時，自動顯示垂直滾動條 */
+            overflow-y: auto; /* ★ 當內容超高時，自動顯示垂直滾動條 */
         }
 
-        /* 數據區塊，讓它有自然的下間距 */
+        /* 數據區塊，有下間距 */
         .data-section {
             margin-bottom: 30px;
-        }
+        }       
 
         /* 區塊標題樣式 */
         .section-title {
-            font-size: 25px;
+            font-size: 28px;
             font-weight: 500;
-            color: #b7bfc9;
+            color: #d6d6d6;
             padding-bottom: 10px;
             border-bottom: 1px solid #30363d;
             margin-top: 0;
-            margin-bottom: 20px;
+                      
         }
 
         /* 數據卡片網格的樣式 */
@@ -70,7 +70,7 @@
             padding: 25px;
         }
         .data-card .title { font-size: 20px; color: #d1dff0; margin-bottom: 10px; }
-        .data-card .value { font-size: 32px; font-weight: bold; color: #58a6ff; }
+        .data-card .value { font-size: 32px; font-weight: bold; color: #52a0fa; }
         .data-card .unit { font-size: 16px; margin-left: 8px; }
 
         /* 圖表容器的樣式 */
@@ -90,10 +90,7 @@
             flex-direction: column;
             gap: 20px;
         }
-        .pie-chart-container {
-            /* 不再需要特殊樣式 */
-        }
-        
+                
         /* 圖表尺寸的包裝層 */
         .chart-wrapper {
             position: relative;
@@ -113,9 +110,9 @@
 
         /* 3. 設定滾動條的滑塊 (可以拖動的部分) */
         #content-wrapper::-webkit-scrollbar-thumb {
-            background-color: #4F565E; /* 一個中性的、不突兀的灰色 */
+            background-color: #4F565E; 
             border-radius: 5px;
-            border: 3px solid #161b22; /* 創造一個內邊距的效果，讓滑塊看起來更細 */
+            border: 3px solid #161b22; /* 創造內邊距的效果 */
         }
 
         /* 4. 設定滑鼠懸停在滑塊上時的樣式 */
@@ -126,6 +123,80 @@
         #content-wrapper {
             scrollbar-width: thin; /* 可以是 'auto', 'thin', 'none' */
             scrollbar-color: #75b3f9 #5e6165; /* 依序是「滑塊顏色」和「軌道顏色」 */
+        }
+        .card-main-content {
+            display: flex;
+            justify-content: space-between; /* 讓主數據和分支數據左右兩端對齊 */
+            align-items: flex-end;      /* 底部對齊 */
+            margin-top: 10px;
+        }
+
+        /* 分支數據容器的樣式 */
+        .sub-data-container {
+            display: flex;
+            gap: 20px; /* 讓住宅區和辦公區之間有一些間距 */
+            font-size: 18px;
+            color: #c1c1c1;
+        }
+
+        /* 分支數據項目的樣式 */
+        .sub-data-item {
+            display: flex;
+            flex-direction: column; /* 讓標題和數值垂直排列 */
+            align-items: center; /* 水平置中 */
+        }
+
+        /* 分支數據數值的樣式 */
+        .sub-value {
+            font-weight: bold;
+            color: #ffffff;
+            margin-top: 5px;
+        }
+
+        /* 圖表切換按鈕的容器樣式 */
+        .chart-toggle {
+            display: flex;
+            justify-content: center;            
+        }
+
+        .data-toggle-group {
+            width: 20%;       /* ★ 設定寬度*/
+            margin: 0 auto;   /* ★ 讓這個按鈕組水平置中 */
+            margin-bottom: 20px; /* 保持與下方卡片的間距 */
+        }
+
+        /* 切換按鈕的樣式 */
+        .toggle-btn {
+            background-color: transparent;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1; /* ★ 讓所有按鈕等量瓜分空間，實現均分寬度 */
+            text-align: center; /* 確保文字在變寬的按鈕中依然置中 */
+        }
+
+        /* 讓容器內的按鈕平均分配這個寬度 */
+        .section-header .toggle-btn {
+            flex: 1;         
+        }
+
+        .toggle-btn:first-child {
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+        .toggle-btn:last-child {
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+            border-left: none; /* 讓按鈕之間無縫連接 */
+        }
+
+        /* 當前選中的按鈕的樣式 */
+        .toggle-btn.active {
+            background-color: #58a6ff;
+            color: white;
+            border-color: #58a6ff;
         }
 
         /* 移除標題連結的預設樣式 */
@@ -195,7 +266,15 @@
 
     <main id="content-wrapper">
         <section class="data-section">
+            <!-- 1. 標題獨立一行 -->
             <h2 class="section-title">電力監控</h2>
+            
+            <div class="chart-toggle data-toggle-group">
+                <button id="total-data-btn" class="toggle-btn active" data-zone="total">全區</button>
+                <button id="res-data-btn" class="toggle-btn" data-zone="residential">住宅區</button>
+                <button id="off-data-btn" class="toggle-btn" data-zone="office">辦公區</button>
+            </div>
+
             <div class="summary-grid">
                 <div class="data-card">
                     <div class="title">即時用電量</div>
@@ -210,32 +289,69 @@
                     <div><span id="month-kwh" class="value">--</span><span class="unit">kWh</span></div>
                 </div>
             </div>
+
             <div class="chart-container">
-                <canvas id="hourly-chart"></canvas>
+                <div class="chart-toggle data-toggle-group">
+                    <button id="line-chart-btn" class="toggle-btn">總量趨勢</button>
+                    <button id="bar-chart-btn" class="toggle-btn active">用量分佈</button>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="hourly-chart"></canvas>
+                </div>
             </div>
         </section>
 
         <section class="data-section">
             <h2 class="section-title">水力監控</h2>
             <div class="water-grid">
-                <div class="summary-grid water-summary">
+                <div class="water-summary">
                     <div class="data-card">
                         <div class="title">本日總用水度數</div>
-                        <div><span id="today-water" class="value">--</span><span class="unit">度</span></div>
+                        <div class="card-main-content">
+                            <div>
+                                <span id="today-water" class="value">--</span><span class="unit">度</span>
+                            </div>
+                            <div class="sub-data-container">
+                                <div class="sub-data-item">
+                                    <span>住宅區:</span>
+                                    <span id="today-water-res" class="sub-value">-- 度</span>
+                                </div>
+                                <div class="sub-data-item">
+                                    <span>辦公區:</span>
+                                    <span id="today-water-off" class="sub-value">-- 度</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="data-card">
                         <div class="title">本月總用水度數</div>
-                        <div><span id="month-water" class="value">--</span><span class="unit">度</span></div>
+                        <div class="card-main-content">
+                            <div>
+                                <span id="month-water" class="value">--</span><span class="unit">度</span></div>
+                            <div class="sub-data-container">
+                                <div class="sub-data-item">
+                                    <span>住宅區:</span>
+                                    <span id="month-water-res" class="sub-value">-- 度</span>
+                                </div>
+                                <div class="sub-data-item">
+                                    <span>辦公區:</span>
+                                    <span id="month-water-off" class="sub-value">-- 度</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="chart-container pie-chart-container">
-                    <canvas id="water-pie-chart"></canvas>
+                    <div class="chart-wrapper">
+                        <canvas id="water-pie-chart"></canvas>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
         // --- 獲取 DOM 元素 ---
         const realtimePowerEl = document.getElementById('realtime-power');
         const todayKwhEl = document.getElementById('today-kwh');
@@ -246,44 +362,24 @@
         const menuToggleBtn = document.getElementById('menu-toggle-btn');
         const sidebarMenu = document.getElementById('sidebar-menu');
         const closeMenuBtn = document.getElementById('close-menu-btn');
+        const todayWaterResEl = document.getElementById('today-water-res');
+        const todayWaterOffEl = document.getElementById('today-water-off');
+        const monthWaterResEl = document.getElementById('month-water-res');
+        const monthWaterOffEl = document.getElementById('month-water-off');
         const ctxPie = document.getElementById('water-pie-chart').getContext('2d');
         
         // --- 初始化圖表 ---
         const ctx = document.getElementById('hourly-chart').getContext('2d');
-        const energyChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-            labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
-            datasets: [{
-            label: '每小時用電量 (kWh)',
-            data: [],
-            borderColor: 'rgba(88, 166, 255, 1)',
-            backgroundColor: 'rgba(88, 166, 255, 0.2)',
-            fill: true,
-            tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true, // 確保響應式是開啟的
-            maintainAspectRatio: false, // 允許圖表根據容器大小調整
-            scales: {
-            y: { 
-                beginAtZero: true,
-                ticks: { color: '#8b949e' }, 
-                grid: { color: '#30363d' }   
-                    },
-            x: {
-                ticks: { color: '#8b949e' }, 
-                grid: { color: '#30363d' }   
-                    }
-            },
-            plugins: {
-                legend: {
-                    labels: { color: '#c9d1d9' } // 圖例文字顏色
-                    }
-                }
-            }
-        });
+        let hourlyChart = null;       
+        let currentPowerZone = 'total';
+        // --- 圖表設定物件 ---
+        const chartLabels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, ticks: { color: '#8b949e' }, grid: { color: '#30363d' } }, x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } } },
+            plugins: { legend: { labels: { color: '#c9d1d9' } } }
+        };
         // --- 初始化水力圓餅圖 ---
         const waterPieChart = new Chart(ctxPie, {
             type: 'pie',
@@ -320,33 +416,154 @@
             }
         });
 
-        // --- 從後端 API 更新儀表板數據 ---
+        // 建立「折線圖」的函式
+        function createLineChart(data) {
+            if (hourlyChart) hourlyChart.destroy(); // 如果已有圖表，先銷毀它
+            hourlyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: '每小時用電總量 (kWh)',
+                        data: data.total,
+                        borderColor: 'rgba(0, 128, 255, 1)',
+                        backgroundColor: 'rgba(88, 166, 255, 0.2)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: chartOptions
+            });
+        }
+
+        // 建立「堆疊長條圖」的函式
+        function createStackedBarChart(data) {
+            if (hourlyChart) hourlyChart.destroy();
+            const stackedOptions = JSON.parse(JSON.stringify(chartOptions)); // 深拷貝一份設定
+            stackedOptions.scales.x.stacked = true; // 開啟 X 軸堆疊
+            stackedOptions.scales.y.stacked = true; // 開啟 Y 軸堆疊
+            stackedOptions.scales.x.offset = true;
+
+            hourlyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [
+                        {
+                            label: '住宅區用電量',
+                            data: data.residential,
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)'
+                        },
+                        {
+                            label: '辦公區用電量',
+                            data: data.office,
+                            backgroundColor: 'rgba(255, 206, 86, 0.8)'
+                        }
+                    ]
+                },
+                options: stackedOptions
+            });
+        }
+
+        // 從 API 更新儀表板數據
         async function updateDashboard() {
             try {
                 const response = await fetch('http://localhost:3000/api/energy');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
 
-                // 更新數據卡片 
-                realtimePowerEl.textContent = data.realtimePower.toFixed(1);
-                todayKwhEl.textContent = data.todayTotalKWh.toLocaleString('en-US', { maximumFractionDigits: 1 });
-                monthKwhEl.textContent = data.monthTotalKWh.toLocaleString('en-US', { maximumFractionDigits: 1 });
-                todayWaterEl.textContent = data.todayWaterUsage.toFixed(1);
-                monthWaterEl.textContent = data.monthWaterUsage.toFixed(1);
+                //console.log("從後端收到的原始數據:", JSON.stringify(data, null, 2));
 
-                // 更新折線圖 
-                energyChart.data.datasets[0].data = data.hourlyKWh;
-                energyChart.update('none');
+                // 1. 更新電力卡片 (加上安全檢查)
+                if (data && data.power && data.power[currentPowerZone]) {
+                    const powerData = data.power[currentPowerZone];
+                    if (powerData.realtime !== undefined) realtimePowerEl.textContent = powerData.realtime.toFixed(1);
+                    if (powerData.today !== undefined) todayKwhEl.textContent = powerData.today.toLocaleString('en-US', { maximumFractionDigits: 1 });
+                    if (powerData.month !== undefined) monthKwhEl.textContent = powerData.month.toLocaleString('en-US', { maximumFractionDigits: 1 });
+                }
 
-                // 更新圓餅圖數據 
-             waterPieChart.data.datasets[0].data = [
-                    data.waterBreakdown.residential,
-                    data.waterBreakdown.office
-                ];
+                // 2. 更新水力卡片 (加上安全檢查)
+                if (data && data.water) {
+                    if (data.water.todayTotal !== undefined) todayWaterEl.textContent = data.water.todayTotal.toFixed(1);
+                    if (data.water.monthTotal !== undefined) monthWaterEl.textContent = data.water.monthTotal.toLocaleString('en-US', { maximumFractionDigits: 1 });
+            
+                    if (data.water.todayBreakdown) {
+                        if (data.water.todayBreakdown.residential !== undefined) todayWaterResEl.textContent = `${data.water.todayBreakdown.residential.toFixed(1)} 度`;
+                        if (data.water.todayBreakdown.office !== undefined) todayWaterOffEl.textContent = `${data.water.todayBreakdown.office.toFixed(1)} 度`;
+                    }
+            
+                    if (data.water.monthBreakdown) {
+                        if (data.water.monthBreakdown.residential !== undefined) monthWaterResEl.textContent = `${data.water.monthBreakdown.residential.toLocaleString('en-US', { maximumFractionDigits: 1 })} 度`;
+                        if (data.water.monthBreakdown.office !== undefined) monthWaterOffEl.textContent = `${data.water.monthBreakdown.office.toLocaleString('en-US', { maximumFractionDigits: 1 })} 度`;
+                    }
+                }
+
+                // 3. 更新用電量圖表 (加上安全檢查)
+                if (data && data.hourlyData) {
+                    if (!hourlyChart) { 
+                        createStackedBarChart(data.hourlyData); 
+                    } else if (hourlyChart.config.type === 'line' && data.hourlyData.total) { 
+                        hourlyChart.data.datasets[0].data = data.hourlyData.total; 
+                        hourlyChart.update('none'); 
+                    } else if (hourlyChart.config.type === 'bar' && data.hourlyData.residential && data.hourlyData.office) { 
+                        hourlyChart.data.datasets[0].data = data.hourlyData.residential; 
+                        hourlyChart.data.datasets[1].data = data.hourlyData.office; 
+                        hourlyChart.update('none'); 
+                    }
+                }
+        
+                // 4. 更新圓餅圖 (加上安全檢查)
+                if (waterPieChart && data && data.water && data.water.todayBreakdown) {
+                    waterPieChart.data.datasets[0].data = [
+                        data.water.todayBreakdown.residential,
+                        data.water.todayBreakdown.office
+                    ];
                 waterPieChart.update('none');
-
+                }
+                
             } catch (error) {
                 console.error("更新儀表板數據失敗:", error);
             }
+        }
+        
+        // 設定圖表切換按鈕的事件
+        function setupChartToggle() {
+            const lineBtn = document.getElementById('line-chart-btn');
+            const barBtn = document.getElementById('bar-chart-btn');
+
+            lineBtn.addEventListener('click', async () => {
+                const response = await fetch('http://localhost:3000/api/energy');
+                const data = await response.json();
+                createLineChart(data.hourlyData);
+                lineBtn.classList.add('active');
+                barBtn.classList.remove('active');
+            });
+            barBtn.addEventListener('click', async () => {
+                const response = await fetch('http://localhost:3000/api/energy');
+                const data = await response.json();
+                createStackedBarChart(data.hourlyData);
+                barBtn.classList.add('active');
+                lineBtn.classList.remove('active');
+            });
+        }
+
+        function setupDataToggle() {
+             const dataToggleContainer = document.querySelector('.data-section:first-of-type .chart-toggle');
+            const dataToggleButtons = dataToggleContainer.querySelectorAll('.toggle-btn');
+
+            dataToggleButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // 只移除「這組」按鈕的 active class
+                    dataToggleButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    // 更新當前選中的區域
+                    currentPowerZone = button.dataset.zone;
+
+                    // 立刻重新抓取並更新儀表板數據
+                    updateDashboard();
+                });
+            });
         }
 
         // --- UI 框架功能函式 ---
@@ -378,12 +595,47 @@
             });
         }
 
+        // 設定圖表切換按鈕的事件
+        function setupChartToggle() {
+            const lineBtn = document.getElementById('line-chart-btn');
+            const barBtn = document.getElementById('bar-chart-btn');
+
+            // 為「總量趨勢」按鈕新增點擊事件
+            lineBtn.addEventListener('click', async () => {
+                // 從後端獲取最新數據
+                const response = await fetch('http://localhost:3000/api/energy');
+                const data = await response.json();
+                // 呼叫函式來建立「折線圖」
+                createLineChart(data.hourlyData);
+
+                // 更新按鈕的選中樣式
+                lineBtn.classList.add('active');
+                barBtn.classList.remove('active');
+            });
+
+            // 為「用量分佈」按鈕新增點擊事件
+            barBtn.addEventListener('click', async () => {
+                // 從後端獲取最新數據
+                const response = await fetch('http://localhost:3000/api/energy');
+                const data = await response.json();
+                // 呼叫函式來建立「堆疊長條圖」
+                createStackedBarChart(data.hourlyData);
+
+                // 更新按鈕的選中樣式
+                barBtn.classList.add('active');
+                lineBtn.classList.remove('active');
+            });
+        }
+
         // --- 啟動所有功能 ---
         updateDashboard();
         setInterval(updateDashboard, 5000);
         updateDateTime();
         setInterval(updateDateTime, 1000);
         setupSidebarMenu();
+        setupChartToggle();
+        setupDataToggle();
+        });
     </script>
 </body>
 </html>
