@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>能源管理儀表板</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <style>
         /* --- 基礎樣式 --- */
         body { margin: 0; font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; overflow: hidden; background-color: #0d1117; color: #c9d1d9; }
@@ -253,6 +254,106 @@
         .data-card.small .value { font-size: 26px; }
         .data-card.small .unit { font-size: 14px; }
         .pie-chart-container { display: flex; align-items: center; justify-content: center; }
+
+        /* 查詢列樣式 */
+        .query-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        #date-picker {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 8px;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        #search-btn {
+            background-color: #238636;
+            color: white;
+            border: 1px solid #2ea043;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        #search-btn:hover {
+            background-color: #2ea043;
+        }
+
+        /* 結果顯示區樣式 */
+        .results-container {
+            margin-top: 20px;
+        }
+        .placeholder-text {
+            text-align: center;
+            color: #8b949e;
+            font-size: 18px;
+            padding: 40px 0;
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        /* 數據表格樣式 */
+        #results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        #results-table th, #results-table td {
+            padding: 12px 15px;
+            border: 1px solid #30363d;
+            text-align: left;
+        }
+        #results-table thead {
+            background-color: #161b22;
+        }
+        #results-table tbody tr:nth-child(even) {
+            background-color: #1c2128;
+        }
+        #results-table tfoot {
+            font-size: 1.1em;
+            background-color: #161b22;
+        }
+        #results-table td:last-child {
+            text-align: right;
+            font-weight: bold;
+            color: #58a6ff;
+        }
+
+        /* 歷史紀錄頁籤的區塊樣式 */
+            .record-block {
+            margin-bottom: 30px;
+         padding-bottom: 30px;
+            border-bottom: 1px solid #30363d;
+        }
+        .record-block:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+    }
+
+        /* 區塊內小標題 */
+        .block-title {
+            color: #8b949e;
+            font-weight: 500;
+            margin-top: 0;
+        }
+
+        /* 月份選擇器的樣式 */
+        #month-picker {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 8px;
+            border-radius: 6px;
+            font-family: inherit;
+            color-scheme: dark; /* 讓日曆彈窗也是深色的 */
+        }
+
     </style>
 </head>
 <body>
@@ -375,9 +476,31 @@
                     </div>
                 </div>
 
-                <!-- 「歷史紀錄」的內容面板 (預設隱藏) -->
+                <!-- 「歷史紀錄」的內容面板  -->
                 <div id="historical-records" class="tab-content">
-                    <h3 style="text-align: center; color: #8b949e; margin-top: 50px;">歷史紀錄功能建置中...</h3>
+                    <div class="record-block">
+                        <h3 class="block-title">單日紀錄查詢</h3>
+                            <div class="query-bar">
+                            <input type="date" id="date-picker">
+                            <button id="search-btn">搜尋</button>
+                        </div>
+                        <div id="historical-results" class="results-container">
+                            <p class="placeholder-text">請選擇日期並點擊搜尋以載入數據</p>
+                            <table id="results-table" class="hidden">
+                                <thead><tr><th>項目</th><th>用電量 (kWh)</th></tr></thead>
+                                <tbody></tbody>
+                                <tfoot><tr><td><strong>總碳排放量 (公斤 CO2e)</strong></td><td id="carbon-emission-cell">--</td></tr></tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="record-block">
+                        <h3 class="block-title">用電紀錄匯出</h3>
+                        <div class="query-bar">
+                            <input type="month" id="month-picker">
+                            <button id="export-btn">匯出 Excel</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -454,6 +577,15 @@
         const analysisLightingEl = document.getElementById('analysis-lighting');
         const analysisServerEl = document.getElementById('analysis-server');
         const analysisOtherEl = document.getElementById('analysis-other');
+        const datePicker = document.getElementById('date-picker');
+        const searchBtn = document.getElementById('search-btn');
+        const historicalResults = document.getElementById('historical-results');
+        const placeholderText = historicalResults.querySelector('.placeholder-text');
+        const resultsTable = document.getElementById('results-table');
+        const tableBody = resultsTable.querySelector('tbody');
+        const carbonEmissionCell = document.getElementById('carbon-emission-cell');
+        const monthPicker = document.getElementById('month-picker');
+        const exportBtn = document.getElementById('export-btn');
         
         // --- 初始化圖表 ---
         const ctx = document.getElementById('hourly-chart').getContext('2d');
@@ -637,8 +769,25 @@
                                     responsive: true,
                                     maintainAspectRatio: false,
                                     plugins: {
-                                        title: { display: true, text: '本日各項設備耗能佔比', color: '#c9d1d9', font: { size: 28 },padding: { bottom: 20 } },
-                                        legend: { position: 'bottom', labels: { color: '#c9d1d9' },padding: { top: 20 } } // 恢復圖例
+                                        title: {
+                                            display: true,
+                                            text: '本日各項設備耗能佔比',
+                                            color: '#c9d1d9',
+                                            font: { size: 22 }, // ★ 稍微加大標題字體
+                                            padding: {
+                                                bottom: 30 // ★ 增加標題與圖表之間的距離
+                                            }
+                                        },
+                                        legend: {
+                                            position: 'bottom',
+                                            labels: {
+                                                color: '#c9d1d9',
+                                                padding: 60, // ★ 增加圖例與圖表之間的距離
+                                                font: {
+                                                size: 16 // ★ 加大圖例的字體大小
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             });
@@ -652,6 +801,121 @@
             }
         }
         
+        // +++ ▼歷史數據函式 ▼▼▼ +++
+        function setupHistoricalRecords() {
+            // 設定日期選擇器的預設值為今天
+            datePicker.value = new Date().toISOString().split('T')[0];
+
+            searchBtn.addEventListener('click', async () => {
+                const selectedDate = datePicker.value;
+                if (!selectedDate) {
+                    alert('請選擇一個日期');
+                    return;
+                }
+
+                // 顯示載入中訊息
+                placeholderText.textContent = '正在載入數據...';
+                placeholderText.classList.remove('hidden');
+                resultsTable.classList.add('hidden');
+
+                try {
+                    const response = await fetch(`http://localhost:3000/api/historical-power?date=${selectedDate}`);
+                    const data = await response.json();
+
+                    // 清空舊的表格內容
+                    tableBody.innerHTML = '';
+
+                    // 建立表格內容
+                    const rows = [
+                        { label: '辦公區 - 電力', value: data.officeConsumption.power },
+                        { label: '辦公區 - 空調', value: data.officeConsumption.ac },
+                        { label: '辦公區 - 照明', value: data.officeConsumption.lighting },
+                        { label: '辦公區 - 機房', value: data.officeConsumption.serverRoom },
+                        { label: '辦公區 - 其他', value: data.officeConsumption.other },
+                        { label: '<strong>辦公區總用電量</strong>', value: data.totalOfficeConsumption },
+                        { label: '<strong>住宅區總用電量</strong>', value: data.residentialConsumption },
+                        { label: '<strong>當日總用電量</strong>', value: data.totalConsumption },
+                    ];
+
+                    rows.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row.label}</td>
+                            <td>${row.value.toLocaleString('en-US', { maximumFractionDigits: 1 })} kWh</td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+
+                    // 更新碳排放量
+                    carbonEmissionCell.textContent = data.carbonEmission.toLocaleString('en-US', { maximumFractionDigits: 1 });
+
+                    // 顯示表格
+                    placeholderText.classList.add('hidden');
+                    resultsTable.classList.remove('hidden');
+
+                } catch (error) {
+                    placeholderText.textContent = '載入數據失敗，請稍後再試。';
+                    console.error("載入歷史數據失敗:", error);
+                }
+            });
+        }
+
+        function setupExportFeature() {
+            // 設定月份選擇器的預設值為當前月份
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            monthPicker.value = `${year}-${month}`;
+
+            exportBtn.addEventListener('click', async () => {
+                const [selectedYear, selectedMonth] = monthPicker.value.split('-');
+                if (!selectedYear || !selectedMonth) {
+                    alert('請選擇一個有效的月份');
+                    return;
+                }
+
+                // 禁用按鈕並顯示載入中
+                exportBtn.disabled = true;
+                exportBtn.textContent = '正在產生...';
+
+                try {
+                    // 1. 從後端獲取整個月的數據
+                    const response = await fetch(`http://localhost:3000/api/monthly-power-report?year=${selectedYear}&month=${selectedMonth}`);
+                    const monthlyData = await response.json();
+
+                    // 2. 將 JSON 數據轉換為 Excel 工作表需要的格式
+                    const dataForExcel = monthlyData.map(day => ({
+                        '日期': day.date,
+                        '辦公區-電力(kWh)': day.officeConsumption.power,
+                        '辦公區-空調(kWh)': day.officeConsumption.ac,
+                        '辦公區-照明(kWh)': day.officeConsumption.lighting,
+                        '辦公區-機房(kWh)': day.officeConsumption.serverRoom,
+                        '辦公區-其他(kWh)': day.officeConsumption.other,
+                        '辦公區-總計(kWh)': day.totalOfficeConsumption,
+                        '住宅區-總計(kWh)': day.residentialConsumption,
+                        '當日總用電量(kWh)': day.totalConsumption,
+                        '碳排放量(kg CO2e)': day.carbonEmission
+                    }));
+
+                    // 3. 使用 SheetJS 產生 Excel 檔案
+                    const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "月度耗能報告");
+
+                    // 4. 觸發下載
+                    XLSX.writeFile(workbook, `興隆社宅_${selectedYear}-${selectedMonth}_耗能報告.xlsx`);
+
+                } catch (error) {
+                    console.error("匯出 Excel 失敗:", error);
+                    alert("產生報告失敗，請查看主控台錯誤訊息。");
+                } finally {
+                    // 恢復按鈕狀態
+                    exportBtn.disabled = false;
+                    exportBtn.textContent = '匯出 Excel';
+                }
+            });
+        }
+
         // 設定圖表切換按鈕的事件
         function setupChartToggle() {
             const lineBtn = document.getElementById('line-chart-btn');
@@ -784,6 +1048,8 @@
         setupChartToggle();
         setupDataToggle();
         setupTabNavigation();
+        setupHistoricalRecords();
+        setupExportFeature();
         });
     </script>
 </body>
