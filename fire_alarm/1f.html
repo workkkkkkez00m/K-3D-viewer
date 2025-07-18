@@ -125,6 +125,76 @@
             color: inherit;
             text-decoration: none; /* 移除底線 */
         }
+
+        /* ★★★ 火警相關樣式 ★★★ */
+        /* 總體狀態提示 */
+        #master-alarm-status {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            z-index: 50;
+            transition: background-color 0.5s;
+        }
+        .status-ok { background-color: rgba(46, 204, 113, 0.8); } /* 綠色 */
+        .status-alarm { background-color: rgba(231, 76, 60, 0.9); } /* 紅色 */
+
+        /* 3D 場景中的火警圖示容器 */
+        #alarm-icons-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; /* 讓滑鼠可以穿透此容器 */
+        }
+
+        /* 單個火警圖示的樣式 */
+        .alarm-icon {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background-color: #e74c3c; /* 使用一個更柔和的紅色 */
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 8px rgb(255, 0, 0); /* 為圖示本身增加紅色光暈 */
+
+            /* --- 確保置中的設定 --- */
+            display: none; /* visible class 會把它改成 flex */
+            justify-content: center; /* 水平置中 */
+            align-items: center;     /* 垂直置中 */
+            line-height: 1;          /* ★ 確保行高不會干擾垂直置中 */
+
+            /* --- 讓驚嘆號更明顯的設定 --- */
+            color: white;
+            font-size: 18px;    /* ★ 加大字體 */
+            font-weight: 900;   /* ★ 使用更粗的字重 */
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.9); /* ★ 新增文字陰影 */
+        }
+
+        .alarm-icon.visible { display: flex; } /* 作用中時顯示 */
+        .alarm-icon::before, .alarm-icon::after {
+            content: '';
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%; height: 100%;
+            background-color: red;
+            border-radius: 50%;
+            animation: pulse 2s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .alarm-icon::after {
+            animation-delay: 1s; /* 第二個光圈延遲 1 秒播放 */
+        }
+        
+        /* 脈衝動畫的定義 */
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -135,6 +205,8 @@
             <h1 id="project-title">興隆社會住宅I區智慧中央監控系統</h1>
         </a>
         <div id="datetime-container"></div>
+        <div id="master-alarm-status" class="status-ok">系統正常</div>
+        <div id="alarm-icons-container"></div>
     </header>
     <nav id="sidebar-menu">
         <button id="close-menu-btn">&times;</button>
@@ -211,6 +283,7 @@
         import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
         import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
         import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
+        import { DRACOLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/DRACOLoader.js';
 
         // --- 變數宣告區 ---
         const scene = new THREE.Scene();
@@ -218,6 +291,7 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         const controls = new OrbitControls(camera, renderer.domElement);
         let model;
+        let fireAlarmPoints = []; // 儲存從後端獲取的火警點
         
         const monitoringPoints = [];
         
@@ -229,6 +303,8 @@
         const frontViewBtn = document.getElementById('front-view-btn');
         const topViewBtn = document.getElementById('top-view-btn');
         const sideViewBtn = document.getElementById('side-view-btn');
+        const masterStatusEl = document.getElementById('master-alarm-status');
+        const iconsContainer = document.getElementById('alarm-icons-container');
 
         const minDistance = 10, maxDistance = 50, minScale = 0.3, maxScale = 1.0;
 
@@ -238,9 +314,9 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
-            
+                        
             // ▼▼▼ 相機位置，從正上方往下看 ▼▼▼
-            camera.position.set(0, 40, 0);
+            camera.position.set(0, 45, 0);
             
             scene.add(new THREE.AmbientLight(0xffffff, 0.6));
             const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -268,12 +344,60 @@
             controls.enablePan = true;
             controls.enableZoom = true;
 
-            // 4. 為了方便俯視角操作，我們將滑鼠左鍵也改為平移
+            // 4. 為了方便俯視角操作，將滑鼠左鍵也改為平移
             controls.mouseButtons = {
                 LEFT: THREE.MOUSE.PAN,
                 MIDDLE: THREE.MOUSE.DOLLY, // 中鍵滾輪點擊 = 縮放 (可選)
                 RIGHT: THREE.MOUSE.PAN
             };
+
+            // ★★★ 從後端獲取火警狀態的函式 ★★★
+            async function updateFireAlarmStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/fire-alarm/1f');
+                const latestData = await response.json();
+
+                // 更新或新增偵測點數據
+                latestData.forEach(newPoint => {
+                    const existingPoint = fireAlarmPoints.find(p => p.id === newPoint.id);
+                    if (existingPoint) {
+                        existingPoint.active = newPoint.active; // 只更新狀態
+                    } else {
+                        fireAlarmPoints.push({ ...newPoint, targetObject: null, element: null });
+                    }
+                });
+
+                // 檢查是否有任何警報正在作用中
+                const isAlarmActive = fireAlarmPoints.some(p => p.active);
+                if (isAlarmActive) {
+                    masterStatusEl.textContent = "火警警報作用中！";
+                    masterStatusEl.className = 'status-alarm';
+                } else {
+                    masterStatusEl.textContent = "系統正常";
+                    masterStatusEl.className = 'status-ok';
+                }
+
+                // 在模型載入後，確保所有點都被綁定
+                if (model) {
+                    bindObjectsToPoints();
+                }
+
+            } catch (error) {
+                console.error("更新火警狀態失敗:", error);
+            }
+        }
+
+        // ★★★ 將 3D 物件綁定到數據點的函式 ★★★
+        function bindObjectsToPoints() {
+            model.traverse((object) => {
+                const point = fireAlarmPoints.find(p => p.name === object.name && !p.targetObject);
+                if (point) {
+                    point.targetObject = object;
+                    console.log(`成功綁定火警物件: ${point.name}`);
+                }
+            });
+        }
+
             const loader = new GLTFLoader();
             loader.load(
                 'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/fire_alarm/1f_model.glb',
@@ -298,66 +422,64 @@
             );
 
             // --- 點擊模型以查詢物件名稱 ---
-            //const raycasterForClick = new THREE.Raycaster();
-            //const mouseForClick = new THREE.Vector2();
+            /*const raycasterForClick = new THREE.Raycaster();
+            const mouseForClick = new THREE.Vector2();
 
-            //window.addEventListener('click', (event) => {
-            // 只在側邊欄關閉時才觸發點擊查詢
-                //if (!sidebarMenu.classList.contains('open')) {
-                    //mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
-                    //mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
+            window.addEventListener('click', (event) => {
+                // 只在側邊欄關閉時才觸發點擊查詢
+                if (!sidebarMenu.classList.contains('open')) {
+                    mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
+                    mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-                    //raycasterForClick.setFromCamera(mouseForClick, camera);
-                    //const intersects = raycasterForClick.intersectObjects(scene.children, true);
+                    raycasterForClick.setFromCamera(mouseForClick, camera);
+                    const intersects = raycasterForClick.intersectObjects(scene.children, true);
 
-                //if (intersects.length > 0) {
+                if (intersects.length > 0) {
                     //const clickedObject = intersects[0].object;
-                //console.log('您點擊了:', clickedObject);
-                //console.log('物件名稱:', clickedObject.name);
-                //console.log('物件位置:', clickedObject.position);
-                    //}
-                //}
-            //});
+                console.log('您點擊了:', clickedObject);
+                console.log('物件名稱:', clickedObject.name);
+                console.log('物件位置:', clickedObject.position);
+                    }
+                }
+            });*/
 
             animate();
             setupEventListeners();
             updateDateTime();
             setInterval(updateDateTime, 1000);
+            // ★★★ 啟動火警狀態的定時更新 ★★★
+            updateFireAlarmStatus();
+            setInterval(updateFireAlarmStatus, 5000);
         }
 
         // --- 動畫迴圈 ---
-        function animate() {
+         function animate() {
             requestAnimationFrame(animate);
             controls.update();
 
-            for (const point of monitoringPoints) {
+            // ★★★ 更新火警圖示的位置和可見性 ★★★
+            for (const point of fireAlarmPoints) {
                 if (point.targetObject) {
+                    // 如果圖示還沒被建立，就現在建立它
                     if (!point.element) {
-                        const label = document.createElement('div');
-                        label.className = 'status-label';
-                        labelsContainer.appendChild(label);
-                        point.element = label;
+                        const icon = document.createElement('div');
+                        icon.className = 'alarm-icon';
+                        icon.innerHTML = '!'; // 圖示中間的符號
+                        iconsContainer.appendChild(icon);
+                        point.element = icon;
                     }
-                    
-                    const position = new THREE.Vector3();
-                    new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
-                    
-                    const distance = camera.position.distanceTo(position);
-                    const distanceProgress = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
-                    const scale = maxScale - (maxScale - minScale) * distanceProgress;
 
-                    position.project(camera);
-                    const x = (position.x * 0.5 + 0.5) * window.innerWidth;
-                    const y = (position.y * -0.5 + 0.5) * window.innerHeight;
+                    // 根據 active 狀態決定是否顯示
+                    point.element.classList.toggle('visible', point.active);
                     
-                    point.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scale})`;
-                    point.element.innerHTML = `${point.text}: <span style="color:red;">${point.status}</span>`;
-                    
-                    // --- ★★★ 新增：根據狀態切換 CSS Class ★★★ ---
-                    if (point.status === '開啟') {
-                        point.element.className = 'status-label status-open';
-                    } else {
-                        point.element.className = 'status-label status-closed';
+                    if (point.active) {
+                        // 如果是作用中，才需要計算並更新位置
+                        const position = new THREE.Vector3();
+                        new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
+                        position.project(camera);
+                        const x = (position.x * 0.5 + 0.5) * window.innerWidth;
+                        const y = (position.y * -0.5 + 0.5) * window.innerHeight;
+                        point.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
                     }
                 }
             }
