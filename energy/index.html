@@ -262,26 +262,40 @@
             margin-bottom: 20px;
             align-items: center;
         }
-        #date-picker {
+        /*#date-picker {
             background-color: #161b22;
             border: 1px solid #30363d;
             color: #c9d1d9;
             padding: 8px;
             border-radius: 6px;
             font-family: inherit;
-        }
-        #search-btn {
-            background-color: #238636;
+        }*/
+        /* 1. 建立一個通用的按鈕 class */
+        .query-bar button {
             color: white;
-            border: 1px solid #2ea043;
-            padding: 8px 16px;
+            border: none; /* 移除預設邊框 */
+            padding: 9px 16px; /* 調整 padding 讓高度和日期選擇器更一致 */
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 16px; /* 統一字體大小 */
             transition: background-color 0.2s;
         }
+
+        /* 2. 為「搜尋」按鈕設定專屬顏色 */
+        #search-btn {
+            background-color: #238636; /* 綠色 */
+        }
         #search-btn:hover {
-            background-color: #2ea043;
+            background-color: #2ea043; /* 懸停時的亮綠色 */
+        }
+
+        /* 3. 為「匯出」按鈕設定專屬顏色 */
+        #export-btn {
+            background-color: #007bff; /* 主題藍色 */
+        }
+        #export-btn:hover {
+            background-color: #0069d9; /* 懸停時的深藍色 */
         }
 
         /* 結果顯示區樣式 */
@@ -343,15 +357,17 @@
             margin-top: 0;
         }
 
-        /* 月份選擇器的樣式 */
+        /* 日期、月份選擇器的樣式 */
+        #date-picker,
         #month-picker {
-            background-color: #161b22;
-            border: 1px solid #30363d;
+            background-color: #21262d; /* ★ 使用一個稍亮的背景色 */
+            border: 1px solid #58a6ff; /* ★ 使用主題藍色作為邊框，提示可互動 */
             color: #c9d1d9;
-            padding: 8px;
+            padding: 8px 12px;
             border-radius: 6px;
             font-family: inherit;
-            color-scheme: dark; /* 讓日曆彈窗也是深色的 */
+            font-size: 16px;
+            color-scheme: dark; /* 盡可能讓彈出的日曆也是深色的 */
         }
 
     </style>
