@@ -122,7 +122,7 @@
 
         /* 移除標題連結的預設樣式 */
         #home-link-title {
-            color: inherit;
+            color: inherit; /* 繼承父元素(header)的文字顏色，也就是白色 */
             text-decoration: none; /* 移除底線 */
         }
     </style>
@@ -173,12 +173,12 @@
             <li class="system-category">
                 <a href="#">影像對講系統</a>
                 <ul class="floor-submenu">
-                   <li><a href="../video_intercom/1f.html">1F</a></li>                   
+                   <li><a href="../video_intercom/1f.html">1F</a></li>
                    <li><a href="../video_intercom/2f.html">2F</a></li>
                    <li><a href="../video_intercom/3f.html">3F</a></li>
                    <li><a href="../video_intercom/4f.html">4F</a></li>
-                   <li><a href="../video_intercom/5f.html">5F</a></li> 
-            </ul>
+                   <li><a href="../video_intercom/5f.html">5F</a></li>
+                </ul>
             </li>
             <li class="system-category">
                 <a href="#">消防火警系統</a>
@@ -204,7 +204,7 @@
         <button id="side-view-btn">側視圖</button>
     </div>
     <div id="controls-helper">左鍵: 旋轉 | 右鍵: 平移 | 滾輪: 縮放</div>
-    <div id="floor-indicator">當前樓層: 門禁保全系統 - 2F</div>
+    <div id="floor-indicator">當前樓層: 消防火警系統 - 2F</div>
     <div id="labels-container"></div>
 
     <script type="module">
@@ -253,7 +253,7 @@
             
             const loader = new GLTFLoader();
             loader.load(
-                'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/access_control/2f_model.glb',
+                'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/fire_alarm/2f_model.glb',
                 (gltf) => {
                     model = gltf.scene;
                     const box = new THREE.Box3().setFromObject(model);

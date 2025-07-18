@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>興隆社會住宅I區智慧中央監控系統 - 2F</title>
+    <title>興隆社會住宅I區智慧中央監控系統 - 5F</title>
     <style>
         /* --- 基本樣式 --- */
         body { margin: 0; font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; overflow: hidden; }
@@ -122,7 +122,7 @@
 
         /* 移除標題連結的預設樣式 */
         #home-link-title {
-            color: inherit;
+            color: inherit; /* 繼承父元素(header)的文字顏色，也就是白色 */
             text-decoration: none; /* 移除底線 */
         }
     </style>
@@ -173,12 +173,12 @@
             <li class="system-category">
                 <a href="#">影像對講系統</a>
                 <ul class="floor-submenu">
-                   <li><a href="../video_intercom/1f.html">1F</a></li>                   
+                   <li><a href="../video_intercom/1f.html">1F</a></li>
                    <li><a href="../video_intercom/2f.html">2F</a></li>
                    <li><a href="../video_intercom/3f.html">3F</a></li>
                    <li><a href="../video_intercom/4f.html">4F</a></li>
-                   <li><a href="../video_intercom/5f.html">5F</a></li> 
-            </ul>
+                   <li><a href="../video_intercom/5f.html">5F</a></li>
+                </ul>
             </li>
             <li class="system-category">
                 <a href="#">消防火警系統</a>
@@ -204,7 +204,7 @@
         <button id="side-view-btn">側視圖</button>
     </div>
     <div id="controls-helper">左鍵: 旋轉 | 右鍵: 平移 | 滾輪: 縮放</div>
-    <div id="floor-indicator">當前樓層: 門禁保全系統 - 2F</div>
+    <div id="floor-indicator">當前樓層: 消防火警系統 - 5F</div>
     <div id="labels-container"></div>
 
     <script type="module">
@@ -220,7 +220,27 @@
         const controls = new OrbitControls(camera, renderer.domElement);
         let model;
         
-        const monitoringPoints = [];
+        const monitoringPoints = [
+            { name: "AW2037_1", text: "窗戶", status: "關閉", targetObject: null, element: null },
+            { name: "ADW2001", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3021", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3020", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3019", text: "門位", status: "開啟", targetObject: null, element: null },
+            { name: "ADW1001", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW4009", text: "門位", status: "開啟", targetObject: null, element: null },
+            { name: "ADW3015", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3017", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW4006", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW4007", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3011", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3016", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3012", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3013", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW4008", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3018", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW3014", text: "門位", status: "關閉", targetObject: null, element: null },
+            { name: "ADW4005", text: "門位", status: "關閉", targetObject: null, element: null },
+        ];
         
         const labelsContainer = document.getElementById('labels-container');
         const datetimeContainer = document.getElementById('datetime-container');
@@ -253,7 +273,7 @@
             
             const loader = new GLTFLoader();
             loader.load(
-                'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/access_control/2f_model.glb',
+                'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/fire_alarm/5f_model.glb',
                 (gltf) => {
                     model = gltf.scene;
                     const box = new THREE.Box3().setFromObject(model);
@@ -413,9 +433,49 @@
             const timeString = now.toLocaleTimeString('zh-TW', timeOptions);
             datetimeContainer.textContent = `${dateString} ${timeString}`;
         }
+        // --- ★★★ 模擬從後端 API 獲取並更新數據的函式 ★★★ ---
+        //async function updateDataFromAPI() {
+            /*try {
+        // 1. 呼叫建立的後端 API
+                const response = await fetch('http://localhost:3000/api/status');
+                const latestData = await response.json();
 
+        // 2. 更新前端的資料
+            for (const point of monitoringPoints) {
+                const newData = latestData.find(d => d.name === point.name);
+            if (newData) {
+                point.status = newData.status; // 只更新狀態，保留其他前端資訊
+            }
+        }
+        console.log("已從 API 更新數據");
+
+            } catch (error) {
+            console.error("從 API 更新數據失敗:", error);
+            }
+        }*/
+
+        // --- ★★★ 模擬從後端 API 獲取並更新數據的函式 ★★★ ---
+        function updateMonitoringData() {
+            console.log("正在模擬從伺服器獲取最新數據...");
+
+            // 遍歷所有監控點
+            for (const point of monitoringPoints) {
+                // 隨機邏輯來模擬狀態變化
+                // 正式上線時，這裡會被替換為 fetch API 的程式碼
+                if (Math.random() > 0.5) {
+                    point.status = "開啟";
+                } else {
+                    point.status = "關閉";
+                }
+            }
+        }
         // --- 啟動 ---
         init();
+
+        // 設定每 5 秒鐘自動更新一次監控數據 +++
+        // 5000 代表 5000 毫秒，也就是 5 秒
+            setInterval(updateMonitoringData, 5000);  
+            /*setInterval(updateDataFromAPI, 5000);*/
 
     </script>
 </body>
