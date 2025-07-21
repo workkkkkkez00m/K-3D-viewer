@@ -203,6 +203,7 @@
         import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
         import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
         import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
+        import { DRACOLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/DRACOLoader.js';
 
         // --- 變數宣告區 ---
         const scene = new THREE.Scene();
@@ -231,7 +232,7 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
 
-            camera.position.set(0, 10, 25);
+            camera.position.set(0, 15, 30);
             
             scene.add(new THREE.AmbientLight(0xffffff, 0.6));
             const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -243,6 +244,9 @@
             controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: null, RIGHT: THREE.MOUSE.PAN };
             
             const loader = new GLTFLoader();
+            const dracoLoader = new DRACOLoader();
+            dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+            loader.setDRACOLoader(dracoLoader);
             loader.load(
                 'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/video_intercom/5f_model.glb',
                 (gltf) => {
