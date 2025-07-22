@@ -131,14 +131,69 @@
             scrollbar-width: thin;
             scrollbar-color: #4F565E transparent;
         }
+        #info-panel {
+            position: absolute; /* 絕對定位，讓它浮在 3D 場景之上 */
+            top: 50px;
+            left: 30px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 200px; /* 設定一個固定寬度 */
+        }
+
+        /* 單張資訊卡片的樣式 */
+        .info-card {
+            background-color: rgba(32, 45, 62, 0.8); /* 半透明深灰色背景 */
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 15px 20px;
+            backdrop-filter: blur(2px); /* ★ 增加玻璃模糊效果 */
+            -webkit-backdrop-filter: blur(5px); /* 針對 Safari 的相容性寫法 */
+        }
+
+        /* 卡片標題 */
+        .info-title {
+            color: #cbcdcf;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        /* 卡片數值 */
+        .info-value {
+            color: #c9d1d9;
+            font-size: 20px;
+            font-weight: 600;
+        }
 
     </style>
 </head>
 <body>
 
     <div id="scene-container"></div>
+        <div id="info-panel">
+            <div class="info-card">
+                <div class="info-title">環境溫溼度</div>
+                <div class="info-value">
+                    <span id="info-temp">--</span>°C / <span id="info-humidity">--</span>%
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-title">全區即時用電</div>
+                <div class="info-value">
+                    <span id="info-power">--</span> kW
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-title">本日碳排放量</div>
+                <div class="info-value">
+                    <span id="info-carbon">--</span> kg CO₂e
+                </div>
+            </div>
+        </div>
 
-    <div id="ui-panel">
+
+    <div id="ui-panel">    
         <h1>智慧中央監控系統</h1>
         <p>請選擇您要檢視的子系統，以進入對應樓層的 3D 監控畫面。</p>
         
@@ -208,6 +263,10 @@
 
         // --- 3D 場景相關程式碼 ---
         const sceneContainer = document.getElementById('scene-container');
+        const tempEl = document.getElementById('info-temp');
+        const humidityEl = document.getElementById('info-humidity');
+        const powerEl = document.getElementById('info-power');
+        const carbonEl = document.getElementById('info-carbon');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0d1117);
         const camera = new THREE.PerspectiveCamera(50, sceneContainer.clientWidth / sceneContainer.clientHeight, 0.1, 1000);
@@ -250,6 +309,31 @@
             renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
         });
 
+        async function updateInfoPanel() {
+            try {
+                // 使用儀表板 API
+                const response = await fetch('http://localhost:3000/api/energy');
+                if (!response.ok) return; // 如果請求失敗，就直接跳出
+                const data = await response.json();
+
+                // 模擬溫溼度數據
+                const temp = 25 + (Math.random() - 0.5) * 2;
+                const humidity = 55 + (Math.random() - 0.5) * 10;
+
+                // 計算本日碳排放量
+                const carbonEmission = data.power.total.today * 0.495; // 使用 2023 年係數
+
+                // 更新 HTML 元素的內容
+                tempEl.textContent = temp.toFixed(1);
+                humidityEl.textContent = humidity.toFixed(0);
+                powerEl.textContent = data.power.total.realtime.toFixed(1);
+                carbonEl.textContent = carbonEmission.toLocaleString('en-US', { maximumFractionDigits: 1 });
+
+            } catch (error) {
+                console.error("更新即時資訊失敗:", error);
+            }
+        }
+
         // --- ★★★ 懸浮選單互動功能 ★★★ ---
         const systemButtons = document.querySelectorAll('.system-btn');
 
@@ -288,6 +372,8 @@
                 openMenu.classList.remove('show');
             });
         });
+
+        setInterval(updateInfoPanel, 5000);
 
     </script>
 </body>

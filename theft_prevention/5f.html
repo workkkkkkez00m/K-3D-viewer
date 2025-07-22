@@ -224,7 +224,7 @@
         let model;
         
         const monitoringPoints = [
-            { name: "AW2037_1", text: "窗戶", status: "關閉", targetObject: null, element: null },
+            { name: "90_x_90cm307_9", text: "窗戶", status: "關閉", targetObject: null, element: null },
             { name: "ADW2001", text: "門位", status: "關閉", targetObject: null, element: null },
             { name: "ADW3021", text: "門位", status: "關閉", targetObject: null, element: null },
             { name: "ADW3020", text: "門位", status: "關閉", targetObject: null, element: null },
@@ -301,26 +301,26 @@
             );
 
             // --- 點擊模型以查詢物件名稱 ---
-            //const raycasterForClick = new THREE.Raycaster();
-            //const mouseForClick = new THREE.Vector2();
+            const raycasterForClick = new THREE.Raycaster();
+            const mouseForClick = new THREE.Vector2();
 
-            //window.addEventListener('click', (event) => {
+            window.addEventListener('click', (event) => {
             // 只在側邊欄關閉時才觸發點擊查詢
-                //if (!sidebarMenu.classList.contains('open')) {
-                    //mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
-                    //mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
+                if (!sidebarMenu.classList.contains('open')) {
+                    mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
+                    mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-                    //raycasterForClick.setFromCamera(mouseForClick, camera);
-                    //const intersects = raycasterForClick.intersectObjects(scene.children, true);
+                    raycasterForClick.setFromCamera(mouseForClick, camera);
+                    const intersects = raycasterForClick.intersectObjects(scene.children, true);
 
-                //if (intersects.length > 0) {
-                    //const clickedObject = intersects[0].object;
-                //console.log('您點擊了:', clickedObject);
-                //console.log('物件名稱:', clickedObject.name);
-                //console.log('物件位置:', clickedObject.position);
-                    //}
-                //}
-            //});
+                if (intersects.length > 0) {
+                    const clickedObject = intersects[0].object;
+                console.log('您點擊了:', clickedObject);
+                console.log('物件名稱:', clickedObject.name);
+                console.log('物件位置:', clickedObject.position);
+                    }
+                }
+            });
 
             animate();
             setupEventListeners();
