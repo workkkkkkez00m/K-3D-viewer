@@ -17,13 +17,13 @@
 
         /* --- UI 元素樣式 --- */
         #top-banner {
-            position: absolute; top: 0; left: 0; width: 100%;
+            position: relative; top: 0; left: 0; width: 100%;
             background-color: rgba(0, 0, 0, 0.7); color: white;
             display: flex; justify-content: space-between; align-items: center;
             padding: 10px 20px; box-sizing: border-box; z-index: 20;
         }
-        #project-title { margin: 0; font-size: 22px; font-weight: 500; margin-left: 15px; }
-        #datetime-container { font-size: 18px; }
+        #project-title { margin: 0; font-size: 22px; font-weight: 500; }
+        #datetime-container { font-size: 16px; }
         #menu-toggle-btn {
             background: none; border: none; color: white; font-size: 24px;
             cursor: pointer; padding: 0 10px;
@@ -130,6 +130,12 @@
         #home-link-title {
             color: inherit; /* 繼承父元素(header)的文字顏色，也就是白色 */
             text-decoration: none; /* 移除底線 */
+            position: absolute; /* ★ 1. 讓標題脫離文檔流，進行絕對定位 */
+            left: 50%;          /* ★ 2. 將標題的左側邊緣，對齊到父容器的中心線 */
+            top: 50%;           /* ★ 3. 將標題的頂部邊緣，對齊到父容器的中心線 */
+            transform: translate(-50%, -50%); /* ★ 4. 將標題向左、向上移動自身寬高的一半，實現完美置中 */
+            width: 60%; /* 設定一個寬度，防止標題在小螢幕上與兩側元素重疊 */
+            text-align: center;
         }
         .header-right-items {
             display: flex;
@@ -209,6 +215,13 @@
                     <li><a href="../fire_alarm/4f.html">4F</a></li>
                     <li><a href="../fire_alarm/5f.html">5F</a></li>
                 </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">給排水系統</a>
+                <ul class="floor-submenu">
+                   <li><a href="../plumbing_drainage/b3f.html">B3F</a></li>                   
+                </ul>
+            </li>
             <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;">能源管理儀表板</a></li>
             <li>
                 <a id="back-to-home-btn" href="../index.html">‹ 回首頁</a>
