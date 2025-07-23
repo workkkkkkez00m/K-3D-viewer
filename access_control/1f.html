@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>興隆社會住宅I區智慧中央監控系統 - 1F</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
+    <link rel="shortcut icon" href="../assets/favicon.ico">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* --- 基本樣式 --- */
         body { margin: 0; font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; overflow: hidden; }
@@ -125,6 +131,18 @@
             color: inherit;
             text-decoration: none; /* 移除底線 */
         }
+        /*icon*/
+        .header-right-items {
+            display: flex;
+            align-items: center; /* 讓日期時間和圖示垂直置中對齊 */
+            gap: 15px; /* 在日期時間和圖示之間增加間距 */
+        }
+
+        /* 2. 右上角 Logo 圖示的樣式 */
+        #logo-icon-right {
+            height: 32px; /* 設定圖示的高度 */
+         width: 32px;  /* 設定圖示的寬度 */
+        }
     </style>
 </head>
 <body>
@@ -134,7 +152,10 @@
         <a href="https://workkkkkkez00m.github.io/K-3D-viewer/index.html" id="home-link-title">
             <h1 id="project-title">興隆社會住宅I區智慧中央監控系統</h1>
         </a>
-        <div id="datetime-container"></div>
+        <div class="header-right-items">
+            <div id="datetime-container"></div>
+            <img src="../assets/favicon-32x32.png" id="logo-icon-right" alt="系統圖示">
+        </div>
     </header>
     <nav id="sidebar-menu">
         <button id="close-menu-btn">&times;</button>

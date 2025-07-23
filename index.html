@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>興隆社會住宅I區 - 系統總覽</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
+    <link rel="shortcut icon" href="../assets/favicon.ico">
     <style>
         /* --- 基礎樣式 --- */
         body {
@@ -165,12 +169,24 @@
             font-size: 20px;
             font-weight: 600;
         }
+        /* 左下角懸浮 Logo 的樣式 */
+        #bottom-left-logo {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            z-index: 10;
+            height: 64px; /* 設定一個較大的圖示尺寸 */
+            width: 64px;
+            opacity: 0.8; /* 讓圖示稍微有點透明感，更好地融入背景 */
+            transition: opacity 0.2s;
+            pointer-events: none; /* 讓滑鼠可以穿透圖示，不會擋住模型操作 */
+        }
 
     </style>
 </head>
 <body>
 
-    <div id="scene-container"></div>
+    <div id="scene-container">
         <div id="info-panel">
             <div class="info-card">
                 <div class="info-title">環境溫溼度</div>
@@ -191,6 +207,8 @@
                 </div>
             </div>
         </div>
+        <img src="./assets/apple-touch-icon.png" id="bottom-left-logo" alt="系統圖示">
+    </div>
 
 
     <div id="ui-panel">    
