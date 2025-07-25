@@ -247,7 +247,15 @@
                 <ul class="floor-submenu">
                    <li><a href="../plumbing_drainage/b3f.html">B3F</a></li>                   
                 </ul>
-            </li>                        
+            </li>
+            <li class="system-category">
+                <a href="#">停車管理系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../parking_management/b1f.html">B1F</a></li>
+                    <li><a href="../parking_management/b2f.html">B2F</a></li>
+                    <li><a href="../parking_management/b3f.html">B3F</a></li>                   
+                </ul>
+            </li>                           
             <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;">能源管理儀表板</a></li>
             <li>
                 <a id="back-to-home-btn" href="../index.html">‹ 回首頁</a>
@@ -310,6 +318,8 @@
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
             controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: null, RIGHT: THREE.MOUSE.PAN };
+            // ★ 限制攝影機最低只能到高於水平線 20 度的視角 (70度角)
+            controls.maxPolarAngle = 70 * (Math.PI / 180);
             
             const loader = new GLTFLoader();
             const dracoLoader = new DRACOLoader();
