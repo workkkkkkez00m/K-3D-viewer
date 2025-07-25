@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>興隆社會住宅I區智慧中央監控系統 - B3F</title>
+    <title>社會住宅I區智慧中央監控系統 - B3F</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
@@ -70,7 +70,7 @@
             transition: max-height 0.4s ease-in-out; /* 平滑的展開/收合動畫 */
         }
         #ui-container {
-            position: absolute; top: 80px; right: 20px; display: flex;
+            /*隱藏視圖按鈕*/display: none !important; position: absolute; top: 80px; right: 20px; display: flex;
             flex-direction: column; gap: 10px; z-index: 10;
         }
         #ui-container button {
@@ -89,28 +89,158 @@
             background-color: rgba(0, 0, 0, 0.5); color: #cccccc; font-size: 16px;
             font-weight: bold; border-radius: 5px; z-index: 10; pointer-events: none;
         }
+        /* 1. 狀態標籤的基礎樣式 (現在是 Flexbox 容器) */
+        #labels-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+
         .status-label {
             position: absolute;
-            padding: 8px 12px;
-            color: rgb(0, 0, 0);
-            border-radius: 5px;
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            font-size: 16px;
-            font-weight: bold;
+            display: flex;
+            align-items: center;
+            width: 36px;   /* 固定寬度 */   
+            height: 36px; /* 固定高度 */
+            padding: 0 ; 
+            color: white;
+            border-radius: 50%; /* 形成圓形 */
+            border: 1px solid rgba(255, 255, 255, 0.3);
             user-select: none;
-            pointer-events: none; /* 禁止鼠標事件，避免干擾模型交互 */
-            transition: background-color 0.3s, transform 0.1s; /* 加入背景顏色過渡效果 */
+            pointer-events: auto; /* ★ 允許標籤接收點擊事件 */
+            cursor: pointer;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* 平滑過渡效果 */
+            overflow: hidden; /* 隱藏超出的文字內容 */
+        }
+        .status-running { background-color: rgba(46, 204, 113, 0.8); }
+        .status-stopped { background-color: rgba(63, 63, 63, 0.8); }
+
+        .pump-icon {
+            width: 36px; /* 圖示寬度等於標籤高度，形成正圓形 */
+            height: 36px;
+            flex-shrink: 0; /* 防止圖示被壓縮 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pump-icon svg { width: 22px; height: 22px; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .pump-icon.is-running svg { animation: spin 2s linear infinite; }
+
+        /* 文字詳情區塊的樣式 */
+        .pump-details {
+            padding-left: 8px;
+            white-space: nowrap; /* 防止文字換行 */
+            opacity: 0; /* 預設透明 */
+            max-width: 0; /* ★ 預設最大寬度為 0，實現收合效果 */
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        /* 當標籤被展開時，讓標籤本身的寬度變寬 */
+        .status-label.expanded {
+            width: auto; /* 讓寬度由內容自動撐開 */
+            padding: 0 12px 0 0; /* 恢復右側的 padding */
+            border-radius: 18px;
+            z-index: 101;
         }
 
-        /* 2. 關閉狀態的樣式 */
-        .status-closed {
-            background-color: rgba(243, 156, 18, 0.9);
-            text-shadow: 1px 1px 1px black;             
+        /* ★ 當標籤被展開時，顯示文字詳情 */
+        .status-label.expanded .pump-details {
+            opacity: 1;
+            max-width: 200px; /* ★ 展開時的最大寬度 */
         }
 
-        /* 3. 開啟狀態的樣式 */
-        .status-open {
-            background-color: rgba(46, 204, 113, 0.9); /* 淺綠色 */            
+        .pump-details .status { font-weight: normal; opacity: 0.9; }
+
+        /* 1. 故障狀態的樣式 (黃色) */
+        .status-fault {
+            background-color: #fffb07; /* 黃色 */
+            border-color: rgba(255, 255, 255, 0.7);            
+        }
+        
+
+        /* 2. 故障狀態的閃爍光暈動畫 */
+        .status-fault.pulsing {
+            animation: pulse-yellow 1.0s infinite;
+        }
+
+        @keyframes pulse-yellow {
+            0% {
+                box-shadow: 0 0 0 0 rgb(255, 0, 0);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 234, 0, 0.253);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(241, 196, 15, 0);
+            }
+        }
+        /* 3. 驚嘆號圖示的樣式 */
+        .fault-icon {
+            color: rgb(0, 0, 0);
+            font-size: 26px;
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        /* --- ★★★ 全新的彈出式資訊面板樣式 ★★★ --- */
+        #info-panel {
+            position: fixed;
+            top: 60px; /* 避開頂部橫幅 */
+            bottom: 0;
+            right: -400px; /* 預設隱藏在右側 */
+            width: 380px;
+            background-color: rgba(22, 27, 34, 0.9);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-left: 1px solid #30363d;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 500;
+        }
+        #info-panel.open {
+            right: 0; /* 彈入畫面 */
+        }
+        #info-panel h2 {
+            color: white; margin-top: 0; padding-bottom: 10px;
+            border-bottom: 1px solid #30363d;
+        }
+        .pump-card-list { display: flex; flex-direction: column; gap: 15px; }
+        .pump-card { background-color: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 20px; }
+        .pump-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 15px; }
+        .pump-card-title { font-size: 18px; font-weight: bold; }
+        .pump-card-status { padding: 4px 10px; border-radius: 12px; font-size: 14px; font-weight: bold; }
+        .pump-card-body { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .pump-data-item .label { font-size: 14px; color: #8b949e; }
+        .pump-data-item .value { font-size: 24px; font-weight: 600; color: #c9d1d9; }
+        .status-running { background-color: #2ea043; color: white; }
+        .status-stopped { background-color: #6e7681; color: white; }
+        .status-fault { background-color: #FFC107; color: black; }
+
+        /* 彈出面板的切換按鈕 */
+        #info-panel-toggle {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 80px;
+            background-color: rgba(22, 27, 34, 0.9);
+            border: 1px solid #30363d;
+            border-right: none;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            color: #8b949e;
+            cursor: pointer;
+            z-index: 501;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        #info-panel-toggle.open {
+            right: 380px; /* 跟隨面板移動 */
         }
 
         #back-to-home-btn {
@@ -136,7 +266,16 @@
             transform: translate(-50%, -50%); /* ★ 4. 將標題向左、向上移動自身寬高的一半，實現完美置中 */
             width: 60%; /* 設定一個寬度，防止標題在小螢幕上與兩側元素重疊 */
             text-align: center;
+        }             
+       
+        #alarm-icons-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; /* 讓滑鼠可以穿透此容器 */
         }
+
+        
         /*icon*/
         .header-right-items {
             display: flex;
@@ -156,12 +295,14 @@
     <header id="top-banner">
         <button id="menu-toggle-btn" title="展開選單">☰</button>
         <a href="https://workkkkkkez00m.github.io/K-3D-viewer/index.html" id="home-link-title">
-            <h1 id="project-title">興隆社會住宅I區智慧中央監控系統</h1>
+            <h1 id="project-title">社會住宅I區智慧中央監控系統</h1>
         </a>
         <div class="header-right-items">
             <div id="datetime-container"></div>
             <img src="../assets/favicon-32x32.png" id="logo-icon-right" alt="系統圖示">
         </div>
+        
+        <div id="alarm-icons-container"></div>
     </header>
     <nav id="sidebar-menu">
         <button id="close-menu-btn">&times;</button>
@@ -229,7 +370,6 @@
                 </li>
                 </ul>
             </li>
-    </li>
 </ul>
     </nav>
     <div id="ui-container">
@@ -237,9 +377,18 @@
         <button id="top-view-btn">俯視圖</button>
         <button id="side-view-btn">側視圖</button>
     </div>
-    <div id="controls-helper">左鍵: 旋轉 | 右鍵: 平移 | 滾輪: 縮放</div>
+    <div id="controls-helper">左鍵: 選轉 | 右鍵: 平移 | 滾輪: 縮放</div>
     <div id="floor-indicator">當前樓層: 給排水系統 - B3F</div>
     <div id="labels-container"></div>
+
+    <!-- 彈出式資訊面板和切換按鈕 -->
+    <button id="info-panel-toggle">‹</button>
+    <aside id="info-panel">
+        <h2>B3F 泵浦狀態</h2>
+        <div class="pump-card-list">
+            <!-- JavaScript 將會在這裡動態填入資訊卡 -->
+        </div>
+    </aside>
 
     <script type="module">
         // --- 導入函式庫 ---
@@ -247,26 +396,29 @@
         import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
         import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
         import { DRACOLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/DRACOLoader.js';
-
+        
         // --- 變數宣告區 ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         const controls = new OrbitControls(camera, renderer.domElement);
-        let model;
-        
-        const monitoringPoints = [];
+        let model;                        
+        let monitoringPoints = [];        
         
         const labelsContainer = document.getElementById('labels-container');
+        const infoPanel = document.getElementById('info-panel');
+        const infoPanelToggle = document.getElementById('info-panel-toggle');
+        const pumpCardList = infoPanel.querySelector('.pump-card-list');
         const datetimeContainer = document.getElementById('datetime-container');
         const menuToggleBtn = document.getElementById('menu-toggle-btn');
         const sidebarMenu = document.getElementById('sidebar-menu');
         const closeMenuBtn = document.getElementById('close-menu-btn');
         const frontViewBtn = document.getElementById('front-view-btn');
         const topViewBtn = document.getElementById('top-view-btn');
-        const sideViewBtn = document.getElementById('side-view-btn');
+        const sideViewBtn = document.getElementById('side-view-btn');        
+        const iconsContainer = document.getElementById('alarm-icons-container');
 
-        const minDistance = 10, maxDistance = 50, minScale = 0.3, maxScale = 1.0;
+        const minDistance = 10, maxDistance = 80, minScale = 0.8, maxScale = 1.3;
 
         // --- 初始化函式 ---
         function init() {
@@ -274,24 +426,27 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
-
-            camera.position.set(0, 15, 30);
+                        
+            // ▼▼▼ 相機位置 ▼▼▼
+            camera.position.set(0, 45, 30);
             
             scene.add(new THREE.AmbientLight(0xffffff, 0.6));
             const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
             directionalLight.position.set(5, 10, 7.5);
             scene.add(directionalLight);
             
+            //模型操作
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
             controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: null, RIGHT: THREE.MOUSE.PAN };
-            
+
             const loader = new GLTFLoader();
             const dracoLoader = new DRACOLoader();
             dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
             loader.setDRACOLoader(dracoLoader);
+            const modelPath = 'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/plumbing_drainage/b3f_model.glb';
             loader.load(
-                'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/plumbing_drainage/b3f_model.glb',
+                modelPath,
                 (gltf) => {
                     model = gltf.scene;
                     const box = new THREE.Box3().setFromObject(model);
@@ -299,134 +454,272 @@
                     model.position.sub(center);
                     scene.add(model);
                     console.log('模型載入成功！');
-
-                    model.traverse((object) => {
-                        const point = monitoringPoints.find(p => p.name === object.name);
-                        if (point) {
-                            point.targetObject = object;
-                            console.log(`成功找到監控物件: ${point.name}`);
-                        }
-                    });
+                    // 模型載入完成後立即執行一次狀態更新
+                    updatePlumbingStatus();
                 },
                 undefined,
-                (error) => console.error('模型載入失敗:', error)
+                (error) => console.error(`模型載入失敗: ${modelPath}`, error)
             );
-
-            // --- 點擊模型以查詢物件名稱 ---
-            //const raycasterForClick = new THREE.Raycaster();
-            //const mouseForClick = new THREE.Vector2();
-
-            //window.addEventListener('click', (event) => {
-            // 只在側邊欄關閉時才觸發點擊查詢
-                //if (!sidebarMenu.classList.contains('open')) {
-                    //mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
-                    //mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
-
-                    //raycasterForClick.setFromCamera(mouseForClick, camera);
-                    //const intersects = raycasterForClick.intersectObjects(scene.children, true);
-
-                //if (intersects.length > 0) {
-                    //const clickedObject = intersects[0].object;
-                //console.log('您點擊了:', clickedObject);
-                //console.log('物件名稱:', clickedObject.name);
-                //console.log('物件位置:', clickedObject.position);
-                    //}
-                //}
-            //});
 
             animate();
             setupEventListeners();
             updateDateTime();
-            setInterval(updateDateTime, 1000);
+            setInterval(updateDateTime, 1000);           
+            setInterval(updatePlumbingStatus, 4000);
+            // ★ 啟動彈出面板功能
+            setupInfoPanelToggle();
         }
-
+        
         // --- 動畫迴圈 ---
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
 
             for (const point of monitoringPoints) {
-                if (point.targetObject) {
-                    if (!point.element) {
-                        const label = document.createElement('div');
-                        label.className = 'status-label';
-                        labelsContainer.appendChild(label);
-                        point.element = label;
-                    }
-                    
+                if (point.targetObject && point.element) {
                     const position = new THREE.Vector3();
                     new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
                     
                     const distance = camera.position.distanceTo(position);
-                    const distanceProgress = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
-                    const scale = maxScale - (maxScale - minScale) * distanceProgress;
-
+                    const scale = maxScale - (maxScale - minScale) * Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
+                    
                     position.project(camera);
                     const x = (position.x * 0.5 + 0.5) * window.innerWidth;
                     const y = (position.y * -0.5 + 0.5) * window.innerHeight;
                     
-                    point.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scale})`;
-                    point.element.innerHTML = `${point.text}: <span style="color:red;">${point.status}</span>`;
+                    point.element.style.transform = `translate(-50%, 0%) translate(${x}px, ${y}px) scale(${scale})`;
                     
-                    // --- ★★★ 新增：根據狀態切換 CSS Class ★★★ ---
-                    if (point.status === '開啟') {
-                        point.element.className = 'status-label status-open';
-                    } else {
-                        point.element.className = 'status-label status-closed';
-                    }
                 }
             }
             renderer.render(scene, camera);
         }
 
-        // --- 事件監聽與功能函式 ---
+        // --- 核心功能函式 ---
+        async function updatePlumbingStatus() {
+            try {
+                console.log('正在更新泵浦狀態...');
+                const response = await fetch('http://localhost:3000/api/plumbing/b3f');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const latestData = await response.json();
+                console.log('收到 API 資料:', latestData);
+
+                // 處理資料更新
+                latestData.forEach(newPoint => {
+                    const existingPoint = monitoringPoints.find(p => p.id === newPoint.id);
+                    if (existingPoint) {
+                        // 更新所有屬性，不只是 status
+                        existingPoint.status = newPoint.status;
+                        existingPoint.powerConsumption = newPoint.powerConsumption;
+                        existingPoint.waterLevel = newPoint.waterLevel;
+                        existingPoint.locationName = newPoint.locationName;
+                        
+                        if (existingPoint.element) {
+                            updateLabelAppearance(existingPoint);
+                        }
+                    } else {
+                        monitoringPoints.push({ ...newPoint, name: newPoint.name, targetObject: null, element: null });
+                    }
+                });
+                
+                // ★ 更新資訊卡視圖
+                updateInfoCards(monitoringPoints);
+
+                if (model) {
+                    bindObjectsToPoints();
+                }
+                
+                console.log('泵浦狀態更新完成，當前監控點數量:', monitoringPoints.length);
+
+            } catch (error) {
+                console.error("API 連接失敗:", error);
+                // 顯示連線錯誤
+                showConnectionError();
+                
+                if (error.message.includes('fetch')) {
+                    console.warn('API 伺服器可能未啟動，請檢查 localhost:3000 是否正常運行');
+                }
+            }
+        }
+
+        // 顯示連線錯誤的函數
+        function showConnectionError() {
+            pumpCardList.innerHTML = `
+                <div class="pump-card" style="text-align: center; padding: 40px;">
+                    <div style="color: #e74c3c; font-size: 18px; font-weight: bold; margin-bottom: 10px;">
+                        ❌ 連線錯誤
+                    </div>
+                    <div style="color: #8b949e; font-size: 14px;">
+                        無法連接到 API 伺服器<br>
+                        請檢查伺服器是否正常運行
+                    </div>
+                </div>
+            `;
+        }
+
+        // ★ 新增：更新資訊卡畫面的函式
+        function updateInfoCards(points) {
+            pumpCardList.innerHTML = ''; // 清空舊卡片
+            points.forEach(point => {
+                const card = document.createElement('div');
+                card.className = 'pump-card';
+                const statusClass = point.status === '運轉中' ? 'status-running' : (point.status === '故障' ? 'status-fault' : 'status-stopped');
+                const waterLevelColor = point.waterLevel === '高高' ? '#e74c3c' : (point.waterLevel === '高' ? '#f1c40f' : '#3498db');
+                card.innerHTML = `
+                    <div class="pump-card-header">
+                        <div class="pump-card-title">${point.locationName}</div>
+                        <div class="pump-card-status ${statusClass}">${point.status}</div>
+                    </div>
+                    <div class="pump-card-body">
+                        <div class="pump-data-item">
+                            <div class="label">即時耗電量</div>
+                            <div class="value">${Number(point.powerConsumption).toFixed(2)} kW</div>
+                        </div>
+                        <div class="pump-data-item">
+                            <div class="label">目前水位</div>
+                            <div class="value" style="color: ${waterLevelColor};">${point.waterLevel}</div>
+                        </div>
+                    </div>
+                `;
+                pumpCardList.appendChild(card);
+            });
+        }
+
+        // ★ 新增：設定彈出面板的事件
+        function setupInfoPanelToggle() {
+            infoPanelToggle.addEventListener('click', () => {
+                infoPanel.classList.toggle('open');
+                infoPanelToggle.classList.toggle('open');
+                infoPanelToggle.innerHTML = infoPanel.classList.contains('open') ? '›' : '‹';
+            });
+        }
+
+        function bindObjectsToPoints() {
+            if (!model) return;
+            model.traverse((object) => {
+                const point = monitoringPoints.find(p => p.name === object.name && !p.targetObject);
+                if (point) {
+                    point.targetObject = object;
+                    console.log(`成功綁定泵浦物件: ${point.locationName} (name: ${object.name})`);
+                    if (!point.element) {
+                        createLabelForPoint(point);
+                    }
+                }
+            });
+        }
+
+        function createLabelForPoint(point) {
+            const label = document.createElement('div');
+            label.innerHTML = `
+                <div class="pump-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2Z" stroke="white" stroke-width="2" stroke-opacity="0.5"/><path d="M12 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M12 18V22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M5.63604 5.63603L8.46447 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M15.5355 15.5355L18.364 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M2 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18 12H22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18.364 5.63603L15.5355 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M8.46447 15.5355L5.63604 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="pump-details">
+                    <span class="location-name">${point.locationName}</span>: <span class="status">${point.status}</span>
+                </div>
+            `;
+            labelsContainer.appendChild(label);
+            point.element = label;
+            updateLabelAppearance(point);
+
+            label.addEventListener('click', (event) => {
+                event.stopPropagation();
+                toggleLabel(point);
+            });
+        }
+
+        function updateLabelAppearance(point) {
+            if (!point.element) return;
+            
+            const iconDiv = point.element.querySelector('.pump-icon');
+            const detailsDiv = point.element.querySelector('.pump-details');
+            
+            if (!iconDiv || !detailsDiv) { // 首次建立時，注入 HTML
+                 label.innerHTML = `
+                    <div class="pump-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2Z" stroke="white" stroke-width="2" stroke-opacity="0.5"/><path d="M12 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M12 18V22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M5.63604 5.63603L8.46447 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M15.5355 15.5355L18.364 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M2 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18 12H22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18.364 5.63603L15.5355 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M8.46447 15.5355L5.63604 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+                    </div>
+                    <div class="pump-details">
+                        <span class="location-name">${point.locationName}</span>: <span class="status">${point.status}</span>
+                    </div>
+                `;
+            }
+
+            point.element.querySelector('.status').textContent = point.status;
+            const updatedIconDiv = point.element.querySelector('.pump-icon');
+            
+            switch (point.status) {
+                case '運轉中':
+                    point.element.className = 'status-label status-running';
+                    updatedIconDiv.classList.add('is-running');
+                    break;
+                case '故障':
+                    point.element.className = 'status-label status-fault pulsing';
+                    updatedIconDiv.innerHTML = `<div class="fault-icon">!</div>`;
+                    updatedIconDiv.classList.remove('is-running');
+                    break;
+                case '停止':
+                default:
+                    point.element.className = 'status-label status-stopped';
+                    if (!updatedIconDiv.querySelector('svg')) { // 如果是從故障切換回來，需要還原 SVG
+                        updatedIconDiv.innerHTML = `<svg viewBox="0 0 24 24" ... >...</svg>`; // 完整的葉片 SVG
+                    }
+                    updatedIconDiv.classList.remove('is-running');
+                    break;
+            }
+        }
+
+        
+        function toggleLabel(clickedPoint) {
+            const wasExpanded = clickedPoint.element.classList.contains('expanded');
+            monitoringPoints.forEach(p => {
+                if (p.element) p.element.classList.remove('expanded');
+            });
+            if (!wasExpanded) {
+                clickedPoint.element.classList.add('expanded');
+            }
+        }
+
+        // --- UI 框架功能函式 ---
         function setupEventListeners() {
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
             });
-
             menuToggleBtn.addEventListener('click', () => sidebarMenu.classList.toggle('open'));
             closeMenuBtn.addEventListener('click', () => sidebarMenu.classList.remove('open'));
-
+            
             document.addEventListener('click', (event) => {
-                const isClickInsideMenu = sidebarMenu.contains(event.target);
-                const isClickOnToggleButton = menuToggleBtn.contains(event.target);
-                if (sidebarMenu.classList.contains('open') && !isClickInsideMenu && !isClickOnToggleButton) {
+                const isClickInsideMenu = sidebarMenu.contains(event.target) || menuToggleBtn.contains(event.target);
+                if (sidebarMenu.classList.contains('open') && !isClickInsideMenu) {
                     sidebarMenu.classList.remove('open');
                 }
+                const isClickInsideLabel = event.target.closest('.status-label');
+                if (!isClickInsideLabel) {
+                    monitoringPoints.forEach(p => {
+                        if (p.element) p.element.classList.remove('expanded');
+                    });
+                }
             });
-
+            
+            document.querySelectorAll('.system-category > a').forEach(categoryLink => {
+                const submenu = categoryLink.nextElementSibling;
+                if (submenu && submenu.classList.contains('floor-submenu')) {
+                    categoryLink.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        categoryLink.parentElement.classList.toggle('active');
+                        submenu.style.maxHeight = submenu.style.maxHeight ? null : submenu.scrollHeight + "px";
+                    });
+                }
+            });
             frontViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(0, 5, 40)));
             topViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(0, 25, 0)));
             sideViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(20, 5, 0)));
-        }
-        const systemCategories = document.querySelectorAll('.system-category');
-
-        systemCategories.forEach(category => {
-            const categoryLink = category.querySelector('a'); // 獲取<a>標籤
-            const submenu = category.querySelector('.floor-submenu'); // 獲取子選單<ul>
-
-            // 只為包含子選單的分類新增點擊事件
-            if (submenu) {
-                categoryLink.addEventListener('click', (event) => {
-                    event.preventDefault(); // 阻止<a>標籤的預設跳轉行為
-                
-                    category.classList.toggle('active'); // 切換 active class，讓 CSS 可以旋轉箭頭
-
-                    // 判斷子選單目前是展開還是收合
-                    if (submenu.style.maxHeight) {
-                    // 如果已有 max-height 值，代表是展開的，要收合
-                    submenu.style.maxHeight = null;
-                    } else {
-                    // 如果沒有，代表是收合的，要展開
-                    // scrollHeight 是這個元素內容的完整高度
-                    submenu.style.maxHeight = submenu.scrollHeight + "px";
-                    }
-                });
-            }
-        });
+        }        
 
         function animateCameraPosition(targetPosition, duration = 1000) {
             const startPosition = camera.position.clone();
@@ -451,6 +744,35 @@
             const timeString = now.toLocaleTimeString('zh-TW', timeOptions);
             datetimeContainer.textContent = `${dateString} ${timeString}`;
         }
+
+        // --- 點擊查詢物件名稱的工具 ---
+        const raycasterForClick = new THREE.Raycaster();
+        const mouseForClick = new THREE.Vector2();
+
+        window.addEventListener('click', (event) => {
+            // 只在側邊欄關閉時才觸發
+            if (!sidebarMenu.classList.contains('open')) {
+                mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+                if (model) { // 確保模型已載入
+                    raycasterForClick.setFromCamera(mouseForClick, camera);
+                    const intersects = raycasterForClick.intersectObject(model, true);
+
+                    if (intersects.length > 0) {
+                        const clickedObject = intersects[0].object;
+                        console.clear();
+                        console.log('--- 您點擊了 ---');
+                        // ★★★ 物件的 name ★★★
+                        console.log('★ 物件名稱 (name):', clickedObject.name);
+                        console.log('--------------------');
+                        // 保留印出 uuid
+                        console.log('物件的 UUID:', clickedObject.uuid);
+                        console.log('完整物件:', clickedObject);
+                    }
+                }
+            }
+        });
 
         // --- 啟動 ---
         init();
