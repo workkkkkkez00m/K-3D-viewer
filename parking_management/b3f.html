@@ -116,18 +116,43 @@
             align-items: center;
             justify-content: center;
         }
-        /* 空位狀態 (綠燈) */
-        .status-available { background-color: #2ecc71; }
-        /* 有車狀態 (紅燈) */
-        .status-occupied { background-color: #e74c3c; }
-        /* 故障狀態 (黃燈) */
+        /* ★ 1. 空位狀態 (綠燈) - 燈泡效果 ★ */
+        .status-available {
+            background: radial-gradient(circle at 70% 30%, #85ff8d, #1dd369 60%);
+            box-shadow: 0 0 8px 2px rgba(49, 255, 135, 0.7);
+        }
+
+        /* ★ 2. 有車狀態 (紅燈) - 燈泡效果 ★ */
+        .status-occupied {
+            background: radial-gradient(circle at 70% 30%, #ff6a6ac9, #e73c3c 60%);
+            box-shadow: 0 0 8px 2px rgba(231, 60, 60, 0.7);
+        }
+
+        /* ★ 3. 故障狀態 (黃燈) ★ */
         .status-fault {
             background-color: #FFC107;
+            border-color: white;
+        }
+        /* ★ 4. 故障狀態的閃爍光暈動畫 ★ */
+        .status-fault.pulsing {
             animation: pulse-yellow 1.5s infinite;
         }
-        @keyframes pulse-yellow { /* ... 閃爍動畫 ... */ }
-        .fault-icon { color: black; font-size: 20px; font-weight: 500; }
-
+        @keyframes pulse-yellow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 243, 7, 0.816);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 7, 7, 0.259);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.401);
+            }
+        }
+        .fault-icon {
+            color: black;
+            font-size: 20px;
+            font-weight: 500;
+        }
 
         /* --- ★★★ 彈出式資訊面板樣式 ★★★ --- */
         #info-panel {
@@ -541,8 +566,7 @@
         }
 
         function updateLabelAppearance(point) {
-            if (!point.element) return;
-            
+            if (!point.element) return;    
             switch (point.status) {
                 case '空位':
                     point.element.className = 'status-label status-available';
@@ -553,12 +577,17 @@
                     point.element.innerHTML = '';
                     break;
                 case '故障':
-                    point.element.className = 'status-label status-fault';
+                    // ★ 新增 pulsing class 來觸發閃爍動畫
+                    point.element.className = 'status-label status-fault pulsing';
                     point.element.innerHTML = `<div class="fault-icon">!</div>`;
+                    break;
+                default:
+                    // 預設情況，避免出錯
+                    point.element.className = 'status-label';
+                    point.element.innerHTML = '';
                     break;
             }
         }
-
         
         function toggleLabel(clickedPoint) {
             const wasExpanded = clickedPoint.element.classList.contains('expanded');
