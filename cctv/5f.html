@@ -155,7 +155,25 @@
         /* 2. 右上角 Logo 圖示的樣式 */
         #logo-icon-right {
             height: 32px; /* 設定圖示的高度 */
-         width: 32px;  /* 設定圖示的寬度 */
+            width: 32px;  /* 設定圖示的寬度 */
+        }
+        /* 頁腳的樣式 */
+        #page-footer {
+            position: fixed; 
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001; /* 確保它在最上層 (比側邊欄的 1000 還高) */
+    
+            color: rgba(255, 255, 255, 0.3); /* 半透明的白色文字 */
+            font-size: 12px;
+    
+            /* 確保滑鼠可以穿透它，不會擋住下方的元素 */
+            pointer-events: none; 
+    
+            /* 確保使用者無法選取文字 */
+            user-select: none;
+            -webkit-user-select: none;
         }
     </style>
 </head>
@@ -464,5 +482,8 @@
         init();
 
     </script>
+    <footer id="page-footer">
+        <span>v1.1.0</span> | <span>Copyright © 2025 KL </span>
+    </footer>
 </body>
 </html>

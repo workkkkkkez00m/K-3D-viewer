@@ -148,8 +148,8 @@
 
         /* 單張資訊卡片的樣式 */
         .info-card {
-            background-color: rgba(32, 45, 62, 0.8); /* 半透明深灰色背景 */
-            border: 1px solid #30363d;
+            background-color: rgba(32, 45, 62, 0.8); 
+            border: 1px solid #9fa6b2d1;
             border-radius: 8px;
             padding: 15px 20px;
             backdrop-filter: blur(2px); /* ★ 增加玻璃模糊效果 */
@@ -169,7 +169,7 @@
             font-size: 20px;
             font-weight: 600;
         }
-        /* 左下角懸浮 Logo 的樣式 */
+        /* 懸浮 Logo 的樣式 */
         #bottom-left-logo {
             position: absolute;
             bottom: 30px;
@@ -177,9 +177,28 @@
             z-index: 10;
             height: 64px; /* 設定一個較大的圖示尺寸 */
             width: 64px;
-            opacity: 0.8; /* 讓圖示稍微有點透明感，更好地融入背景 */
+            opacity: 0.8; /* 圖示透明感 */
             transition: opacity 0.2s;
             pointer-events: none; /* 讓滑鼠可以穿透圖示，不會擋住模型操作 */
+        }
+
+        /* 頁腳的樣式 */
+        #page-footer {
+            position: fixed; 
+            bottom: 10px;
+            left: 30%;
+            transform: translateX(-50%);
+            z-index: 1001; /* 確保它在最上層 (比側邊欄的 1000 還高) */
+    
+            color: rgba(255, 255, 255, 0.3); /* 半透明的白色文字 */
+            font-size: 12px;
+    
+            /* 確保滑鼠可以穿透它，不會擋住下方的元素 */
+            pointer-events: none; 
+    
+            /* 確保使用者無法選取文字 */
+            user-select: none;
+            -webkit-user-select: none;
         }
 
     </style>
@@ -400,5 +419,8 @@
         setInterval(updateInfoPanel, 5000);
 
     </script>
+    <footer id="page-footer">
+        <span>v1.1.0</span> | <span>Copyright © 2025 KL </span>
+    </footer>
 </body>
 </html>
