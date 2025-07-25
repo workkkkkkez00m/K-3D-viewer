@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>興隆社會住宅I區智慧中央監控系統 - 1F</title>
+    <title>智慧住宅中央監控系統  - 1F</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
@@ -12,8 +12,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* --- 基本樣式 --- */
-        body { margin: 0; font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; overflow: hidden; }
-        canvas { display: block; }
+        body {
+            margin: 0;
+            font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif;
+            overflow: hidden;
+            background-color: #0d1117;
+            color: #c9d1d9; 
+        }
+        canvas {
+            display: block;
+        }
 
         /* --- UI 元素樣式 --- */
         #top-banner {
@@ -181,9 +189,9 @@
             line-height: 1;          /* ★ 確保行高不會干擾垂直置中 */
 
             /* --- 讓驚嘆號更明顯的設定 --- */
-            color: white;
-            font-size: 18px;    /* ★ 加大字體 */
-            font-weight: 900;   /* ★ 使用更粗的字重 */
+            color: rgb(255, 255, 255);
+            font-size: 20px;    /* ★ 加大字體 */
+            font-weight: 500;   /* ★ 使用更粗的字重 */
             text-shadow: 0 0 5px rgba(0, 0, 0, 0.9); /* ★ 新增文字陰影 */
         }
 
@@ -226,7 +234,7 @@
     <header id="top-banner">
         <button id="menu-toggle-btn" title="展開選單">☰</button>
         <a href="https://workkkkkkez00m.github.io/K-3D-viewer/index.html" id="home-link-title">
-            <h1 id="project-title">興隆社會住宅I區智慧中央監控系統</h1>
+            <h1 id="project-title">智慧住宅中央監控系統</h1>
         </a>
         <div class="header-right-items">
             <div id="datetime-container"></div>

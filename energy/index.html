@@ -15,9 +15,14 @@
         body { margin: 0; font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; overflow: hidden; background-color: #0d1117; color: #c9d1d9; }
 
         /* --- 框架 UI 樣式  --- */
-        #top-banner { position: absolute; top: 0; left: 0; width: 100%; background-color: rgba(0, 0, 0, 0.7); color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; box-sizing: border-box; z-index: 20; }
+        #top-banner {
+            position: relative; top: 0; left: 0; width: 100%;
+            background-color: rgba(0, 0, 0, 0.7); color: white;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px; box-sizing: border-box; z-index: 20;
+        }
         #project-title { margin: 0; font-size: 22px; font-weight: 500; margin-left: 15px; }
-        #datetime-container { font-size: 18px; }
+        #datetime-container { font-size: 16px; }
         #menu-toggle-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0 10px; }
         #sidebar-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background-color: #2c3e50; padding: 20px; box-sizing: border-box; z-index: 1000; transition: left 0.3s ease-in-out; }
         #sidebar-menu.open { left: 0; }
@@ -210,9 +215,15 @@
 
         /* 移除標題連結的預設樣式 */
         #home-link-title {
-            color: inherit;
+            color: inherit; /* 繼承父元素(header)的文字顏色，也就是白色 */
             text-decoration: none; /* 移除底線 */
-        }
+            position: absolute; /* ★ 1. 讓標題脫離文檔流，進行絕對定位 */
+            left: 50%;          /* ★ 2. 將標題的左側邊緣，對齊到父容器的中心線 */
+            top: 50%;           /* ★ 3. 將標題的頂部邊緣，對齊到父容器的中心線 */
+            transform: translate(-50%, -50%); /* ★ 4. 將標題向左、向上移動自身寬高的一半，實現完美置中 */
+            width: 60%; /* 設定一個寬度，防止標題在小螢幕上與兩側元素重疊 */
+            text-align: center;
+        }     
 
         /* 頁籤導覽列的樣式 */
         .tab-nav {
@@ -392,7 +403,7 @@
     <header id="top-banner">
         <button id="menu-toggle-btn" title="展開選單">☰</button>
         <a href="https://workkkkkkez00m.github.io/K-3D-viewer/index.html" id="home-link-title">
-            <h1 id="project-title">興隆社會住宅I區智慧中央監控系統</h1>
+            <h1 id="project-title">智慧住宅中央監控系統 </h1>
         </a>
         <div class="header-right-items">
             <div id="datetime-container"></div>
