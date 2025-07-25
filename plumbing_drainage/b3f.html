@@ -188,7 +188,7 @@
             bottom: 0;
             right: -400px; /* 預設隱藏在右側 */
             width: 380px;
-            background-color: rgba(22, 27, 34, 0.9);
+            background-color: rgba(60, 78, 101, 0.553);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             border-left: 1px solid #30363d;
@@ -225,12 +225,12 @@
             transform: translateY(-50%);
             width: 30px;
             height: 80px;
-            background-color: rgba(22, 27, 34, 0.9);
-            border: 1px solid #30363d;
+            background-color: rgba(188, 188, 188, 0.873);
+            border: 2px solid #c2c6cb;
             border-right: none;
             border-top-left-radius: 8px;
             border-bottom-left-radius: 8px;
-            color: #8b949e;
+            color: #eaeaea;
             cursor: pointer;
             z-index: 501;
             display: flex;
@@ -634,40 +634,36 @@
         function updateLabelAppearance(point) {
             if (!point.element) return;
             
-            const iconDiv = point.element.querySelector('.pump-icon');
-            const detailsDiv = point.element.querySelector('.pump-details');
-            
-            if (!iconDiv || !detailsDiv) { // 首次建立時，注入 HTML
-                 label.innerHTML = `
-                    <div class="pump-icon">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2Z" stroke="white" stroke-width="2" stroke-opacity="0.5"/><path d="M12 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M12 18V22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M5.63604 5.63603L8.46447 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M15.5355 15.5355L18.364 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M2 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18 12H22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18.364 5.63603L15.5355 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M8.46447 15.5355L5.63604 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
-                    </div>
-                    <div class="pump-details">
-                        <span class="location-name">${point.locationName}</span>: <span class="status">${point.status}</span>
-                    </div>
-                `;
+            // 先更新狀態文字
+            const statusSpan = point.element.querySelector('.status');
+            if (statusSpan) {
+                statusSpan.textContent = point.status;
             }
-
-            point.element.querySelector('.status').textContent = point.status;
-            const updatedIconDiv = point.element.querySelector('.pump-icon');
+            
+            const iconDiv = point.element.querySelector('.pump-icon');
             
             switch (point.status) {
                 case '運轉中':
                     point.element.className = 'status-label status-running';
-                    updatedIconDiv.classList.add('is-running');
+                    // 確保有 SVG 圖示
+                    if (!iconDiv.querySelector('svg')) {
+                        iconDiv.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2Z" stroke="white" stroke-width="2" stroke-opacity="0.5"/><path d="M12 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M12 18V22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M5.63604 5.63603L8.46447 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M15.5355 15.5355L18.364 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M2 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18 12H22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18.364 5.63603L15.5355 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M8.46447 15.5355L5.63604 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
+                    }
+                    iconDiv.classList.add('is-running');
                     break;
                 case '故障':
                     point.element.className = 'status-label status-fault pulsing';
-                    updatedIconDiv.innerHTML = `<div class="fault-icon">!</div>`;
-                    updatedIconDiv.classList.remove('is-running');
+                    iconDiv.innerHTML = `<div class="fault-icon">!</div>`;
+                    iconDiv.classList.remove('is-running');
                     break;
                 case '停止':
                 default:
                     point.element.className = 'status-label status-stopped';
-                    if (!updatedIconDiv.querySelector('svg')) { // 如果是從故障切換回來，需要還原 SVG
-                        updatedIconDiv.innerHTML = `<svg viewBox="0 0 24 24" ... >...</svg>`; // 完整的葉片 SVG
+                    // 如果是從故障切換回來，需要還原 SVG
+                    if (!iconDiv.querySelector('svg')) {
+                        iconDiv.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2Z" stroke="white" stroke-width="2" stroke-opacity="0.5"/><path d="M12 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M12 18V22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M5.63604 5.63603L8.46447 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M15.5355 15.5355L18.364 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M2 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18 12H22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18.364 5.63603L15.5355 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M8.46447 15.5355L5.63604 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
                     }
-                    updatedIconDiv.classList.remove('is-running');
+                    iconDiv.classList.remove('is-running');
                     break;
             }
         }
