@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Open B2F Parking Management",
+			"type": "shell",
+			"command": "start",
+			"args": [
+				"c:\\Users\\weimingli\\Documents\\GitHub\\K-3D-viewer\\parking_management\\b2f.html"
+			],
+			"group": "test",
+			"isBackground": false
+		}
+	]
+}

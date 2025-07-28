@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智慧住宅中央監控系統 - B3F</title>
+    <title>智慧住宅中央監控系統 - B2F</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
@@ -116,6 +116,45 @@
             align-items: center;
             justify-content: center;
         }
+
+        /* --- ★★★ 車道號誌標籤樣式 ★★★ --- */
+        .traffic-light-label {
+            position: absolute;
+            width: 25px;
+            height: 50px;
+            background-color: rgba(0, 0, 0, 0.743);
+            border: 2px solid rgba(255, 255, 255, 0.611);
+            border-radius: 15px;
+            user-select: none;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            padding: 3px;
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                padding 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                border-radius 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                background-color 0.3s;
+        }
+        
+        .traffic-light-label .light-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #333;
+            transition: all 0.3s;
+        }
+        
+        .traffic-light-label .light-indicator.red-active {
+            background-color: #e74c3c;
+            box-shadow: 0 0 10px #e74c3c;
+        }
+        
+        .traffic-light-label .light-indicator.green-active {
+            background-color: #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
+        }
         /* ★ 1. 空位狀態 (綠燈) - 燈泡效果 ★ */
         .status-available {
             background: radial-gradient(circle at 70% 30%, #85ff8d, #1dd369 60%);
@@ -152,6 +191,70 @@
             color: black;
             font-size: 20px;
             font-weight: 500;
+        }
+
+        /* --- ★★★ 車道號誌樣式 ★★★ --- */
+        #traffic-light-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(22, 27, 34, 0.8);
+            backdrop-filter: blur(5px);
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 15px;
+            z-index: 101;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .traffic-light-box {
+            width: 50px;
+            height: 100px;
+            background-color: #0d1117;
+            border-radius: 8px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .light {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #30363d; /* 預設的暗燈顏色 */
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .light.red.active {
+            background-color: #e74c3c;
+            box-shadow: 0 0 15px #e74c3c;
+        }
+        .light.green.active {
+            background-color: #2ecc71;
+            box-shadow: 0 0 15px #2ecc71;
+        }
+        .traffic-light-info .title {
+            font-size: 14px;
+            color: #8b949e;
+        }
+        .traffic-light-info .status-text {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .traffic-light-info .status-text.red { color: #e74c3c; }
+        .traffic-light-info .status-text.green { color: #2ecc71; }
+
+        /* ★ 車道號誌資訊卡樣式 */
+        .traffic-light-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 15px;
         }
 
         /* --- ★★★ 彈出式資訊面板樣式 ★★★ --- */
@@ -375,6 +478,31 @@
             <div class="label">目前空位數</div>
             <div class="value green"><span id="available-spaces">--</span><span class="unit">格</span></div>
         </div>
+        </div>
+        <hr style="border-color: #30363d; margin: 20px 0;">
+    
+        <!-- ★ 上行車道號誌的資訊卡 -->
+        <div class="traffic-light-card">
+            <div class="traffic-light-box">
+                <div id="light-red-up" class="light red"></div>
+                <div id="light-green-up" class="light green"></div>
+            </div>
+            <div class="traffic-light-info">
+                <div class="title">上行車道狀態</div>
+                <div id="light-status-text-up" class="status-text">--</div>
+            </div>
+        </div>    
+        <!-- ★ 下行車道號誌的資訊卡 -->
+        <div class="traffic-light-card" style="margin-top: 15px;">
+            <div class="traffic-light-box">
+                <div id="light-red-down" class="light red"></div>
+                <div id="light-green-down" class="light green"></div>
+            </div>
+            <div class="traffic-light-info">
+                <div class="title">下行車道狀態</div>
+                <div id="light-status-text-down" class="status-text">--</div>
+            </div>
+        </div>
     </aside>
 
     <script type="module">
@@ -390,7 +518,8 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         const controls = new OrbitControls(camera, renderer.domElement);
         let model;                        
-        let monitoringPoints = [];        
+        let monitoringPoints = [];
+        let trafficLights = [];        
         
         const labelsContainer = document.getElementById('labels-container');
         const infoPanel = document.getElementById('info-panel');
@@ -406,6 +535,17 @@
         const iconsContainer = document.getElementById('alarm-icons-container');
         const totalSpacesEl = document.getElementById('total-spaces');
         const availableSpacesEl = document.getElementById('available-spaces');
+        // ★ 上行車道號誌 DOM 元素
+        const lightRedUpUI = document.getElementById('light-red-up');
+        const lightGreenUpUI = document.getElementById('light-green-up');
+        const lightStatusTextUpUI = document.getElementById('light-status-text-up');
+        // ★ 下行車道號誌 DOM 元素  
+        const lightRedDownUI = document.getElementById('light-red-down');
+        const lightGreenDownUI = document.getElementById('light-green-down');
+        const lightStatusTextDownUI = document.getElementById('light-status-text-down');
+        const redLightMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0xff0000, emissiveIntensity: 1 });
+        const greenLightMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00, emissive: 0x00ff00, emissiveIntensity: 1 });
+        const offLightMaterial = new THREE.MeshStandardMaterial({ color: 0x222222, emissive: 0x222222, emissiveIntensity: 0.1 });
         
         // --- 初始化函式 ---
         function init() {
@@ -458,6 +598,9 @@
             setInterval(updateParkingStatus, 1000); // ★ 更新頻率改為1秒
             // ★ 啟動彈出面板功能
             setupInfoPanelToggle();
+            // ★ 啟動車道號誌的定時更新
+            updateTrafficLightStatus();
+            setInterval(updateTrafficLightStatus, 5000);
         }
         
         // --- 動畫迴圈 ---
@@ -497,6 +640,35 @@
                     } else {
                         // 物件在攝影機後方，隱藏標籤
                         point.element.style.visibility = 'hidden';
+                    }
+                }
+            }
+            // ★ 更新車道號誌標籤位置
+            for (const light of trafficLights) {
+                if (light.targetObject && light.element) {
+                    const position = new THREE.Vector3();
+                    new THREE.Box3().setFromObject(light.targetObject).getCenter(position);
+                    
+                    const cameraPosition = camera.position.clone();
+                    const objectDirection = position.clone().sub(cameraPosition).normalize();
+                    const cameraDirection = new THREE.Vector3();
+                    camera.getWorldDirection(cameraDirection);
+                    
+                    const dotProduct = objectDirection.dot(cameraDirection);
+                    
+                    if (dotProduct > 0) {
+                        position.project(camera);
+                        
+                        if (position.x >= -1 && position.x <= 1 && position.y >= -1 && position.y <= 1) {
+                            const x = (position.x * 0.5 + 0.5) * window.innerWidth;
+                            const y = (position.y * -0.5 + 0.5) * window.innerHeight;
+                            light.element.style.transform = `translate(-50%, 20%) translate(${x}px, ${y}px)`;
+                            light.element.style.visibility = 'visible';
+                        } else {
+                            light.element.style.visibility = 'hidden';
+                        }
+                    } else {
+                        light.element.style.visibility = 'hidden';
                     }
                 }
             }
@@ -557,7 +729,7 @@
             availableSpacesEl.textContent = available;
         }
 
-        // ★ 新增：設定彈出面板的事件
+        // ★ 設定彈出面板的事件
         function setupInfoPanelToggle() {
             infoPanelToggle.addEventListener('click', () => {
                 infoPanel.classList.toggle('open');
@@ -621,6 +793,172 @@
             });
             if (!wasExpanded) {
                 clickedPoint.element.classList.add('expanded');
+            }
+        }
+        // ★ 更新車道號誌UI的輔助函數
+        function updateLightUI(light, redUI, greenUI, statusTextUI) {
+            if (light.status === 'red') {
+                redUI.classList.add('active');
+                greenUI.classList.remove('active');
+                statusTextUI.textContent = "禁止通行";
+                statusTextUI.className = 'status-text red';
+            } else if (light.status === 'green') {
+                redUI.classList.remove('active');
+                greenUI.classList.add('active');
+                statusTextUI.textContent = "可以通行";
+                statusTextUI.className = 'status-text green';
+            }
+        }
+
+        // ★★★ 從後端獲取車道號誌狀態的函式 ★★★
+        async function updateTrafficLightStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/traffic-light/b2f');
+                const data = await response.json();
+                
+                const lightsData = Object.values(data);
+
+                lightsData.forEach(newLightData => {
+                    let light = trafficLights.find(l => l.id === newLightData.id);
+                    if (light) {
+                        light.status = newLightData.status;
+                    } else {
+                        light = { ...newLightData, targetObject: null };
+                        trafficLights.push(light);
+                    }
+                    // ★ 根據 ID 更新對應的 UI
+                    if (light.id.includes('UP')) {
+                        updateLightUI(light, lightRedUpUI, lightGreenUpUI, lightStatusTextUpUI);
+                    } else if (light.id.includes('DOWN')) {
+                        updateLightUI(light, lightRedDownUI, lightGreenDownUI, lightStatusTextDownUI);
+                    }
+
+                    // 更新 3D 模型材質
+                    if (light.targetObject) {
+                        const redLightMesh = light.targetObject.getObjectByName('Red');
+                        const greenLightMesh = light.targetObject.getObjectByName('Green');
+                        if (redLightMesh && greenLightMesh) {
+                            redLightMesh.material = light.status === 'red' ? redLightMaterial : offLightMaterial;
+                            greenLightMesh.material = light.status === 'green' ? greenLightMaterial : offLightMaterial;
+                        }
+                    }
+                });
+
+                // ★ 修復：首先綁定 3D 物件，然後再更新狀態
+                if (model) {
+                    bindTrafficLights();
+                }
+
+                // 更新所有 3D 號誌燈
+                trafficLights.forEach(light => {
+                    // ★ 創建或更新 3D 標籤（類似停車位標籤）
+                    if (light.targetObject) {
+                        console.log(`正在更新 3D 號誌燈標籤: ${light.name}, 狀態: ${light.status}`);
+                        
+                        // 如果還沒有標籤元素，創建一個
+                        if (!light.element) {
+                            createTrafficLightLabel(light);
+                        }
+                        
+                        // 更新標籤外觀
+                        updateTrafficLightLabelAppearance(light);
+                    } else {
+                        console.log(`號誌燈 ${light.name} 尚未綁定到 3D 物件`);
+                    }
+                });
+
+            } catch (error) {
+                console.error("更新車道號誌狀態失敗:", error);
+            }
+        }
+
+        // ★ 將 3D 號誌燈模型綁定到數據點的函式
+        function bindTrafficLights() {
+            if (!model) return;
+            
+            model.traverse((object) => {
+                // ★ 修復：更靈活的物件名稱匹配
+                const light = trafficLights.find(l => {
+                    // 嘗試多種匹配方式
+                    return (l.name === object.name) || 
+                           (object.name && object.name.toLowerCase().includes('traffic')) ||
+                           (object.name && object.name.toLowerCase().includes('light')) ||
+                           (object.name && l.name && object.name.toLowerCase().includes(l.name.toLowerCase()));
+                });
+                
+                if (light && !light.targetObject) {
+                    light.targetObject = object;
+                    console.log(`成功綁定車道號誌: ${light.name} -> ${object.name}`);
+                    
+                    // ★ 立即創建標籤
+                    if (!light.element) {
+                        createTrafficLightLabel(light);
+                    }
+                }
+            });
+            
+            // ★ 如果找不到特定名稱的物件，列出所有可能的候選物件
+            if (trafficLights.some(l => !l.targetObject)) {
+                console.log('未綁定的號誌燈，以下是模型中所有可能的物件:');
+                model.traverse((object) => {
+                    if (object.name && (
+                        object.name.toLowerCase().includes('traffic') ||
+                        object.name.toLowerCase().includes('light') ||
+                        object.name.toLowerCase().includes('signal') ||
+                        object.name.toLowerCase().includes('lane')
+                    )) {
+                        console.log(`  候選物件: ${object.name}`);
+                    }
+                });
+            }
+        }
+
+        // ★ 創建車道號誌標籤的函式
+        function createTrafficLightLabel(light) {
+            const label = document.createElement('div');
+            label.className = 'traffic-light-label';
+            
+            // 創建紅燈指示器
+            const redLight = document.createElement('div');
+            redLight.className = 'light-indicator red-light';
+            
+            // 創建綠燈指示器
+            const greenLight = document.createElement('div');
+            greenLight.className = 'light-indicator green-light';
+            
+            label.appendChild(redLight);
+            label.appendChild(greenLight);
+            
+            labelsContainer.appendChild(label);
+            light.element = label;
+            light.element.style.visibility = 'visible';
+            
+            console.log(`創建車道號誌標籤: ${light.name}`);
+            
+            // 立即更新外觀
+            updateTrafficLightLabelAppearance(light);
+        }
+
+        // ★ 更新車道號誌標籤外觀的函式
+        function updateTrafficLightLabelAppearance(light) {
+            if (!light.element) return;
+            
+            const redLight = light.element.querySelector('.red-light');
+            const greenLight = light.element.querySelector('.green-light');
+            
+            if (redLight && greenLight) {
+                // 重置所有狀態
+                redLight.classList.remove('red-active');
+                greenLight.classList.remove('green-active');
+                
+                // 根據狀態設置對應的燈
+                if (light.status === 'red') {
+                    redLight.classList.add('red-active');
+                    console.log(`車道號誌標籤顯示紅燈: ${light.name}`);
+                } else if (light.status === 'green') {
+                    greenLight.classList.add('green-active');
+                    console.log(`車道號誌標籤顯示綠燈: ${light.name}`);
+                }
             }
         }
 
