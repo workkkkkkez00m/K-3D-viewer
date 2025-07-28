@@ -526,6 +526,7 @@
         // --- 動畫迴圈 ---
          function animate() {
             requestAnimationFrame(animate);
+            controls.target.y = 0;
             controls.update();
 
             // ★★★ 更新火警圖示的位置和可見性 ★★★

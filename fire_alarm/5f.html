@@ -423,6 +423,7 @@
         // --- 動畫迴圈 ---
         function animate() {
             requestAnimationFrame(animate);
+            controls.target.y = 0;
             controls.update();
 
             for (const point of monitoringPoints) {

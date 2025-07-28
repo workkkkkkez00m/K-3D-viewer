@@ -400,6 +400,7 @@
         // --- 動畫迴圈 ---
         function animate() {
             requestAnimationFrame(animate);
+            controls.target.y = 0;
             controls.update();
 
             for (const point of monitoringPoints) {
@@ -414,22 +415,51 @@
                     const position = new THREE.Vector3();
                     new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
                     
-                    const distance = camera.position.distanceTo(position);
-                    const distanceProgress = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
-                    const scale = maxScale - (maxScale - minScale) * distanceProgress;
+                    // --- ★★★ 1. 視野檢測：檢查物件是否在攝影機前方 ★★★ ---
+                    const cameraDirection = new THREE.Vector3();
+                    camera.getWorldDirection(cameraDirection);
+                    const objectDirection = new THREE.Vector3();
+                    objectDirection.subVectors(position, camera.position).normalize();
+                    
+                    // 使用向量點積計算，如果小於等於0表示物件在攝影機後方
+                    const dotProduct = cameraDirection.dot(objectDirection);
+                    const isInFrontOfCamera = dotProduct > 0;
+                    
+                    // --- ★★★ 2. 螢幕範圍檢測：投影並檢查是否在螢幕範圍內 ★★★ ---
+                    const projectedPosition = position.clone();
+                    projectedPosition.project(camera);
+                    
+                    // 檢查投影後的座標是否在螢幕範圍內（-1 到 1）
+                    const isInScreenBounds = (
+                        projectedPosition.x >= -1 && projectedPosition.x <= 1 &&
+                        projectedPosition.y >= -1 && projectedPosition.y <= 1 &&
+                        projectedPosition.z >= -1 && projectedPosition.z <= 1
+                    );
+                    
+                    // --- ★★★ 3. 可見性控制 ★★★ ---
+                    const isVisible = isInFrontOfCamera && isInScreenBounds;
+                    
+                    if (isVisible) {
+                        const distance = camera.position.distanceTo(position);
+                        const distanceProgress = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
+                        const scale = maxScale - (maxScale - minScale) * distanceProgress;
 
-                    position.project(camera);
-                    const x = (position.x * 0.5 + 0.5) * window.innerWidth;
-                    const y = (position.y * -0.5 + 0.5) * window.innerHeight;
-                    
-                    point.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scale})`;
-                    point.element.innerHTML = `${point.text}: <span style="color:red;">${point.status}</span>`;
-                    
-                    // --- ★★★ 新增：根據狀態切換 CSS Class ★★★ ---
-                    if (point.status === '開啟') {
-                        point.element.className = 'status-label status-open';
+                        const x = (projectedPosition.x * 0.5 + 0.5) * window.innerWidth;
+                        const y = (projectedPosition.y * -0.5 + 0.5) * window.innerHeight;
+                        
+                        point.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scale})`;
+                        point.element.style.visibility = 'visible';
+                        point.element.innerHTML = `${point.text}: <span style="color:red;">${point.status}</span>`;
+                        
+                        // --- 根據狀態切換 CSS Class ---
+                        if (point.status === '開啟') {
+                            point.element.className = 'status-label status-open';
+                        } else {
+                            point.element.className = 'status-label status-closed';
+                        }
                     } else {
-                        point.element.className = 'status-label status-closed';
+                        // 如果物件不在視野內或螢幕範圍外，隱藏標籤
+                        point.element.style.visibility = 'hidden';
                     }
                 }
             }
