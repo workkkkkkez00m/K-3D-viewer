@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧住宅中央監控系統 - B3F</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
+    <link rel="shortcut icon" href="../assets/favicon.ico">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* --- 基本樣式 --- */
+        body {
+            margin: 0;
+            font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif;
+            overflow: hidden;
+            background-color: #0d1117;
+            color: #c9d1d9; 
+        }
+        canvas {
+            display: block;
+        }
+
+        /* --- UI 元素樣式 --- */
+        #top-banner {
+            position: relative; top: 0; left: 0; width: 100%;
+            background-color: rgba(0, 0, 0, 0.7); color: white;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px; box-sizing: border-box; z-index: 20;
+        }
+        #project-title { margin: 0; font-size: 22px; font-weight: 500; }
+        #datetime-container { font-size: 16px; }
+        #menu-toggle-btn {
+            background: none; border: none; color: white; font-size: 24px;
+            cursor: pointer; padding: 0 10px;
+        }
+        #sidebar-menu {
+            position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
+            background-color: #2c3e50; padding: 20px; box-sizing: border-box;
+            z-index: 1000; transition: left 0.3s ease-in-out;
+        }
+        #sidebar-menu.open { left: 0; }
+        #sidebar-menu h2 { color: white; margin-top: 50px; border-bottom: 1px solid #465a70; padding-bottom: 10px; }
+        #sidebar-menu ul { list-style: none; padding: 0; margin-top: 20px;}
+        #sidebar-menu li a {
+            display: block; color: #ecf0f1; text-decoration: none;
+            padding: 15px 10px; border-radius: 4px; transition: background-color 0.2s;
+        }
+        #sidebar-menu li a:hover { background-color: #34495e; }
+        #close-menu-btn {
+            position: absolute; top: 15px; right: 15px; background: none; border: none;
+            color: white; font-size: 30px; font-weight: bold; line-height: 1; cursor: pointer;
+        }
+        /* 系統分類的樣式 */
+        #sidebar-menu .system-category > a {
+            font-weight: bold;
+            background-color: #1bdbed; /* 系統分類底色 */
+            color: white;
+        }
+        /* 在分類後方加上一個箭頭圖示 */
+        #sidebar-menu .system-category > a::after {
+            content: '▼';
+            float: right;
+            transition: transform 0.3s;
+        }
+        /* 當分類被展開時，讓箭頭朝上 */
+        #sidebar-menu .system-category.active > a::after {
+            transform: rotate(180deg);
+        }
+        /* 樓層子選單的樣式 (預設隱藏) */
+        .floor-submenu {
+            list-style: none;
+            padding-left: 20px; /* 增加內縮 */
+            max-height: 0; /* 預設高度為 0 */
+            overflow: hidden; /* 隱藏超出的內容 */
+            transition: max-height 0.4s ease-in-out; /* 平滑的展開/收合動畫 */
+        }
+        #ui-container {
+            /*隱藏視圖按鈕*/display: none !important; position: absolute; top: 80px; right: 20px; display: flex;
+            flex-direction: column; gap: 10px; z-index: 10;
+        }
+        #ui-container button {
+            padding: 10px 15px; font-size: 16px; color: white;
+            background-color: rgba(59, 57, 57, 0.6); border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px; cursor: pointer; transition: background-color 0.3s;
+        }
+        #ui-container button:hover { background-color: rgba(77, 77, 77, 0.736); }
+        #controls-helper {
+            position: absolute; bottom: 20px; right: 20px; padding: 8px 15px;
+            background-color: rgba(0, 0, 0, 0.5); color: #cccccc; font-size: 14px;
+            border-radius: 5px; z-index: 10; pointer-events: none;
+        }
+        #floor-indicator {
+            position: absolute; bottom: 20px; left: 20px; padding: 8px 15px;
+            background-color: rgba(0, 0, 0, 0.5); color: #cccccc; font-size: 16px;
+            font-weight: bold; border-radius: 5px; z-index: 10; pointer-events: none;
+        }
+        /* --- ★★★ 停車狀態標籤樣式 ★★★ --- */
+        #labels-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+
+        .status-label {
+            position: absolute;
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            user-select: none;
+            pointer-events: none;
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                padding 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                border-radius 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* ★ 1. 空位狀態 (綠燈) - 燈泡效果 ★ */
+        .status-available {
+            background: radial-gradient(circle at 70% 30%, #85ff8d, #1dd369 60%);
+            box-shadow: 0 0 8px 2px rgba(49, 255, 135, 0.7);
+        }
+
+        /* ★ 2. 有車狀態 (紅燈) - 燈泡效果 ★ */
+        .status-occupied {
+            background: radial-gradient(circle at 70% 30%, #ff6a6ac9, #e73c3c 60%);
+            box-shadow: 0 0 8px 2px rgba(231, 60, 60, 0.7);
+        }
+
+        /* ★ 3. 故障狀態 (黃燈) ★ */
+        .status-fault {
+            background-color: #FFC107;
+            border-color: white;
+        }
+        /* ★ 4. 故障狀態的閃爍光暈動畫 ★ */
+        .status-fault.pulsing {
+            animation: pulse-yellow 1.5s infinite;
+        }
+        @keyframes pulse-yellow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 243, 7, 0.816);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 7, 7, 0.259);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.401);
+            }
+        }
+        .fault-icon {
+            color: black;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        /* --- ★★★ 彈出式資訊面板樣式 ★★★ --- */
+        #info-panel {
+            position: fixed; top: 60px; bottom: 0; right: -400px; width: 380px;
+            background-color: rgba(22, 27, 34, 0.9); backdrop-filter: blur(8px);
+            border-left: 1px solid #30363d; padding: 20px; box-sizing: border-box;
+            overflow-y: auto; transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 500;
+        }
+        #info-panel.open { right: 0; }
+        #info-panel h2 { color: white; margin-top: 0; padding-bottom: 10px; border-bottom: 1px solid #30363d; }
+        .parking-stats-card {
+            background-color: #0d1117; border: 1px solid #30363d;
+            border-radius: 8px; padding: 20px; text-align: center;
+        }
+        .parking-stats-card .label { font-size: 16px; color: #8b949e; margin-bottom: 10px; }
+        .parking-stats-card .value { font-size: 48px; font-weight: bold; }
+        .parking-stats-card .value.green { color: #2ecc71; }
+        .parking-stats-card .unit { font-size: 18px; margin-left: 8px; }
+
+        /* 彈出面板的切換按鈕 */
+        #info-panel-toggle {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 80px;
+            background-color: rgba(45, 71, 98, 0.873);
+            border: 2px solid #c2c6cb;
+            border-right: none;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            color: #eaeaea;
+            cursor: pointer;
+            z-index: 501;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        #info-panel-toggle.open {
+            right: 380px; /* 跟隨面板移動 */
+        }
+
+        #back-to-home-btn {
+            margin-top: 20px; /* 與上方選單產生間距 */
+            padding-top: 20px !important; /* 增加頂部內邊距，並確保其優先級 */
+            border-top: 1px solid #465a70; /* 加上一條分隔線 */
+            font-weight: bold; /* 加粗字體 */
+            color: #1bdbed !important; /* 使用一個醒目的主題綠色 */
+        }
+
+        #back-to-home-btn:hover {
+            background-color: #34495e !important; /* 維持懸停效果 */
+            color: #1fecff !important; /* 懸停時顏色更亮 */
+        }
+
+        /* 移除標題連結的預設樣式 */
+        #home-link-title {
+            color: inherit; /* 繼承父元素(header)的文字顏色，也就是白色 */
+            text-decoration: none; /* 移除底線 */
+            position: absolute; /* ★ 1. 讓標題脫離文檔流，進行絕對定位 */
+            left: 50%;          /* ★ 2. 將標題的左側邊緣，對齊到父容器的中心線 */
+            top: 50%;           /* ★ 3. 將標題的頂部邊緣，對齊到父容器的中心線 */
+            transform: translate(-50%, -50%); /* ★ 4. 將標題向左、向上移動自身寬高的一半，實現完美置中 */
+            width: 60%; /* 設定一個寬度，防止標題在小螢幕上與兩側元素重疊 */
+            text-align: center;
+        }             
+       
+        #alarm-icons-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; /* 讓滑鼠可以穿透此容器 */
+        }
+                
+        /*icon*/
+        .header-right-items {
+            display: flex;
+            align-items: center; /* 讓日期時間和圖示垂直置中對齊 */
+            gap: 15px; /* 在日期時間和圖示之間增加間距 */
+        }
+
+        /* 2. 右上角 Logo 圖示的樣式 */
+        #logo-icon-right {
+            height: 32px; /* 設定圖示的高度 */
+         width: 32px;  /* 設定圖示的寬度 */
+        }
+
+        /* 頁腳的樣式 */
+        #page-footer {
+            position: fixed; 
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001; /* 確保它在最上層 (比側邊欄的 1000 還高) */
+    
+            color: rgba(255, 255, 255, 0.3); /* 半透明的白色文字 */
+            font-size: 12px;
+    
+            /* 確保滑鼠可以穿透它，不會擋住下方的元素 */
+            pointer-events: none; 
+    
+            /* 確保使用者無法選取文字 */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header id="top-banner">
+        <button id="menu-toggle-btn" title="展開選單">☰</button>
+        <a href="https://workkkkkkez00m.github.io/K-3D-viewer/index.html" id="home-link-title">
+            <h1 id="project-title">智慧住宅中央監控系統</h1>
+        </a>
+        <div class="header-right-items">
+            <div id="datetime-container"></div>
+            <img src="../assets/favicon-32x32.png" id="logo-icon-right" alt="系統圖示">
+        </div>
+        
+        <div id="alarm-icons-container"></div>
+    </header>
+    <nav id="sidebar-menu">
+        <button id="close-menu-btn">&times;</button>
+        <h2>系統選單</h2>
+        <ul>
+            <li class="system-category">
+                <a href="#">防盜及求救系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../theft_prevention/1f.html">1F</a></li>
+                    <li><a href="../theft_prevention/2f.html">2F</a></li>
+                    <li><a href="../theft_prevention/3f.html">3F</a></li>
+                    <li><a href="../theft_prevention/4f.html">4F</a></li>
+                    <li><a href="../theft_prevention/5f.html">5F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">攝影監視系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../cctv/1f.html">1F</a></li>
+                    <li><a href="../cctv/2f.html">2F</a></li>
+                    <li><a href="../cctv/3f.html">3F</a></li>
+                    <li><a href="../cctv/4f.html">4F</a></li>
+                    <li><a href="../cctv/5f.html">5F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">門禁保全系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../access_control/1f.html">1F</a></li>
+                    <li><a href="../access_control/2f.html">2F</a></li>
+                    <li><a href="../access_control/3f.html">3F</a></li>
+                    <li><a href="../access_control/4f.html">4F</a></li>
+                    <li><a href="../access_control/5f.html">5F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">影像對講系統</a>
+                <ul class="floor-submenu">
+                   <li><a href="../video_intercom/1f.html">1F</a></li>
+                   <li><a href="../video_intercom/2f.html">2F</a></li>
+                   <li><a href="../video_intercom/3f.html">3F</a></li>
+                   <li><a href="../video_intercom/4f.html">4F</a></li>
+                   <li><a href="../video_intercom/5f.html">5F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">消防火警系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../fire_alarm/1f.html">1F</a></li>
+                    <li><a href="../fire_alarm/2f.html">2F</a></li>
+                    <li><a href="../fire_alarm/3f.html">3F</a></li>
+                    <li><a href="../fire_alarm/4f.html">4F</a></li>
+                    <li><a href="../fire_alarm/5f.html">5F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">給排水系統</a>
+                <ul class="floor-submenu">
+                   <li><a href="../plumbing_drainage/b3f.html">B3F</a></li>                   
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">停車管理系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../parking_management/b1f.html">B1F</a></li>
+                    <li><a href="../parking_management/b2f.html">B2F</a></li>
+                    <li><a href="../parking_management/b3f.html">B3F</a></li>                   
+                </ul>
+            </li>            
+            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;">能源管理儀表板</a></li>
+            <li>
+                <a id="back-to-home-btn" href="../index.html">‹ 回首頁</a>
+                </li>
+                </ul>
+            </li>
+</ul>
+    </nav>
+    <div id="ui-container">
+        <button id="front-view-btn">正視圖</button>
+        <button id="top-view-btn">俯視圖</button>
+        <button id="side-view-btn">側視圖</button>
+    </div>
+    <div id="controls-helper">左鍵: 選轉 | 右鍵: 平移 | 滾輪: 縮放</div>
+    <div id="floor-indicator">當前樓層: 停車管理系統 - B1F</div>
+    <div id="labels-container"></div>
+
+    <!-- 彈出式資訊面板和切換按鈕 -->
+    <button id="info-panel-toggle">‹</button>
+    <aside id="info-panel">
+        <h2>B1F 停車資訊</h2>
+        <div class="parking-stats-card">
+            <div class="label">本層總車位數</div>
+            <div class="value"><span id="total-spaces">--</span><span class="unit">格</span></div>
+        </div>
+        <br>
+        <div class="parking-stats-card">
+            <div class="label">目前空位數</div>
+            <div class="value green"><span id="available-spaces">--</span><span class="unit">格</span></div>
+        </div>
+    </aside>
+
+    <script type="module">
+        // --- 導入函式庫 ---
+        import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
+        import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
+        import { DRACOLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/DRACOLoader.js';
+        
+        // --- 變數宣告區 ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const controls = new OrbitControls(camera, renderer.domElement);
+        let model;                        
+        let monitoringPoints = [];        
+        
+        const labelsContainer = document.getElementById('labels-container');
+        const infoPanel = document.getElementById('info-panel');
+        const infoPanelToggle = document.getElementById('info-panel-toggle');
+        const pumpCardList = infoPanel.querySelector('.pump-card-list');
+        const datetimeContainer = document.getElementById('datetime-container');
+        const menuToggleBtn = document.getElementById('menu-toggle-btn');
+        const sidebarMenu = document.getElementById('sidebar-menu');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const frontViewBtn = document.getElementById('front-view-btn');
+        const topViewBtn = document.getElementById('top-view-btn');
+        const sideViewBtn = document.getElementById('side-view-btn');        
+        const iconsContainer = document.getElementById('alarm-icons-container');
+        const totalSpacesEl = document.getElementById('total-spaces');
+        const availableSpacesEl = document.getElementById('available-spaces');
+        
+        // --- 初始化函式 ---
+        function init() {
+            scene.background = new THREE.Color(0x0d1117);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+                        
+            // ▼▼▼ 相機位置 ▼▼▼
+            camera.position.set(0, 45, 30);
+            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            directionalLight.position.set(5, 10, 7.5);
+            scene.add(directionalLight);
+            
+            //模型操作
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: null, RIGHT: THREE.MOUSE.PAN };
+            // ★ 限制攝影機最低只能到高於水平線 20 度的視角 (70度角)
+            controls.maxPolarAngle = 70 * (Math.PI / 180);
+
+            const loader = new GLTFLoader();
+            const dracoLoader = new DRACOLoader();
+            dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+            loader.setDRACOLoader(dracoLoader);
+            const modelPath = 'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/parking_management/b1f_model.glb';
+            loader.load(
+                modelPath,
+                (gltf) => {
+                    model = gltf.scene;
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    model.position.sub(center);
+                    scene.add(model);
+                    console.log('模型載入成功！');
+                    // 模型載入完成後立即執行一次狀態更新
+                    updateParkingStatus();
+                },
+                undefined,
+                (error) => console.error(`模型載入失敗: ${modelPath}`, error)
+            );
+
+            animate();
+            setupEventListeners();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);           
+            updateParkingStatus();
+            setInterval(updateParkingStatus, 1000); // ★ 更新頻率改為1秒
+            // ★ 啟動彈出面板功能
+            setupInfoPanelToggle();
+        }
+        
+        // --- 動畫迴圈 ---
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            for (const point of monitoringPoints) {
+                if (point.targetObject && point.element) {
+                    const position = new THREE.Vector3();
+                    new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
+                    position.project(camera);
+                    const x = (position.x * 0.5 + 0.5) * window.innerWidth;
+                    const y = (position.y * -0.5 + 0.5) * window.innerHeight;
+                    point.element.style.transform = `translate(-50%, 130%) translate(${x}px, ${y}px)`;
+                }
+            }
+            renderer.render(scene, camera);
+        }
+
+        // --- 核心功能函式 ---
+        async function updateParkingStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/parking/b1f');
+                const latestData = await response.json();
+
+                // 更新數據
+                latestData.forEach(newPoint => {
+                    const existingPoint = monitoringPoints.find(p => p.id === newPoint.id);
+                    if (existingPoint) {
+                        existingPoint.status = newPoint.status;
+                        // ★ 關鍵修復：更新狀態後立即更新標籤外觀
+                        if (existingPoint.element) {
+                            updateLabelAppearance(existingPoint);
+                        }
+                    } else {
+                        monitoringPoints.push({ ...newPoint, name: newPoint.name, targetObject: null, element: null });
+                    }
+                });
+
+                // 更新資訊卡
+                updateInfoCards(monitoringPoints);
+
+                if (model) {
+                    bindObjectsToPoints();
+                }
+            } catch (error) {
+                console.error("更新停車位狀態失敗:", error);
+            }
+        }
+
+        // 顯示連線錯誤的函數
+        function showConnectionError() {
+            pumpCardList.innerHTML = `
+                <div class="pump-card" style="text-align: center; padding: 40px;">
+                    <div style="color: #e74c3c; font-size: 18px; font-weight: bold; margin-bottom: 10px;">
+                        ❌ 連線錯誤
+                    </div>
+                    <div style="color: #8b949e; font-size: 14px;">
+                        無法連接到 API 伺服器<br>
+                        請檢查伺服器是否正常運行
+                    </div>
+                </div>
+            `;
+        }
+
+        // ★ 更新資訊卡畫面的函式
+        function updateInfoCards(points) {
+            const total = points.length;
+            const available = points.filter(p => p.status === '空位').length;
+            totalSpacesEl.textContent = total;
+            availableSpacesEl.textContent = available;
+        }
+
+        // ★ 新增：設定彈出面板的事件
+        function setupInfoPanelToggle() {
+            infoPanelToggle.addEventListener('click', () => {
+                infoPanel.classList.toggle('open');
+                infoPanelToggle.classList.toggle('open');
+                infoPanelToggle.innerHTML = infoPanel.classList.contains('open') ? '›' : '‹';
+            });
+        }
+
+        function bindObjectsToPoints() {
+            if (!model) return;
+            model.traverse((object) => {
+                const point = monitoringPoints.find(p => p.name === object.name && !p.targetObject);
+                if (point) {
+                    point.targetObject = object;
+                    console.log(`成功綁定停車位: ${point.locationName} (name: ${object.name})`);
+                    if (!point.element) {
+                        createLabelForPoint(point);
+                    } else {
+                        // ★ 如果標籤已存在，確保外觀是最新的
+                        updateLabelAppearance(point);
+                    }
+                }
+            });
+        }
+
+        function createLabelForPoint(point) {
+            const label = document.createElement('div');
+            labelsContainer.appendChild(label);
+            point.element = label;
+            updateLabelAppearance(point);
+        }
+
+        function updateLabelAppearance(point) {
+            if (!point.element) return;    
+            switch (point.status) {
+                case '空位':
+                    point.element.className = 'status-label status-available';
+                    point.element.innerHTML = '';
+                    break;
+                case '有車':
+                    point.element.className = 'status-label status-occupied';
+                    point.element.innerHTML = '';
+                    break;
+                case '故障':
+                    // ★ 新增 pulsing class 來觸發閃爍動畫
+                    point.element.className = 'status-label status-fault pulsing';
+                    point.element.innerHTML = `<div class="fault-icon">!</div>`;
+                    break;
+                default:
+                    // 預設情況，避免出錯
+                    point.element.className = 'status-label';
+                    point.element.innerHTML = '';
+                    break;
+            }
+        }
+        
+        function toggleLabel(clickedPoint) {
+            const wasExpanded = clickedPoint.element.classList.contains('expanded');
+            monitoringPoints.forEach(p => {
+                if (p.element) p.element.classList.remove('expanded');
+            });
+            if (!wasExpanded) {
+                clickedPoint.element.classList.add('expanded');
+            }
+        }
+
+        // --- UI 框架功能函式 ---
+        function setupEventListeners() {
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+            menuToggleBtn.addEventListener('click', () => sidebarMenu.classList.toggle('open'));
+            closeMenuBtn.addEventListener('click', () => sidebarMenu.classList.remove('open'));
+            
+            document.addEventListener('click', (event) => {
+                const isClickInsideMenu = sidebarMenu.contains(event.target) || menuToggleBtn.contains(event.target);
+                if (sidebarMenu.classList.contains('open') && !isClickInsideMenu) {
+                    sidebarMenu.classList.remove('open');
+                }
+                const isClickInsideLabel = event.target.closest('.status-label');
+                if (!isClickInsideLabel) {
+                    monitoringPoints.forEach(p => {
+                        if (p.element) p.element.classList.remove('expanded');
+                    });
+                }
+            });
+            
+            document.querySelectorAll('.system-category > a').forEach(categoryLink => {
+                const submenu = categoryLink.nextElementSibling;
+                if (submenu && submenu.classList.contains('floor-submenu')) {
+                    categoryLink.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        categoryLink.parentElement.classList.toggle('active');
+                        submenu.style.maxHeight = submenu.style.maxHeight ? null : submenu.scrollHeight + "px";
+                    });
+                }
+            });
+            frontViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(0, 5, 40)));
+            topViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(0, 25, 0)));
+            sideViewBtn.addEventListener('click', () => animateCameraPosition(new THREE.Vector3(20, 5, 0)));
+        }        
+
+        function animateCameraPosition(targetPosition, duration = 1000) {
+            const startPosition = camera.position.clone();
+            const startTarget = controls.target.clone();
+            const newTarget = new THREE.Vector3(0,0,0);
+            let startTime = null;
+            function loop(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const progress = Math.min((currentTime - startTime) / duration, 1);
+                camera.position.lerpVectors(startPosition, targetPosition, progress);
+                controls.target.lerpVectors(startTarget, newTarget, progress);
+                if (progress < 1) requestAnimationFrame(loop);
+            }
+            requestAnimationFrame(loop);
+        }
+        
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const dateString = now.toLocaleDateString('zh-TW', dateOptions);
+            const timeString = now.toLocaleTimeString('zh-TW', timeOptions);
+            datetimeContainer.textContent = `${dateString} ${timeString}`;
+        }
+
+        // --- 點擊查詢物件名稱的工具 ---
+        const raycasterForClick = new THREE.Raycaster();
+        const mouseForClick = new THREE.Vector2();
+
+        window.addEventListener('click', (event) => {
+            // 只在側邊欄關閉時才觸發
+            if (!sidebarMenu.classList.contains('open')) {
+                mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+                if (model) { // 確保模型已載入
+                    raycasterForClick.setFromCamera(mouseForClick, camera);
+                    const intersects = raycasterForClick.intersectObject(model, true);
+
+                    if (intersects.length > 0) {
+                        const clickedObject = intersects[0].object;
+                        console.clear();
+                        console.log('--- 您點擊了 ---');
+                        // ★★★ 物件的 name ★★★
+                        console.log('★ 物件名稱 (name):', clickedObject.name);
+                        console.log('--------------------');
+                        // 保留印出 uuid
+                        console.log('物件的 UUID:', clickedObject.uuid);
+                        console.log('完整物件:', clickedObject);
+                    }
+                }
+            }
+        });
+
+        // --- 啟動 ---
+        init();
+
+    </script>
+    <footer id="page-footer">
+        <span>v1.1.0</span> | <span>Copyright © 2025 KL </span>
+    </footer>
+</body>
+</html>
