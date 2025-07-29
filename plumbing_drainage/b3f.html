@@ -120,7 +120,10 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* 平滑過渡效果 */
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                padding 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                border-radius 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                background-color 0.3s;
             overflow: hidden; /* 隱藏超出的文字內容 */
         }
         .status-running { background-color: rgba(46, 204, 113, 0.8); }
@@ -267,6 +270,10 @@
             background-color: #34495e !important; /* 維持懸停效果 */
             color: #1fecff !important; /* 懸停時顏色更亮 */
         }
+        /* 為能源管理和電梯監控系統按鈕添加適當間距 */
+        #sidebar-menu li a[href*="energy"] {
+            margin-bottom: 18px; /* 能源管理按鈕下方間距 */
+        }
 
         /* 移除標題連結的預設樣式 */
         #home-link-title {
@@ -404,6 +411,7 @@
                 </ul>
             </li>   
             <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;">能源管理儀表板</a></li>
+            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;">電梯監控系統</a></li>
             <li>
                 <a id="back-to-home-btn" href="../index.html">‹ 回首頁</a>
                 </li>
@@ -514,7 +522,6 @@
         // --- 動畫迴圈 ---
         function animate() {
             requestAnimationFrame(animate);
-            controls.target.y = 0;
             controls.update();
 
             for (const point of monitoringPoints) {
@@ -522,33 +529,15 @@
                     const position = new THREE.Vector3();
                     new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
                     
-                    // ★ 修復：檢查物件是否在攝影機視野內
-                    const cameraPosition = camera.position.clone();
-                    const objectDirection = position.clone().sub(cameraPosition).normalize();
-                    const cameraDirection = new THREE.Vector3();
-                    camera.getWorldDirection(cameraDirection);
+                    const distance = camera.position.distanceTo(position);
+                    const scale = maxScale - (maxScale - minScale) * Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
                     
-                    // 計算物件是否在攝影機前方（點積 > 0 表示在前方）
-                    const dotProduct = objectDirection.dot(cameraDirection);
+                    position.project(camera);
+                    const x = (position.x * 0.5 + 0.5) * window.innerWidth;
+                    const y = (position.y * -0.5 + 0.5) * window.innerHeight;
                     
-                    if (dotProduct > 0) {
-                        // 物件在攝影機前方，正常顯示
-                        position.project(camera);
-                        
-                        // 檢查投影後的座標是否在螢幕範圍內 (-1 到 1)
-                        if (position.x >= -1 && position.x <= 1 && position.y >= -1 && position.y <= 1) {
-                            const x = (position.x * 0.5 + 0.5) * window.innerWidth;
-                            const y = (position.y * -0.5 + 0.5) * window.innerHeight;
-                            point.element.style.transform = `translate(-50%, 20%) translate(${x}px, ${y}px)`;
-                            point.element.style.visibility = 'visible';
-                        } else {
-                            // 物件投影在螢幕範圍外，隱藏標籤
-                            point.element.style.visibility = 'hidden';
-                        }
-                    } else {
-                        // 物件在攝影機後方，隱藏標籤
-                        point.element.style.visibility = 'hidden';
-                    }
+                    point.element.style.transform = `translate(-50%, 0%) translate(${x}px, ${y}px) scale(${scale})`;
+                    
                 }
             }
             renderer.render(scene, camera);

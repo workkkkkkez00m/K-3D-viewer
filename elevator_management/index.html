@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電梯監控系統</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
+    <link rel="shortcut icon" href="../assets/favicon.ico">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <style>
+        /* --- 基礎樣式 --- */
+        body { margin: 0; font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; overflow: hidden; background-color: #0d1117; color: #c9d1d9; }
+
+        /* --- 框架 UI 樣式  --- */
+        #top-banner {
+            position: relative; top: 0; left: 0; width: 100%;
+            background-color: rgba(0, 0, 0, 0.7); color: white;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px; box-sizing: border-box; z-index: 20;
+        }
+        #project-title { margin: 0; font-size: 22px; font-weight: 500; margin-left: 15px; }
+        #datetime-container { font-size: 16px; }
+        #menu-toggle-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0 10px; }
+        #sidebar-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background-color: #2c3e50; padding: 20px; box-sizing: border-box; z-index: 1000; transition: left 0.3s ease-in-out; }
+        #sidebar-menu.open { left: 0; }
+        #sidebar-menu h2 { color: white; margin-top: 50px; border-bottom: 1px solid #465a70; padding-bottom: 10px; }
+        #sidebar-menu ul { list-style: none; padding: 0; margin-top: 20px;}
+        #sidebar-menu li a { display: block; color: #ecf0f1; text-decoration: none; padding: 15px 10px; border-radius: 4px; transition: background-color 0.2s; }
+        #sidebar-menu li a:hover { background-color: #34495e; }
+        #close-menu-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: white; font-size: 30px; font-weight: bold; line-height: 1; cursor: pointer; }
+        #sidebar-menu .system-category > a { font-weight: bold; background-color: #1bdbed; color: white; }
+        #sidebar-menu .system-category > a::after { content: '▼'; float: right; transition: transform 0.3s; }
+        #sidebar-menu .system-category.active > a::after { transform: rotate(180deg); }
+        .floor-submenu { list-style: none; padding-left: 20px; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out; }
+        #back-to-home-btn { margin-top: 20px; padding-top: 20px !important; border-top: 1px solid #465a70; font-weight: bold; color: #1bdbed !important; }
+        #back-to-home-btn:hover { background-color: #34495e !important; color: #1fecff !important; }
+        /* 為能源管理和電梯監控系統按鈕添加適當間距 */
+        #sidebar-menu li a[href*="energy"] {
+            margin-bottom: 18px; /* 能源管理按鈕下方間距 */
+        }
+        /* 此頁面沒有3D操控，隱藏不需要的按鈕和提示 */
+        #ui-container, #controls-helper, #floor-indicator { display: none; }
+       
+        /* 移除標題連結的預設樣式 */
+        #home-link-title {
+            color: inherit; /* 繼承父元素(header)的文字顏色，也就是白色 */
+            text-decoration: none; /* 移除底線 */
+            position: absolute; /* ★ 1. 讓標題脫離文檔流，進行絕對定位 */
+            left: 50%;          /* ★ 2. 將標題的左側邊緣，對齊到父容器的中心線 */
+            top: 50%;           /* ★ 3. 將標題的頂部邊緣，對齊到父容器的中心線 */
+            transform: translate(-50%, -50%); /* ★ 4. 將標題向左、向上移動自身寬高的一半，實現完美置中 */
+            width: 60%; /* 設定一個寬度，防止標題在小螢幕上與兩側元素重疊 */
+            text-align: center;
+        }             
+        /*icon*/
+        .header-right-items {
+            display: flex;
+            align-items: center; /* 讓日期時間和圖示垂直置中對齊 */
+            gap: 15px; /* 在日期時間和圖示之間增加間距 */
+        }
+        /* 2. 右上角 Logo 圖示的樣式 */
+        #logo-icon-right {
+            height: 32px; /* 設定圖示的高度 */
+            width: 32px;  /* 設定圖示的寬度 */
+        }
+        /* 頁腳的樣式 */
+        #page-footer {
+            position: fixed; 
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001; /* 確保它在最上層 (比側邊欄的 1000 還高) */
+    
+            color: rgba(255, 255, 255, 0.3); /* 半透明的白色文字 */
+            font-size: 12px;
+    
+            /* 確保滑鼠可以穿透它，不會擋住下方的元素 */
+            pointer-events: none; 
+    
+            /* 確保使用者無法選取文字 */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        /* --- ★★★ 全新的電梯儀表板樣式 ★★★ --- */
+        #elevator-dashboard {
+            position: absolute;
+            top: 60px; /* 避開頂部橫幅 */
+            left: 0;
+            right: 0;
+            bottom: 40px; /* 避開底部版權信息 */
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        /* --- 電梯儀表板樣式 --- */
+        .elevator-unit {
+            background-color: #161b22; border: 2px solid #30363d; border-radius: 8px;
+            padding: 10px; display: flex; position: relative; width: 280px;
+            min-height: 400px; gap: 10px;
+        }
+        
+        /* 電梯容器 */
+        .elevator-unit {
+            background-color: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            position: relative;
+            width: 280px;
+            min-height: 400px;
+            gap: 10px;
+        }
+        
+        /* 電梯標題 */
+        .elevator-header {
+            text-align: center;
+            padding: 8px;
+            font-weight: bold;
+            color: white;
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            background-color: #21262d;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            border-bottom: 1px solid #30363d;
+            font-size: 14px;
+        }
+        
+        /* 樓層信息側 */
+        .floors-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column-reverse;
+            margin-top: 40px;
+            border-right: 1px solid #30363d;
+            padding-right: 8px;
+        }
+        
+        /* 車廂動畫側 */
+        .elevator-side {
+            flex: 0 0 80px;
+            display: flex;
+            flex-direction: column-reverse;
+            margin-top: 40px;
+            position: relative;
+            background-color: #0d1117;
+            border-radius: 4px;
+            border: 1px solid #21262d;
+        }
+        
+        .floor {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 8px;
+            border-bottom: 1px dashed #30363d;
+            transition: all 0.3s ease;
+            min-height: 35px;
+        }
+        .floor:last-child { border-bottom: none; }
+        .floor-name { font-size: 14px; font-weight: bold; color: #8b949e; }
+        .hall-call-buttons button {
+            background: none; border: none; color: #8b949e;
+            font-size: 16px; cursor: default;
+        }
+        .hall-call-buttons button.active { color: #f1c40f; }
+
+        /* 車廂側樓層標示 */
+        .shaft-floor {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid #21262d;
+            font-size: 10px;
+            color: #6e7681;
+            transition: all 0.3s ease;
+            min-height: 35px;
+        }
+        .shaft-floor:last-child { border-bottom: none; }
+
+        /* 電梯車廂 */
+        .elevator-car {
+            position: absolute;
+            bottom: 0;
+            left: 2px; right: 2px;
+            height: 12.5%;
+            background-color: #6e7681;
+            border: 2px solid #c9d1d9;
+            border-radius: 3px;
+            box-sizing: border-box;
+            transition: bottom 1s ease-in-out;
+            z-index: 10;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* 車門 */
+        .elevator-door {
+            width: 50%;
+            height: 100%;
+            background-color: #adb5bd;
+            border: 1px solid #8b949e;
+            box-sizing: border-box;
+            transition: transform 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: #495057;
+        }
+        
+        .elevator-car.door-open .elevator-door.left { 
+            transform: translateX(-100%); 
+        }
+        .elevator-car.door-open .elevator-door.right { 
+            transform: translateX(100%); 
+        }
+
+        /* 車廂狀態顯示 */
+        .car-status {
+            position: absolute;
+            top: 1px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #212529;
+            font-weight: bold;
+            font-size: 8px;
+            z-index: 11;
+            background: rgba(255,255,255,0.9);
+            padding: 1px 2px;
+            border-radius: 2px;
+        }
+
+        .shaft-floor.elevator-here {
+            background-color: rgba(88, 166, 255, 0.3) !important;
+            color: #58a6ff !important;
+            font-weight: bold;
+            box-shadow: inset 0 0 8px rgba(88, 166, 255, 0.5);
+        }
+
+        /* 車廂內叫車樓層顯示（改用藍色框） */
+        .shaft-floor.car-call {
+            background-color: rgba(88, 166, 255, 0.3) !important;
+            color: #58a6ff !important;
+            font-weight: bold;
+            border: 1px solid #58a6ff;
+            box-shadow: inset 0 0 8px rgba(88, 166, 255, 0.5);
+        }
+
+        /* ★★★ 狀態列樣式 ★★★ */
+        .status-bar {
+            position: absolute;
+            top: 40px; /* 剛好在 header 下方 */
+            left: 10px; right: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        
+        /* 緊急呼叫按鈕樣式 */
+        .emergency-call {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            color: #8b949e;
+            font-size: 11px;
+            transition: all 0.3s ease;
+        }
+        
+        .emergency-call-light {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #404040;
+            border: 1px solid #555;
+            transition: all 0.3s ease;
+        }
+        
+        .emergency-call.active {
+            background-color: #2d1b1b;
+            border-color: #e74c3c;
+            color: #ff8a80;
+            font-weight: bold;
+            box-shadow: 0 0 8px rgba(231, 76, 60, 0.3);
+        }
+        
+        .emergency-call.active .emergency-call-light {
+            background-color: #e74c3c;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 6px #e74c3c, inset 0 0 6px #ff4444;
+        }
+        
+        /* 運轉狀態按鈕樣式 */
+        .run-status {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .run-status.fault { 
+            background-color: #2d2519;
+            border-color: #FFC107;
+            color: #FFC107; 
+            box-shadow: 0 0 6px rgba(255, 193, 7, 0.3);
+        }
+        
+        .run-status.power-off { 
+            background-color: #2d1b1b;
+            border-color: #e74c3c;
+            color: #e74c3c; 
+            box-shadow: 0 0 6px rgba(231, 76, 60, 0.3);
+        }
+        
+        .run-status.standby { 
+            background-color: #1f2329;
+            border-color: #6b7280;
+            color: #8b949e; 
+        }
+        
+        .run-status.normal { 
+            background-color: #1b2d1f;
+            border-color: #2ecc71;
+            color: #2ecc71; 
+            box-shadow: 0 0 6px rgba(46, 204, 113, 0.3);
+        }
+
+        /* 調整樓層區塊的上邊距以容納狀態列 */
+        .floors-side, .elevator-side {
+            margin-top: 80px; /* 從 40px 加大到 80px */
+        }
+
+
+    </style>
+</head>
+<body>
+    <header id="top-banner">
+        <button id="menu-toggle-btn" title="展開選單">☰</button>
+        <a href="https://workkkkkkez00m.github.io/K-3D-viewer/index.html" id="home-link-title">
+            <h1 id="project-title">智慧住宅中央監控系統 </h1>
+        </a>
+        <div class="header-right-items">
+            <div id="datetime-container"></div>
+            <img src="../assets/favicon-32x32.png" id="logo-icon-right" alt="系統圖示">
+        </div>
+    </header>
+
+    <nav id="sidebar-menu">
+        <button id="close-menu-btn">&times;</button>
+        <h2>系統選單</h2>
+        <ul>            
+            <li class="system-category">
+                <a href="#">防盜及求救系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../theft_prevention/1f.html">1F</a></li>
+                    <li><a href="../theft_prevention/2f.html">2F</a></li>
+                    <li><a href="../theft_prevention/3f.html">3F</a></li>
+                    <li><a href="../theft_prevention/4f.html">4F</a></li>
+                    <li><a href="../theft_prevention/5f.html">5F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">攝影監視系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../cctv/1f.html">1F</a></li>
+                    <li><a href="../cctv/2f.html">2F</a></li>
+                    <li><a href="../cctv/3f.html">3F</a></li>
+                    <li><a href="../cctv/4f.html">4F</a></li>
+                    <li><a href="../cctv/5f.html">5F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">門禁保全系統</a>
+                <ul class="floor-submenu">
+                     <li><a href="../access_control/1f.html">1F</a></li>
+                    <li><a href="../access_control/2f.html">2F</a></li>
+                    <li><a href="../access_control/3f.html">3F</a></li>
+                    <li><a href="../access_control/4f.html">4F</a></li>
+                    <li><a href="../access_control/5f.html">5F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">影像對講系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../video_intercom/1f.html">1F</a></li>
+                    <li><a href="../video_intercom/2f.html">2F</a></li>
+                    <li><a href="../video_intercom/3f.html">3F</a></li>
+                    <li><a href="../video_intercom/4f.html">4F</a></li>
+                    <li><a href="../video_intercom/5f.html">5F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">消防火警系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../fire_alarm/1f.html">1F</a></li>
+                    <li><a href="../fire_alarm/2f.html">2F</a></li>
+                    <li><a href="../fire_alarm/3f.html">3F</a></li>
+                    <li><a href="../fire_alarm/4f.html">4F</a></li>
+                    <li><a href="../fire_alarm/5f.html">5F</a></li>
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">給排水系統</a>
+                <ul class="floor-submenu">
+                   <li><a href="../plumbing_drainage/b3f.html">B3F</a></li>                   
+                </ul>
+            </li>
+            <li class="system-category">
+                <a href="#">停車管理系統</a>
+                <ul class="floor-submenu">
+                    <li><a href="../parking_management/b1f.html">B1F</a></li>
+                    <li><a href="../parking_management/b2f.html">B2F</a></li>
+                    <li><a href="../parking_management/b3f.html">B3F</a></li>                   
+                </ul>
+            </li>   
+            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;">能源管理儀表板</a></li>            
+            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;">電梯監控系統</a></li>
+            <li><a id="back-to-home-btn" href="../index.html">‹ 回首頁</a></li>
+        </ul>
+    </nav>
+
+    <main id="content-wrapper">
+        <div id="elevator-dashboard">
+        </div>    
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 全局樓層列表定義（從低樓層到高樓層） ---
+            const allFloors = ['B3F', 'B2F', 'B1F', '1F', '2F', '3F', '4F', '5F'];
+            
+            // --- 獲取基本 DOM 元素 ---
+            const datetimeContainer = document.getElementById('datetime-container');
+            const menuToggleBtn = document.getElementById('menu-toggle-btn');
+            const sidebarMenu = document.getElementById('sidebar-menu');
+            const closeMenuBtn = document.getElementById('close-menu-btn');
+            const dashboard = document.getElementById('elevator-dashboard');
+
+            // --- UI 框架功能函式 ---
+            function updateDateTime() {
+                const now = new Date();
+                const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' };
+                const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+                datetimeContainer.textContent = `${now.toLocaleDateString('zh-TW', dateOptions)} ${now.toLocaleTimeString('zh-TW', timeOptions)}`;
+            }
+
+            function setupSidebarMenu() {
+                menuToggleBtn.addEventListener('click', () => sidebarMenu.classList.toggle('open'));
+                closeMenuBtn.addEventListener('click', () => sidebarMenu.classList.remove('open'));
+                document.addEventListener('click', (event) => {
+                    const isClickInsideMenu = sidebarMenu.contains(event.target) || menuToggleBtn.contains(event.target);
+                    if (sidebarMenu.classList.contains('open') && !isClickInsideMenu) {
+                        sidebarMenu.classList.remove('open');
+                    }
+                });
+                document.querySelectorAll('.system-category > a').forEach(categoryLink => {
+                    const submenu = categoryLink.nextElementSibling;
+                    if (submenu && submenu.classList.contains('floor-submenu')) {
+                        categoryLink.addEventListener('click', (event) => {
+                            event.preventDefault();
+                            categoryLink.parentElement.classList.toggle('active');
+                            submenu.style.maxHeight = submenu.style.maxHeight ? null : submenu.scrollHeight + "px";
+                        });
+                    }
+                });
+            }
+
+            async function updateElevatorStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/elevators');
+                const elevatorsData = await response.json();
+
+                if (dashboard.children.length === 0) {
+                    createElevatorUI(elevatorsData);
+                }
+
+                elevatorsData.forEach(data => {
+                    const floorsSide = document.getElementById(`floors-side-${data.id}`);
+                    const elevatorSide = document.getElementById(`elevator-side-${data.id}`);
+                    const unit = document.getElementById(`elevator-unit-${data.id}`);
+                    if (!floorsSide || !elevatorSide) return;
+                    
+                    const car = elevatorSide.querySelector('.elevator-car');
+                    const carStatus = elevatorSide.querySelector('.car-status');
+                    
+                    // ★★★ 計算電梯位置 ★★★
+                    const currentGlobalIndex = allFloors.indexOf(data.currentFloor);
+                    const floorHeightPercentage = 100 / allFloors.length;
+
+                    // 1. 更新電梯車廂位置
+                    car.style.bottom = `${currentGlobalIndex * floorHeightPercentage}%`;
+                    car.style.height = `${floorHeightPercentage}%`;
+
+                    // 2. 更新車廂狀態顯示
+                    let directionText = '';
+                    if(data.direction === 'up') directionText = '▲';
+                    if(data.direction === 'down') directionText = '▼';
+                    carStatus.textContent = `${data.currentFloor} ${directionText}`;
+
+                    // 3. 更新車門狀態
+                    car.classList.toggle('door-open', data.doorStatus === 'open');
+
+                    // 4. 清除所有樓層的電梯效果
+                    floorsSide.querySelectorAll('.floor').forEach(floor => {
+                        floor.classList.remove('elevator-here');
+                    });
+                    elevatorSide.querySelectorAll('.shaft-floor').forEach(floor => {
+                        floor.classList.remove('elevator-here', 'car-call');
+                    });
+
+                    // 5. 顯示車廂內叫車樓層（電梯井右側藍色框）
+                    if (data.carCalls && data.carCalls.length > 0) {
+                        data.carCalls.forEach(callFloor => {
+                            const shaftFloorEl = elevatorSide.querySelector(`[data-floor-name="${callFloor}"]`);
+                            if (shaftFloorEl && callFloor !== data.currentFloor) {
+                                shaftFloorEl.classList.add('car-call');
+                            }
+                        });
+                    }
+
+                    // 6. 更新樓層叫車燈（大廳叫車）
+                    floorsSide.querySelectorAll('.hall-call-buttons button').forEach(btn => btn.classList.remove('active'));
+                    data.hallCalls.forEach(call => {
+                        const floorEl = floorsSide.querySelector(`[data-floor-name="${call.floor}"]`);
+                        if(floorEl) {
+                            const btn = floorEl.querySelector(`[data-direction="${call.direction}"]`);
+                            if(btn) btn.classList.add('active');
+                        }
+                    });
+
+                    // ★★★ 更新狀態列 ★★★
+                    const emergencyCallEl = unit.querySelector('.emergency-call');
+                    const runStatusEl = unit.querySelector('.run-status');
+                    
+                    emergencyCallEl.classList.toggle('active', data.emergencyCall);
+                    
+                    runStatusEl.textContent = data.runStatus;
+                    runStatusEl.className = 'run-status'; // 先重置 class
+                    if (data.runStatus === '電梯故障') runStatusEl.classList.add('fault');
+                    // 只有五號電梯（緊急電梯）才會有停電運轉狀態
+                    if (data.runStatus === '停電運轉' && data.id === 5) runStatusEl.classList.add('power-off');
+                    if (data.runStatus === '自動休止') runStatusEl.classList.add('standby');
+                    if (data.runStatus === '自動運轉') runStatusEl.classList.add('normal');
+
+                });
+
+            } catch (error) {
+                console.error("更新電梯狀態失敗:", error);
+                // 顯示錯誤狀態到儀表板
+                if (dashboard.children.length === 0) {
+                    dashboard.innerHTML = '<div style="color: #ff6b6b; text-align: center; padding: 50px; font-size: 18px;">無法連接到電梯 API 伺服器<br><small>請確認 API 服務正在運行</small></div>';
+                }
+            }
+        }
+        
+        // 第一次建立電梯 UI 的函式
+        function createElevatorUI(elevatorsData) {
+            dashboard.innerHTML = '';
+            elevatorsData.forEach(data => {
+                // 創建電梯單元容器
+                const elevatorUnit = document.createElement('div');
+                elevatorUnit.className = 'elevator-unit';
+                elevatorUnit.id = `elevator-unit-${data.id}`;
+
+                // 創建樓層信息側和車廂動畫側
+                const floorsSide = document.createElement('div');
+                floorsSide.className = 'floors-side';
+                floorsSide.id = `floors-side-${data.id}`;
+
+                const elevatorSide = document.createElement('div');
+                elevatorSide.className = 'elevator-side';
+                elevatorSide.id = `elevator-side-${data.id}`;
+
+                // 建立樓層信息和車廂側標示
+                let floorsHTML = '';
+                let shaftFloorsHTML = '';
+                allFloors.forEach(floorName => {
+                    if (data.serviceFloors.includes(floorName)) {
+                        // 樓層信息側
+                        floorsHTML += `
+                            <div class="floor" data-floor-name="${floorName}">
+                                <span class="floor-name">${floorName}</span>
+                                <div class="hall-call-buttons">
+                                    ${floorName !== '5F' ? `<button data-direction="up">▲</button>` : '<span></span>'}
+                                    ${floorName !== 'B3F' ? `<button data-direction="down">▼</button>` : '<span></span>'}
+                                </div>
+                            </div>
+                        `;
+                        // 車廂側樓層標示
+                        shaftFloorsHTML += `<div class="shaft-floor" data-floor-name="${floorName}">${floorName}</div>`;
+                    } else {
+                        floorsHTML += `<div class="floor" style="background-color: transparent;"></div>`;
+                        shaftFloorsHTML += `<div class="shaft-floor"></div>`;
+                    }
+                });
+
+                // 設置內容
+                floorsSide.innerHTML = floorsHTML;
+                elevatorSide.innerHTML = `
+                    ${shaftFloorsHTML}
+                    <div class="elevator-car">
+                        <div class="car-status"></div>
+                        <div class="elevator-door left">◀</div>
+                        <div class="elevator-door right">▶</div>
+                    </div>
+                `;
+
+                // 設置電梯標題和狀態列
+                elevatorUnit.innerHTML = `
+                    <div class="elevator-header">${data.name}</div>
+                    <div class="status-bar">
+                        <div class="emergency-call">
+                            <div class="emergency-call-light"></div>
+                            <span>緊急呼叫</span>
+                        </div>
+                        <div class="run-status"></div>
+                    </div>
+                `;
+                
+                // 組裝
+                elevatorUnit.appendChild(floorsSide);
+                elevatorUnit.appendChild(elevatorSide);
+                dashboard.appendChild(elevatorUnit);
+            });
+        }
+
+            // --- 啟動基本功能 ---
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            setupSidebarMenu();
+            updateElevatorStatus();
+            setInterval(updateElevatorStatus, 2000);
+        });
+    </script>
+    <footer id="page-footer">
+        <span>v1.1.0</span> | <span>Copyright © 2025 KL </span>
+    </footer>
+</body>
+</html>

@@ -37,6 +37,9 @@
         .floor-submenu { list-style: none; padding-left: 20px; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out; }
         #back-to-home-btn { margin-top: 20px; padding-top: 20px !important; border-top: 1px solid #465a70; font-weight: bold; color: #1bdbed !important; }
         #back-to-home-btn:hover { background-color: #34495e !important; color: #1fecff !important; }
+        #sidebar-menu li a[href*="energy"] {
+            margin-bottom: 18px; /* 能源管理按鈕下方間距 */
+        }
         /* 此頁面沒有3D操控，隱藏不需要的按鈕和提示 */
         #ui-container, #controls-helper, #floor-indicator { display: none; }
 
@@ -498,7 +501,7 @@
                 </ul>
             </li>   
             <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;">能源管理儀表板</a></li>
-            </li>
+            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;">電梯監控系統</a></li>
             <li><a id="back-to-home-btn" href="../index.html">‹ 回首頁</a></li>
         </ul>
     </nav>

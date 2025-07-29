@@ -107,7 +107,10 @@
             font-weight: bold;
             user-select: none;
             pointer-events: none; /* 禁止鼠標事件，避免干擾模型交互 */
-            transition: background-color 0.3s, transform 0.1s; /* 加入背景顏色過渡效果 */
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                padding 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                border-radius 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                background-color 0.3s;
         }
 
         /* 2. 關閉狀態的樣式 */
@@ -132,6 +135,10 @@
         #back-to-home-btn:hover {
             background-color: #34495e !important; /* 維持懸停效果 */
             color: #1fecff !important; /* 懸停時顏色更亮 */
+        }
+        /* 為能源管理和電梯監控系統按鈕添加適當間距 */
+        #sidebar-menu li a[href*="energy"] {
+            margin-bottom: 18px; /* 能源管理按鈕下方間距 */
         }
 
         /* 移除標題連結的預設樣式 */
@@ -257,6 +264,7 @@
                 </ul>
             </li>   
             <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;">能源管理儀表板</a></li>
+            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;">電梯監控系統</a></li>
             <li>
                 <a id="back-to-home-btn" href="../index.html">‹ 回首頁</a>
                 </li>
