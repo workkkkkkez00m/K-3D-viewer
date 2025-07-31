@@ -91,17 +91,38 @@
             left: 0;
             right: 0;
             bottom: 40px; /* 避開底部版權信息 */
-            padding: 20px;
+            padding: clamp(10px, 2vw, 20px);  /* 響應式內邊距 */
             display: flex;
             justify-content: center;
-            gap: 30px;
+            gap: clamp(15px, 3vw, 30px);  /* 響應式間距 */
             flex-wrap: wrap;
+            overflow-y: auto;  /* 允許垂直滾動 */
+        }
+        
+        /* 美化 elevator-dashboard 的滾動條樣式 */
+        #elevator-dashboard::-webkit-scrollbar {
+            width: 8px;
+        }
+        #elevator-dashboard::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #elevator-dashboard::-webkit-scrollbar-thumb {
+            background-color: #65a4ec;
+            border-radius: 4px;
+        }
+        #elevator-dashboard::-webkit-scrollbar-thumb:hover {
+            background-color: #c0c1c3;
+        }
+        #elevator-dashboard {
+            scrollbar-width: thin;
+            scrollbar-color: #65a4ec transparent;
         }
         /* --- 電梯儀表板樣式 --- */
         .elevator-unit {
             background-color: #161b22; border: 2px solid #30363d; border-radius: 8px;
-            padding: 0; position: relative; width: 280px;
-            min-height: 400px;
+            padding: 0; position: relative; 
+            width: clamp(250px, 25vw, 280px);  /* 響應式寬度 */
+            min-height: clamp(350px, 40vh, 400px);  /* 響應式高度 */
             perspective: 1000px;
         }
         .flipper {
@@ -140,6 +161,8 @@
             /* 背面內容：垂直布局（進階功能），預先翻轉 180 度 */
             transform: rotateY(180deg);
             flex-direction: column;
+            overflow: hidden; /* 確保內容不會溢出卡片邊界 */
+            position: relative; /* 確保子元素的定位基準 */
         }
         /* 背面進階功能的樣式 */
         .advanced-controls {
@@ -147,6 +170,9 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            height: 100%; /* 確保佔滿整個背面 */
+            overflow: hidden; /* 防止內容溢出 */
+            box-sizing: border-box; /* 包含內邊距在內 */
         }
         .adv-data-item {
             display: flex;
@@ -171,10 +197,45 @@
             /* 確保按鈕內所有子元素的點擊事件都傳遞給父按鈕 */
             pointer-events: none;
         }
-        .manual-controls { text-align: center; }
+        .manual-controls { 
+            text-align: center; 
+            display: flex;
+            flex-direction: column;
+            gap: 15px;  /* 增加兩組按鈕之間的間距 */
+            padding: 0 10px; /* 左右內邊距，確保不碰到邊界 */
+            box-sizing: border-box;
+            max-width: 100%; /* 確保不超出父容器 */
+            overflow: hidden; /* 防止溢出 */
+        }
+        .manual-controls-row {
+            display: flex;
+            justify-content: center;
+            gap: clamp(5px, 2vw, 10px); /* 響應式間距 */
+            flex-wrap: nowrap; /* 防止按鈕換行 */
+        }
         .manual-controls button {
-            font-size: 24px; width: 50px; height: 50px;
-            margin: 5px;
+            font-size: clamp(16px, 3vw, 24px); /* 調整響應式字體大小 */
+            width: clamp(35px, 7vw, 50px);     /* 調整響應式寬度 */
+            height: clamp(35px, 7vw, 50px);    /* 調整響應式高度 */
+            margin: 0;
+            min-width: 35px;  /* 確保最小尺寸 */
+            min-height: 35px;
+            flex-shrink: 0; /* 防止按鈕被壓縮 */
+        }
+        .manual-controls .door-buttons {
+            display: flex;
+            justify-content: center;
+            gap: clamp(5px, 2vw, 10px); /* 響應式間距 */
+            margin-top: 10px;  /* 門控按鈕額外的上邊距 */
+            flex-wrap: nowrap; /* 防止按鈕換行 */
+        }
+        .manual-controls .door-buttons button {
+            font-size: clamp(10px, 2vw, 14px); /* 調整響應式字體大小 */
+            width: clamp(45px, 8vw, 60px);     /* 調整響應式寬度 */
+            height: clamp(28px, 5vw, 40px);    /* 調整響應式高度 */
+            min-width: 45px;   /* 確保最小尺寸 */
+            min-height: 28px;
+            flex-shrink: 0; /* 防止按鈕被壓縮 */
         }
         
         /* 電梯標題 */
@@ -593,6 +654,89 @@
         }        
         .modal-buttons .adv-btn.call.active { background-color: #e74c3c; border-color: #ff6b6b; color: white; }
 
+        /* ★★★ 響應式設計媒體查詢 ★★★ */
+        @media (max-width: 768px) {
+            .elevator-unit {
+                width: clamp(200px, 45vw, 250px);
+                min-height: clamp(300px, 35vh, 350px);
+            }
+            
+            .manual-controls {
+                padding: 0 5px; /* 減少內邊距 */
+                gap: 10px; /* 減少間距 */
+            }
+            
+            .manual-controls button {
+                font-size: clamp(14px, 4vw, 18px);
+                width: clamp(30px, 6vw, 40px);
+                height: clamp(30px, 6vw, 40px);
+                min-width: 30px;
+                min-height: 30px;
+            }
+            
+            .manual-controls .door-buttons button {
+                font-size: clamp(9px, 2vw, 12px);
+                width: clamp(40px, 9vw, 50px);
+                height: clamp(25px, 5vw, 32px);
+                min-width: 40px;
+                min-height: 25px;
+            }
+            
+            .manual-controls-row {
+                gap: clamp(3px, 1vw, 8px);
+            }
+            
+            .manual-controls .door-buttons {
+                gap: clamp(3px, 1vw, 8px);
+            }
+            
+            #elevator-dashboard {
+                gap: clamp(10px, 2vw, 20px);
+                padding: clamp(5px, 1vw, 15px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .elevator-unit {
+                width: clamp(180px, 90vw, 220px);
+                min-height: clamp(280px, 50vh, 320px);
+            }
+            
+            .manual-controls {
+                padding: 0 3px; /* 進一步減少內邊距 */
+                gap: 8px;
+            }
+            
+            .manual-controls button {
+                font-size: clamp(12px, 3vw, 16px);
+                width: clamp(28px, 5vw, 35px);
+                height: clamp(28px, 5vw, 35px);
+                min-width: 28px;
+                min-height: 28px;
+            }
+            
+            .manual-controls .door-buttons button {
+                font-size: clamp(8px, 2vw, 10px);
+                width: clamp(35px, 8vw, 45px);
+                height: clamp(22px, 4vw, 28px);
+                min-width: 35px;
+                min-height: 22px;
+            }
+            
+            .manual-controls-row {
+                gap: 2px;
+            }
+            
+            .manual-controls .door-buttons {
+                gap: 2px;
+            }
+            
+            /* 確保進階控制區域不會溢出 */
+            .advanced-controls {
+                padding: 15px 5px 10px 5px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -733,6 +877,7 @@
             const modalResolveBtn = document.getElementById('modal-resolve-btn');
             const modalCallBtn = document.getElementById('modal-call-btn');
             let currentExportElevator = null;
+            let currentEmergencyElevator = null;
 
             // --- UI 框架功能函式 ---
             function updateDateTime() {
@@ -770,8 +915,17 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const elevatorsData = await response.json();
-
+                
+                // ★ 第一次載入時，記錄API回應結構
                 if (dashboard.children.length === 0) {
+                    console.log('=== API 回應結構分析 ===');
+                    console.log('電梯數據:', elevatorsData);
+                    if (elevatorsData.length > 0) {
+                        console.log('第一部電梯的完整數據結構:', elevatorsData[0]);
+                        console.log('可用的屬性:', Object.keys(elevatorsData[0]));
+                    }
+                    console.log('=== 分析完畢 ===');
+                    
                     createElevatorUI(elevatorsData);
                 }
 
@@ -794,6 +948,7 @@
 
                     // 獲取背面卡片的數據元素
                     const advCarFloor = unit.querySelector('.adv-car-floor');
+                    const advDoorStatus = unit.querySelector('.adv-door-status');
                     const advRunTime = unit.querySelector('.adv-run-time');
                     const advStartupCount = unit.querySelector('.adv-startup-count');
                     
@@ -844,6 +999,7 @@
 
                     // ★ 更新背面卡片的數據
                     advCarFloor.textContent = data.currentFloor;
+                    advDoorStatus.textContent = data.doorStatus === 'open' ? '開啟' : '關閉';
                     advRunTime.textContent = `${data.runTime} 分鐘`;
                     advStartupCount.textContent = `${data.startupCount} 次`;
 
@@ -958,6 +1114,10 @@
                                     <span class="value adv-car-floor">--</span>
                                 </div>
                                 <div class="adv-data-item">
+                                    <span class="label">電梯門狀態</span>
+                                    <span class="value adv-door-status">--</span>
+                                </div>
+                                <div class="adv-data-item">
                                     <span class="label">本日運轉時間</span>
                                     <span class="value adv-run-time">--</span>
                                 </div>
@@ -970,9 +1130,15 @@
                                     <button class="adv-btn manual-toggle">手動模式</button>
                                 </div>
                                 <div class="manual-controls" style="display: none;">
-                                    <button class="adv-btn">▲</button>
-                                    <button class="adv-btn">■</button>
-                                    <button class="adv-btn">▼</button>
+                                    <div class="manual-controls-row">
+                                        <button class="adv-btn manual-up">▲</button>
+                                        <button class="adv-btn manual-stop">■</button>
+                                        <button class="adv-btn manual-down">▼</button>
+                                    </div>
+                                    <div class="door-buttons">
+                                        <button class="adv-btn manual-open">開門</button>
+                                        <button class="adv-btn manual-close">關門</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1004,36 +1170,165 @@
                 const manualToggleBtn = elevatorUnit.querySelector('.manual-toggle');
                 const manualControls = elevatorUnit.querySelector('.manual-controls');
                 
-                manualToggleBtn.addEventListener('click', () => {
+                manualToggleBtn.addEventListener('click', async () => {
                     const isVisible = manualControls.style.display !== 'none';
-                    const isManualMode = !isVisible;
+                    const willBeManualMode = !isVisible;
                     
-                    // 切換手動控制按鈕顯示
-                    manualControls.style.display = isVisible ? 'none' : 'block';
-                    manualToggleBtn.textContent = isVisible ? '手動模式' : '關閉手動';
-                    manualToggleBtn.style.backgroundColor = isVisible ? '#21262d' : '#2d1b2d';
-                    manualToggleBtn.style.borderColor = isVisible ? '#30363d' : '#8b5cf6';
-                    manualToggleBtn.style.color = isVisible ? '#c9d1d9' : '#c084fc';
+                    // 先禁用按鈕，防止重複點擊
+                    manualToggleBtn.disabled = true;
+                    manualToggleBtn.textContent = willBeManualMode ? '切換中...' : '關閉中...';
                     
-                    // 設置手動模式標記
-                    elevatorUnit.dataset.manualMode = isManualMode;
-                    
-                    // 更新前面的運轉狀態顯示
-                    const runStatusEl = elevatorUnit.querySelector('.run-status');
-                    if (isManualMode) {
-                        runStatusEl.textContent = '手動運轉';
-                        runStatusEl.className = 'run-status';
-                        runStatusEl.style.backgroundColor = '#2d1b2d';
-                        runStatusEl.style.borderColor = '#8b5cf6';
-                        runStatusEl.style.color = '#c084fc';
-                        runStatusEl.style.boxShadow = '0 0 6px rgba(139, 92, 246, 0.3)';
+                    try {
+                        // 調用後端 API 切換手動模式
+                        console.log(`切換手動模式: 電梯 ${data.id}, 目標模式: ${willBeManualMode ? '手動' : '自動'}`);
+                        
+                        const response = await fetch(`http://localhost:3000/api/elevators/${data.id}/toggle-manual`, { 
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            }
+                        });
+                        
+                        console.log(`手動模式切換回應狀態: ${response.status}`);
+                        
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                        }
+                        
+                        const updatedData = await response.json();
+                        console.log('手動模式切換回應:', updatedData);
+                        
+                        // 根據後端回應更新前端狀態
+                        const actualManualMode = updatedData.manualMode;
+                        elevatorUnit.dataset.manualMode = actualManualMode;
+                        
+                        // 更新 UI 顯示
+                        manualControls.style.display = actualManualMode ? 'block' : 'none';
+                        manualToggleBtn.style.backgroundColor = actualManualMode ? '#2d1b2d' : '#21262d';
+                        manualToggleBtn.style.borderColor = actualManualMode ? '#8b5cf6' : '#30363d';
+                        manualToggleBtn.style.color = actualManualMode ? '#c084fc' : '#c9d1d9';
+                        
+                        // 更新運轉狀態顯示
+                        const runStatusEl = elevatorUnit.querySelector('.run-status');
+                        if (actualManualMode) {
+                            runStatusEl.textContent = '手動運轉';
+                            runStatusEl.className = 'run-status';
+                            runStatusEl.style.backgroundColor = '#2d1b2d';
+                            runStatusEl.style.borderColor = '#8b5cf6';
+                            runStatusEl.style.color = '#c084fc';
+                            runStatusEl.style.boxShadow = '0 0 6px rgba(139, 92, 246, 0.3)';
+                        }
+                        // 如果關閉手動模式，狀態會在下次API更新時恢復
+                        
+                    } catch (error) {
+                        console.error("切換手動模式失敗:", error);
+                        alert(`切換手動模式失敗: ${error.message}`);
+                        
+                        // 發生錯誤時保持原狀態
+                        elevatorUnit.dataset.manualMode = isVisible;
+                    } finally {
+                        // 恢復按鈕狀態
+                        const finalManualMode = elevatorUnit.dataset.manualMode === 'true';
+                        manualToggleBtn.textContent = finalManualMode ? '關閉手動' : '手動模式';
+                        manualToggleBtn.disabled = false;
                     }
-                    // 如果關閉手動模式，狀態會在下次API更新時恢復
                 });
+
+                // ★ 為手動控制按鈕添加事件監聽器
+                const upBtn = manualControls.querySelector('.manual-up');
+                const stopBtn = manualControls.querySelector('.manual-stop');
+                const downBtn = manualControls.querySelector('.manual-down');
+
+                if (upBtn) {
+                    upBtn.addEventListener('click', async () => {
+                        upBtn.style.backgroundColor = '#58a6ff';
+                        await sendManualCommand(data.id, 'up');
+                        setTimeout(() => {
+                            upBtn.style.backgroundColor = '';
+                        }, 500);
+                    });
+                }
+                
+                if (stopBtn) {
+                    stopBtn.addEventListener('click', async () => {
+                        stopBtn.style.backgroundColor = '#e74c3c';
+                        await sendManualCommand(data.id, 'stop');
+                        setTimeout(() => {
+                            stopBtn.style.backgroundColor = '';
+                        }, 500);
+                    });
+                }
+                
+                if (downBtn) {
+                    downBtn.addEventListener('click', async () => {
+                        downBtn.style.backgroundColor = '#58a6ff';
+                        await sendManualCommand(data.id, 'down');
+                        setTimeout(() => {
+                            downBtn.style.backgroundColor = '';
+                        }, 500);
+                    });
+                }
+
+                const openBtn = elevatorUnit.querySelector('.manual-open');
+                const closeBtn = elevatorUnit.querySelector('.manual-close');
+                
+                if (openBtn) {
+                    openBtn.addEventListener('click', async () => {
+                        openBtn.style.backgroundColor = '#27ae60';
+                        await sendManualCommand(data.id, 'open');
+                        setTimeout(() => {
+                            openBtn.style.backgroundColor = '';
+                        }, 500);
+                    });
+                }
+                
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', async () => {
+                        closeBtn.style.backgroundColor = '#e67e22';
+                        await sendManualCommand(data.id, 'close');
+                        setTimeout(() => {
+                            closeBtn.style.backgroundColor = '';
+                        }, 500);
+                    });
+                }
 
                 // 添加到儀表板
                 dashboard.appendChild(elevatorUnit);
             });
+        }
+
+        async function sendManualCommand(elevatorId, command) {
+            try {
+                console.log(`發送手動指令: 電梯 ${elevatorId}, 指令: ${command}`);
+                
+                const response = await fetch(`http://localhost:3000/api/elevators/${elevatorId}/manual-command`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ command: command })
+                });
+                
+                console.log(`手動指令回應狀態: ${response.status}`);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('手動指令回應:', result);
+                
+                // 立即觸發一次更新，以獲得即時反饋
+                updateElevatorStatus();
+                
+            } catch (error) {
+                console.error(`發送手動指令 ${command} 失敗:`, error);
+                alert(`手動控制失敗: ${error.message}`);
+            }
         }
 
         // ★★★ 緊急呼叫相關函式 ★★★
@@ -1164,7 +1459,7 @@
         });
     </script>
     <footer id="page-footer">
-        <span>v1.2.0</span> | <span>Copyright © 2025 KL </span>
+        <span>v1.2.1</span> | <span>Copyright © 2025 KL </span>
     </footer>
 </body>
 </html>
