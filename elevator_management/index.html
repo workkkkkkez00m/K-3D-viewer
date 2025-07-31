@@ -151,7 +151,7 @@
         .adv-data-item {
             display: flex;
             justify-content: space-between;
-            font-size: 14px;
+            font-size: 15px;
             padding: 5px 0;
             border-bottom: 1px solid #21262d;
         }
@@ -182,10 +182,10 @@
             border-top-left-radius: 6px;
             border-top-right-radius: 6px;
             border-bottom: 1px solid #30363d;
-            font-size: 14px;
+            font-size: 15px;
         }
         
-        /* 樓層信息側 */
+        /* 樓層側 */
         .floors-side {
             flex: 1;
             display: flex;
@@ -218,9 +218,9 @@
             min-height: 35px;
         }
         .floor:last-child { border-bottom: 1px dashed #30363d; }
-        .floor-name { font-size: 14px; font-weight: bold; color: #8b949e; }
+        .floor-name { font-size: 16px; font-weight: bold; color: #d1d5d8; }
         .hall-call-buttons button {
-            background: none; border: none; color: #8b949e;
+            background: none; border: none; color: #65717e;
             font-size: 16px; cursor: default;
         }
         .hall-call-buttons button.active { color: #f1c40f; }
@@ -232,7 +232,7 @@
             justify-content: center;
             align-items: center;
             border-bottom: 1px solid #21262d;
-            font-size: 10px;
+            font-size: 12px;
             color: #6e7681;
             transition: all 0.3s ease;
             min-height: 35px;
@@ -318,6 +318,7 @@
             align-items: center;
             gap: 8px;
             font-size: 12px;
+            z-index: 5;
         }
         
         /* 緊急呼叫按鈕樣式 */
@@ -332,7 +333,7 @@
             border: 1px solid #30363d;
             border-radius: 4px;
             color: #8b949e;
-            font-size: 11px;
+            font-size: 13px;
             transition: all 0.3s ease;
         }
         
@@ -350,13 +351,25 @@
             border-color: #e74c3c;
             color: #ff8a80;
             font-weight: bold;
-            box-shadow: 0 0 8px rgba(231, 76, 60, 0.3);
+            animation: pulse-red 1.5s infinite; /* ★ 將靜態陰影改為閃爍動畫 */
         }
         
         .emergency-call.active .emergency-call-light {
             background-color: #e74c3c;
             border-color: #ff6b6b;
             box-shadow: 0 0 6px #e74c3c, inset 0 0 6px #ff4444;
+        }
+
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 12px rgba(231, 77, 60, 0.15);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+                }
         }
         
         /* 運轉狀態按鈕樣式 */
@@ -370,7 +383,7 @@
             border: 1px solid #30363d;
             border-radius: 4px;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 13px;
             text-align: center;
             transition: all 0.3s ease;
         }
@@ -384,7 +397,7 @@
         
         .run-status.power-off { 
             background-color: #2d1b1b;
-            border-color: #e74c3c;
+            border-color: #f5412d;
             color: #e74c3c; 
             box-shadow: 0 0 6px rgba(231, 76, 60, 0.3);
         }
@@ -471,6 +484,34 @@
         .modal-buttons .adv-btn {
             flex: 1;
             max-width: 120px;
+        }
+        /* 設定按鈕的專屬樣式 */
+        .settings-btn {
+            position: absolute;
+            top: 2px; /* 稍微增加與邊緣的距離 */
+            right: 2px;
+            z-index: 12;
+    
+            /* --- ★ 修改大小 --- */
+            width: 30px;
+            height: 30px;
+            font-size: 20px; /* 齒輪圖示的大小 */
+
+            /* --- ★修改顏色 --- */
+            background-color: #818f9f68; /* 按鈕背景色 */
+            color: #a9b0b9;            /* 齒輪的顏色 */
+            border: 1px solid #484f58;
+
+            /* 其他樣式 */
+            padding: 0; /* 移除內邊距以讓圖示置中 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-btn:hover {
+            background-color: #484f58;
+            color: #c9d1d9;
         }
 
 
@@ -840,7 +881,7 @@
                             </div>
                         </div>
                     </div>
-                    <button class="adv-btn settings-btn" style="position: absolute; top: 5px; right: 5px; z-index: 12; width: 30px; height: 30px; padding: 0;">⚙️</button>
+                    <button class="adv-btn settings-btn">⚙️</button>
                 `;
                 
                 // 為設定按鈕新增翻轉事件
