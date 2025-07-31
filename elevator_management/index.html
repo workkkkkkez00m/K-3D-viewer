@@ -359,6 +359,7 @@
             color: #ff8a80;
             font-weight: bold;
             animation: pulse-red 1.5s infinite; /* ★ 將靜態陰影改為閃爍動畫 */
+            cursor: pointer;
         }
         
         .emergency-call.active .emergency-call-light {
@@ -553,6 +554,44 @@
             color: #c9d1d9;
         }
 
+        /* ★★★ 緊急呼叫彈出視窗樣式 ★★★ */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(66, 64, 64, 0.498); display: flex;
+            align-items: center; justify-content: center; z-index: 2000;
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+        }
+        .modal-overlay.visible { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background-color: #161b22b7; padding: 25px; border-radius: 8px;
+            border: 1px solid #6b96c7; width: 480px;
+            transform: scale(0.95); transition: transform 0.3s ease;
+        }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-content h3 { margin-top: 0; color: #ff8a80; }
+        .video-placeholder {
+            width: 100%;
+            height: 270px;
+            background-color: #0d1117;
+            border: 1px solid #80889299;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #cad0d7;
+            margin-bottom: 20px;
+        }
+        .modal-buttons { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
+        .modal-buttons .adv-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .modal-buttons .adv-btn svg { width: 18px; height: 18px; fill: currentColor; }
+        .modal-buttons .adv-btn.resolve { background-color: #2ea043; border-color: #3fb950;color: white; }
+        .modal-buttons .adv-btn.resolve:hover { background-color: #3fb950; }
+        .modal-buttons .adv-btn.call {
+            background-color: #4190ff; /* 深色背景 */
+            border-color: #58a6ff;   /* 藍色邊框 */
+            color: #ffffff;         /* 藍色文字和圖示 */
+        }        
+        .modal-buttons .adv-btn.call.active { background-color: #e74c3c; border-color: #ff6b6b; color: white; }
 
     </style>
 </head>
@@ -658,6 +697,20 @@
             </div>
         </div>
     </div>
+    <!-- ★ 新增：緊急呼叫 Modal -->
+    <div id="emergency-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="emergency-modal-title">緊急呼叫處理</h3>
+            <div class="video-placeholder">影像連線中...</div>
+            <div class="modal-buttons">
+                <button id="modal-resolve-btn" class="adv-btn resolve">事件解除</button>
+                <button id="modal-call-btn" class="adv-btn call">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 14q-1.25 0-2.125-.875T9 11V5q0-1.25.875-2.125T12 2q1.25 0 2.125.875T15 5v6q0 1.25-.875 2.125T12 14Zm-1 7v-3.075q-2.6-.35-4.3-2.325T4 11H6q0 2.075 1.463 3.538T11 16v-2h2v2q2.075-.537 3.538-1.962T18 11h2q0 2.925-1.7 4.9T14 17.925V21Z"/></svg>
+                    <span>即時通話</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -675,6 +728,10 @@
             const monthPicker = document.getElementById('month-picker');
             const modalCancelBtn = document.getElementById('modal-cancel-btn');
             const modalExportBtn = document.getElementById('modal-export-btn');
+            const emergencyModal = document.getElementById('emergency-modal');
+            const emergencyModalTitle = document.getElementById('emergency-modal-title');
+            const modalResolveBtn = document.getElementById('modal-resolve-btn');
+            const modalCallBtn = document.getElementById('modal-call-btn');
             let currentExportElevator = null;
 
             // --- UI 框架功能函式 ---
@@ -923,6 +980,15 @@
                     <button class="adv-btn settings-btn">⚙️</button>
                 `;
                 
+                // ★ 為緊急呼叫按鈕新增事件
+                const emergencyCallBtn = elevatorUnit.querySelector('.emergency-call');
+                emergencyCallBtn.addEventListener('click', () => {
+                    // 只有在處於 active 狀態時才能點擊
+                    if (emergencyCallBtn.classList.contains('active')) {
+                        openEmergencyModal(data);
+                    }
+                });
+
                 // 為設定按鈕新增翻轉事件
                 elevatorUnit.querySelector('.settings-btn').addEventListener('click', () => {
                     elevatorUnit.classList.toggle('flipped');
@@ -970,7 +1036,45 @@
             });
         }
 
-        // ★★★ 全新的紀錄匯出相關函式 ★★★
+        // ★★★ 緊急呼叫相關函式 ★★★
+        function openEmergencyModal(elevatorData) {
+            currentEmergencyElevator = elevatorData;
+            emergencyModalTitle.textContent = `緊急呼叫處理 - ${elevatorData.name}`;
+            emergencyModal.classList.add('visible');
+        }
+
+        function closeEmergencyModal() {
+            emergencyModal.classList.remove('visible');
+            modalCallBtn.classList.remove('active'); // 關閉時重置通話按鈕
+            currentEmergencyElevator = null;
+        }
+
+        async function handleResolveEmergency() {
+            if (!currentEmergencyElevator) return;
+
+            modalResolveBtn.textContent = '解除中...';
+            modalResolveBtn.disabled = true;
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/elevators/${currentEmergencyElevator.id}/resolve-emergency`, {
+                    method: 'POST',
+                });
+                if (!response.ok) {
+                    throw new Error('解除失敗');
+                }
+                // 立即更新前端狀態，提供即時反饋
+                updateElevatorStatus();
+            } catch (error) {
+                console.error("解除緊急呼叫失敗:", error);
+                alert("解除失敗，請查看主控台錯誤訊息。");
+            } finally {
+                modalResolveBtn.textContent = '事件解除';
+                modalResolveBtn.disabled = false;
+                closeEmergencyModal();
+            }
+        }
+
+        // ★★★ 紀錄匯出相關函式 ★★★
         function openExportModal(elevatorData) {
             currentExportElevator = elevatorData;
             modalSubtitle.textContent = `正在為 ${elevatorData.name} 選擇匯出月份`;
@@ -1046,6 +1150,10 @@
         // --- 事件監聽 ---
         modalCancelBtn.addEventListener('click', closeExportModal);
         modalExportBtn.addEventListener('click', handleExport);
+        modalResolveBtn.addEventListener('click', handleResolveEmergency);
+        modalCallBtn.addEventListener('click', () => {
+            modalCallBtn.classList.toggle('active');
+        });
 
             // --- 啟動基本功能 ---
             updateDateTime();
