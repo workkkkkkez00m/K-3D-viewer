@@ -100,21 +100,74 @@
         /* --- 電梯儀表板樣式 --- */
         .elevator-unit {
             background-color: #161b22; border: 2px solid #30363d; border-radius: 8px;
-            padding: 10px; display: flex; position: relative; width: 280px;
-            min-height: 400px; gap: 10px;
+            padding: 0; position: relative; width: 280px;
+            min-height: 400px;
+            perspective: 1000px;
         }
-        
-        /* 電梯容器 */
-        .elevator-unit {
+        .flipper {
+            position: relative;
+            width: 100%;
+            height: calc(100% - 80px); /* 減去標題和狀態列的高度 */
+            margin-top: 80px; /* 為標題和狀態列預留空間 */
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        /* 當 .elevator-unit 擁有 .flipped class 時，翻轉 .flipper */
+        .elevator-unit.flipped .flipper {
+            transform: rotateY(180deg);
+        }
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
             background-color: #161b22;
             border: 2px solid #30363d;
             border-radius: 8px;
+            border-top: none; /* 移除上邊框，因為上方有標題區 */
+            border-top-left-radius: 0; /* 移除上方圓角 */
+            border-top-right-radius: 0; /* 移除上方圓角 */
             padding: 10px;
-            display: flex;
-            position: relative;
-            width: 280px;
-            min-height: 400px;
+            box-sizing: border-box;
+        }
+        .front {
+            /* 正面內容：水平布局（樓層側 + 電梯側） */
             gap: 10px;
+        }
+        .back {
+            /* 背面內容：垂直布局（進階功能），預先翻轉 180 度 */
+            transform: rotateY(180deg);
+            flex-direction: column;
+        }
+        /* 背面進階功能的樣式 */
+        .advanced-controls {
+            padding-top: 20px; /* 減少上方間距 */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .adv-data-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            padding: 5px 0;
+            border-bottom: 1px solid #21262d;
+        }
+        .adv-data-item .label { color: #8b949e; }
+        .adv-data-item .value { font-weight: bold; }
+        .adv-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .adv-btn {
+            background-color: #21262d; border: 1px solid #30363d;
+            color: #c9d1d9; padding: 10px; border-radius: 6px;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+        .adv-btn:hover { background-color: #30363d; }
+        .manual-controls { text-align: center; }
+        .manual-controls button {
+            font-size: 24px; width: 50px; height: 50px;
+            margin: 5px;
         }
         
         /* 電梯標題 */
@@ -164,7 +217,7 @@
             transition: all 0.3s ease;
             min-height: 35px;
         }
-        .floor:last-child { border-bottom: none; }
+        .floor:last-child { border-bottom: 1px dashed #30363d; }
         .floor-name { font-size: 14px; font-weight: bold; color: #8b949e; }
         .hall-call-buttons button {
             background: none; border: none; color: #8b949e;
@@ -184,7 +237,7 @@
             transition: all 0.3s ease;
             min-height: 35px;
         }
-        .shaft-floor:last-child { border-bottom: none; }
+        .shaft-floor:last-child { border-bottom: 1px solid #21262d; }
 
         /* 電梯車廂 */
         .elevator-car {
@@ -349,9 +402,75 @@
             box-shadow: 0 0 6px rgba(46, 204, 113, 0.3);
         }
 
-        /* 調整樓層區塊的上邊距以容納狀態列 */
+        /* 調整樓層區塊的上邊距 */
         .floors-side, .elevator-side {
-            margin-top: 80px; /* 從 40px 加大到 80px */
+            margin-top: 0; /* 移除上邊距，因為標題和狀態列已經在外面 */
+        }
+
+        /* ★★★ Modal 樣式 ★★★ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background-color: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .modal-content h3 {
+            margin-top: 0;
+            color: #c9d1d9;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .modal-content p {
+            color: #8b949e;
+            margin-bottom: 20px;
+        }
+        
+        .modal-content input[type="month"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .modal-buttons .adv-btn {
+            flex: 1;
+            max-width: 120px;
         }
 
 
@@ -447,6 +566,18 @@
         <div id="elevator-dashboard">
         </div>    
     </main>
+    <!-- 紀錄匯出 Modal -->
+    <div id="export-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modal-title">匯出電梯紀錄</h3>
+            <p id="modal-subtitle"></p>
+            <input type="month" id="month-picker">
+            <div class="modal-buttons">
+                <button id="modal-cancel-btn" class="adv-btn">取消</button>
+                <button id="modal-export-btn" class="adv-btn">匯出</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -459,6 +590,12 @@
             const sidebarMenu = document.getElementById('sidebar-menu');
             const closeMenuBtn = document.getElementById('close-menu-btn');
             const dashboard = document.getElementById('elevator-dashboard');
+            const exportModal = document.getElementById('export-modal');
+            const modalSubtitle = document.getElementById('modal-subtitle');
+            const monthPicker = document.getElementById('month-picker');
+            const modalCancelBtn = document.getElementById('modal-cancel-btn');
+            const modalExportBtn = document.getElementById('modal-export-btn');
+            let currentExportElevator = null;
 
             // --- UI 框架功能函式 ---
             function updateDateTime() {
@@ -492,6 +629,9 @@
             async function updateElevatorStatus() {
             try {
                 const response = await fetch('http://localhost:3000/api/elevators');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const elevatorsData = await response.json();
 
                 if (dashboard.children.length === 0) {
@@ -499,13 +639,26 @@
                 }
 
                 elevatorsData.forEach(data => {
-                    const floorsSide = document.getElementById(`floors-side-${data.id}`);
-                    const elevatorSide = document.getElementById(`elevator-side-${data.id}`);
                     const unit = document.getElementById(`elevator-unit-${data.id}`);
+                    if (!unit) return;
+                    
+                    // 檢查是否處於手動模式
+                    const isManualMode = unit.dataset.manualMode === 'true';
+                    
+                    // 樓層側和電梯側現在在 .front 容器內
+                    const frontContainer = unit.querySelector('.front');
+                    const floorsSide = frontContainer.querySelector('.floors-side');
+                    const elevatorSide = frontContainer.querySelector('.elevator-side');
+                    
                     if (!floorsSide || !elevatorSide) return;
                     
                     const car = elevatorSide.querySelector('.elevator-car');
                     const carStatus = elevatorSide.querySelector('.car-status');
+
+                    // 獲取背面卡片的數據元素
+                    const advCarFloor = unit.querySelector('.adv-car-floor');
+                    const advRunTime = unit.querySelector('.adv-run-time');
+                    const advStartupCount = unit.querySelector('.adv-startup-count');
                     
                     // ★★★ 計算電梯位置 ★★★
                     const currentGlobalIndex = allFloors.indexOf(data.currentFloor);
@@ -552,27 +705,55 @@
                         }
                     });
 
+                    // ★ 更新背面卡片的數據
+                    advCarFloor.textContent = data.currentFloor;
+                    advRunTime.textContent = `${data.runTime} 分鐘`;
+                    advStartupCount.textContent = `${data.startupCount} 次`;
+
                     // ★★★ 更新狀態列 ★★★
                     const emergencyCallEl = unit.querySelector('.emergency-call');
                     const runStatusEl = unit.querySelector('.run-status');
                     
+                    // 緊急呼叫狀態不受手動模式影響
                     emergencyCallEl.classList.toggle('active', data.emergencyCall);
                     
-                    runStatusEl.textContent = data.runStatus;
-                    runStatusEl.className = 'run-status'; // 先重置 class
-                    if (data.runStatus === '電梯故障') runStatusEl.classList.add('fault');
-                    // 只有五號電梯（緊急電梯）才會有停電運轉狀態
-                    if (data.runStatus === '停電運轉' && data.id === 5) runStatusEl.classList.add('power-off');
-                    if (data.runStatus === '自動休止') runStatusEl.classList.add('standby');
-                    if (data.runStatus === '自動運轉') runStatusEl.classList.add('normal');
+                    // 只有在非手動模式時才更新運轉狀態
+                    if (!isManualMode) {
+                        runStatusEl.textContent = data.runStatus;
+                        runStatusEl.className = 'run-status'; // 先重置 class
+                        runStatusEl.style.backgroundColor = '';
+                        runStatusEl.style.borderColor = '';
+                        runStatusEl.style.color = '';
+                        runStatusEl.style.boxShadow = '';
+                        
+                        if (data.runStatus === '電梯故障') runStatusEl.classList.add('fault');
+                        // 只有五號電梯（緊急電梯）才會有停電運轉狀態
+                        if (data.runStatus === '停電運轉' && data.id === 5) runStatusEl.classList.add('power-off');
+                        if (data.runStatus === '自動休止') runStatusEl.classList.add('standby');
+                        if (data.runStatus === '自動運轉') runStatusEl.classList.add('normal');
+                    }
 
                 });
 
             } catch (error) {
                 console.error("更新電梯狀態失敗:", error);
-                // 顯示錯誤狀態到儀表板
+                // 顯示詳細錯誤信息到儀表板
                 if (dashboard.children.length === 0) {
-                    dashboard.innerHTML = '<div style="color: #ff6b6b; text-align: center; padding: 50px; font-size: 18px;">無法連接到電梯 API 伺服器<br><small>請確認 API 服務正在運行</small></div>';
+                    dashboard.innerHTML = `
+                        <div style="color: #ff6b6b; text-align: center; padding: 50px; font-size: 18px;">
+                            無法連接到電梯 API 伺服器<br>
+                            <small>請確認 API 服務正在運行</small><br><br>
+                            <div style="background-color: #2d1b1b; border: 1px solid #e74c3c; border-radius: 6px; padding: 15px; margin-top: 20px; font-size: 12px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
+                                <strong>錯誤詳情：</strong><br>
+                                ${error.message}<br><br>
+                                <strong>可能的解決方案：</strong><br>
+                                1. 確認 API 服務器是否在 localhost:3000 運行<br>
+                                2. 檢查網路連接<br>
+                                3. 確認 CORS 設定是否正確<br>
+                                4. 查看瀏覽器開發者工具的 Network 標籤
+                            </div>
+                        </div>
+                    `;
                 }
             }
         }
@@ -585,15 +766,6 @@
                 const elevatorUnit = document.createElement('div');
                 elevatorUnit.className = 'elevator-unit';
                 elevatorUnit.id = `elevator-unit-${data.id}`;
-
-                // 創建樓層信息側和車廂動畫側
-                const floorsSide = document.createElement('div');
-                floorsSide.className = 'floors-side';
-                floorsSide.id = `floors-side-${data.id}`;
-
-                const elevatorSide = document.createElement('div');
-                elevatorSide.className = 'elevator-side';
-                elevatorSide.id = `elevator-side-${data.id}`;
 
                 // 建立樓層信息和車廂側標示
                 let floorsHTML = '';
@@ -618,18 +790,7 @@
                     }
                 });
 
-                // 設置內容
-                floorsSide.innerHTML = floorsHTML;
-                elevatorSide.innerHTML = `
-                    ${shaftFloorsHTML}
-                    <div class="elevator-car">
-                        <div class="car-status"></div>
-                        <div class="elevator-door left">◀</div>
-                        <div class="elevator-door right">▶</div>
-                    </div>
-                `;
-
-                // 設置電梯標題和狀態列
+                // 設置完整的電梯HTML結構
                 elevatorUnit.innerHTML = `
                     <div class="elevator-header">${data.name}</div>
                     <div class="status-bar">
@@ -639,14 +800,172 @@
                         </div>
                         <div class="run-status"></div>
                     </div>
+                    <div class="flipper">
+                        <div class="front">
+                            <div class="floors-side">
+                                ${floorsHTML}
+                            </div>
+                            <div class="elevator-side">
+                                ${shaftFloorsHTML}
+                                <div class="elevator-car">
+                                    <div class="car-status"></div>
+                                    <div class="elevator-door left">◀</div>
+                                    <div class="elevator-door right">▶</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="back">
+                            <div class="advanced-controls">
+                                <div class="adv-data-item">
+                                    <span class="label">車廂樓層</span>
+                                    <span class="value adv-car-floor">--</span>
+                                </div>
+                                <div class="adv-data-item">
+                                    <span class="label">本日運轉時間</span>
+                                    <span class="value adv-run-time">--</span>
+                                </div>
+                                <div class="adv-data-item">
+                                    <span class="label">本日啟動次數</span>
+                                    <span class="value adv-startup-count">--</span>
+                                </div>
+                                <div class="adv-buttons">
+                                    <button class="adv-btn">紀錄匯出</button>
+                                    <button class="adv-btn manual-toggle">手動模式</button>
+                                </div>
+                                <div class="manual-controls" style="display: none;">
+                                    <button class="adv-btn">▲</button>
+                                    <button class="adv-btn">■</button>
+                                    <button class="adv-btn">▼</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="adv-btn settings-btn" style="position: absolute; top: 5px; right: 5px; z-index: 12; width: 30px; height: 30px; padding: 0;">⚙️</button>
                 `;
                 
-                // 組裝
-                elevatorUnit.appendChild(floorsSide);
-                elevatorUnit.appendChild(elevatorSide);
+                // 為設定按鈕新增翻轉事件
+                elevatorUnit.querySelector('.settings-btn').addEventListener('click', () => {
+                    elevatorUnit.classList.toggle('flipped');
+                });
+                
+                // ★ 為紀錄匯出按鈕新增事件
+                const exportBtn = elevatorUnit.querySelector('.adv-buttons button:first-child');
+                exportBtn.addEventListener('click', () => {
+                    openExportModal(data);
+                });
+
+                // 為手動模式按鈕添加切換功能
+                const manualToggleBtn = elevatorUnit.querySelector('.manual-toggle');
+                const manualControls = elevatorUnit.querySelector('.manual-controls');
+                
+                manualToggleBtn.addEventListener('click', () => {
+                    const isVisible = manualControls.style.display !== 'none';
+                    const isManualMode = !isVisible;
+                    
+                    // 切換手動控制按鈕顯示
+                    manualControls.style.display = isVisible ? 'none' : 'block';
+                    manualToggleBtn.textContent = isVisible ? '手動模式' : '關閉手動';
+                    manualToggleBtn.style.backgroundColor = isVisible ? '#21262d' : '#2d1b2d';
+                    manualToggleBtn.style.borderColor = isVisible ? '#30363d' : '#8b5cf6';
+                    manualToggleBtn.style.color = isVisible ? '#c9d1d9' : '#c084fc';
+                    
+                    // 設置手動模式標記
+                    elevatorUnit.dataset.manualMode = isManualMode;
+                    
+                    // 更新前面的運轉狀態顯示
+                    const runStatusEl = elevatorUnit.querySelector('.run-status');
+                    if (isManualMode) {
+                        runStatusEl.textContent = '手動運轉';
+                        runStatusEl.className = 'run-status';
+                        runStatusEl.style.backgroundColor = '#2d1b2d';
+                        runStatusEl.style.borderColor = '#8b5cf6';
+                        runStatusEl.style.color = '#c084fc';
+                        runStatusEl.style.boxShadow = '0 0 6px rgba(139, 92, 246, 0.3)';
+                    }
+                    // 如果關閉手動模式，狀態會在下次API更新時恢復
+                });
+
+                // 添加到儀表板
                 dashboard.appendChild(elevatorUnit);
             });
         }
+
+        // ★★★ 全新的紀錄匯出相關函式 ★★★
+        function openExportModal(elevatorData) {
+            currentExportElevator = elevatorData;
+            modalSubtitle.textContent = `正在為 ${elevatorData.name} 選擇匯出月份`;
+            
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            monthPicker.value = `${year}-${month}`;
+            
+            exportModal.classList.add('visible');
+        }
+
+        function closeExportModal() {
+            exportModal.classList.remove('visible');
+            currentExportElevator = null;
+        }
+
+        async function handleExport() {
+            if (!currentExportElevator) return;
+
+            const [year, month] = monthPicker.value.split('-');
+            const elevatorId = currentExportElevator.id;
+            
+            modalExportBtn.textContent = '正在產生...';
+            modalExportBtn.disabled = true;
+
+            try {
+                console.log(`正在請求報告數據: year=${year}, month=${month}, elevatorId=${elevatorId}`);
+                const response = await fetch(`http://localhost:3000/api/elevators/report?year=${year}&month=${month}&elevatorId=${elevatorId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}, statusText: ${response.statusText}`);
+                }
+                
+                const reportData = await response.json();
+                console.log('收到報告數據:', reportData);
+
+                // 檢查數據結構
+                if (!reportData.dailySummaries || !reportData.eventLogs) {
+                    throw new Error('報告數據格式不正確');
+                }
+
+                const wb = XLSX.utils.book_new();
+                const summaryWS = XLSX.utils.json_to_sheet(reportData.dailySummaries);
+                const logWS = XLSX.utils.json_to_sheet(reportData.eventLogs);
+
+                XLSX.utils.book_append_sheet(wb, summaryWS, "每日摘要");
+                XLSX.utils.book_append_sheet(wb, logWS, "事件紀錄");
+
+                XLSX.writeFile(wb, `${currentExportElevator.name}_${year}-${month}_營運報告.xlsx`);
+                
+                console.log('Excel 文件已成功生成');
+            } catch (error) {
+                console.error("匯出報告失敗:", error);
+                let errorMessage = "產生報告失敗";
+                
+                if (error.message.includes('HTTP error')) {
+                    errorMessage = "API 服務器錯誤，請檢查服務器狀態";
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage = "無法連接到 API 服務器";
+                } else if (error.message.includes('報告數據格式不正確')) {
+                    errorMessage = "服務器返回的數據格式有誤";
+                }
+                
+                alert(`${errorMessage}\n\n詳細錯誤：${error.message}`);
+            } finally {
+                modalExportBtn.textContent = '匯出';
+                modalExportBtn.disabled = false;
+                closeExportModal();
+            }
+        }
+
+        // --- 事件監聽 ---
+        modalCancelBtn.addEventListener('click', closeExportModal);
+        modalExportBtn.addEventListener('click', handleExport);
 
             // --- 啟動基本功能 ---
             updateDateTime();
@@ -657,7 +976,7 @@
         });
     </script>
     <footer id="page-footer">
-        <span>v1.1.0</span> | <span>Copyright © 2025 KL </span>
+        <span>v1.2.0</span> | <span>Copyright © 2025 KL </span>
     </footer>
 </body>
 </html>
