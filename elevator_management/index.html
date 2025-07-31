@@ -162,8 +162,15 @@
             background-color: #21262d; border: 1px solid #30363d;
             color: #c9d1d9; padding: 10px; border-radius: 6px;
             cursor: pointer; transition: background-color 0.2s;
+            /* 確保按鈕內的文字不會干擾點擊事件 */
+            position: relative;
+            z-index: 1;
         }
         .adv-btn:hover { background-color: #30363d; }
+        .adv-btn * {
+            /* 確保按鈕內所有子元素的點擊事件都傳遞給父按鈕 */
+            pointer-events: none;
+        }
         .manual-controls { text-align: center; }
         .manual-controls button {
             font-size: 24px; width: 50px; height: 50px;
@@ -362,7 +369,7 @@
 
         @keyframes pulse-red {
             0% {
-                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+                box-shadow: 0 0 0 0 rgba(255, 79, 59, 0.71);
             }
             70% {
                 box-shadow: 0 0 0 12px rgba(231, 77, 60, 0.15);
@@ -443,36 +450,47 @@
         }
         
         .modal-content {
-            background-color: #161b22;
-            border: 2px solid #30363d;
+            background-color: #1e2328;  /* 改為稍微亮一點的深灰色 */
+            border: 2px solid #58a6ff;  /* 改為藍色邊框 */
             border-radius: 8px;
             padding: 30px;
             max-width: 400px;
             width: 90%;
             text-align: center;
+            box-shadow: 0 4px 20px rgba(88, 166, 255, 0.3); /* 添加藍色光暈 */
         }
         
         .modal-content h3 {
             margin-top: 0;
-            color: #c9d1d9;
+            color: #58a6ff;  /* 改為藍色標題 */
             font-size: 20px;
             margin-bottom: 10px;
         }
         
         .modal-content p {
-            color: #8b949e;
+            color: #c9d1d9;  /* 改為更亮的白色文字 */
             margin-bottom: 20px;
         }
         
         .modal-content input[type="month"] {
             width: 100%;
             padding: 10px;
-            background-color: #21262d;
-            border: 1px solid #30363d;
+            background-color: #0d1117;  /* 更深的背景色 */
+            border: 1px solid #58a6ff;  /* 藍色邊框 */
             border-radius: 6px;
             color: #c9d1d9;
             font-size: 16px;
             margin-bottom: 20px;
+            text-align: center; /* 讓輸入內容置中 */
+            box-sizing: border-box; /* 確保 width: 100% 包含 padding 和 border */
+            color-scheme: dark; /* 使用深色主題 */
+            accent-color: #58a6ff; /* 設定強調色為藍色 */
+        }
+        
+        .modal-content input[type="month"]:focus {
+            outline: none;
+            border-color: #79c0ff;  /* 聚焦時更亮的藍色 */
+            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
         }
         
         .modal-buttons {
@@ -484,6 +502,27 @@
         .modal-buttons .adv-btn {
             flex: 1;
             max-width: 120px;
+            background-color: #21262d;
+            border: 1px solid #58a6ff;  /* 藍色邊框 */
+            color: #58a6ff;  /* 藍色文字 */
+        }
+        
+        .modal-buttons .adv-btn:hover {
+            background-color: rgba(88, 166, 255, 0.1);  /* 藍色半透明背景 */
+            border-color: #79c0ff;  /* 更亮的藍色邊框 */
+            color: #79c0ff;  /* 更亮的藍色文字 */
+        }
+        
+        /* 匯出按鈕特殊樣式 */
+        .modal-buttons #modal-export-btn {
+            background-color: #238636;  /* 綠色背景 */
+            border-color: #2ea043;  /* 綠色邊框 */
+            color: #ffffff;  /* 白色文字 */
+        }
+        
+        .modal-buttons #modal-export-btn:hover {
+            background-color: #2ea043;  /* 更亮的綠色 */
+            border-color: #46954a;
         }
         /* 設定按鈕的專屬樣式 */
         .settings-btn {
@@ -498,7 +537,7 @@
             font-size: 20px; /* 齒輪圖示的大小 */
 
             /* --- ★修改顏色 --- */
-            background-color: #818f9f68; /* 按鈕背景色 */
+            background-color: #52586068; /* 按鈕背景色 */
             color: #a9b0b9;            /* 齒輪的顏色 */
             border: 1px solid #484f58;
 
