@@ -425,281 +425,64 @@
             margin-top: 50px;
             border-bottom: 1px solid #465a70;
             padding-bottom: 10px;
-            margin-bottom: 20px; /* 增加與下方選單的間距 */
-            flex-wrap: nowrap !important; /* 防止換行 */
-            min-height: 40px;
         }
-        
         #sidebar-menu h2 {
-            color: white;
-            margin: 0;
-            padding: 0;
-            border: none;
-            font-size: 18px; /* 增大字體以提高可讀性 */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            transition: font-size 0.3s ease;
-            flex-shrink: 1; /* 允許文字適當縮小 */
-            max-width: 140px; /* 稍微增加最大寬度 */
+            color: white; margin: 0; padding: 0;
+            border: none; font-size: 18px;
+            flex-shrink: 1; /* 允許標題在空間不足時被壓縮 */
+        }
+        #google_translate_element {
+            flex-shrink: 0; /* 防止翻譯元件被壓縮 */
+            min-width: 80px; /* 確保有最小寬度 */
         }
         
-        /* 隱藏 Google 翻譯的原生橫幅和不必要的元素 */
+        /* 隱藏 Google 翻譯的原生橫幅 */
         body { top: 0 !important; }
         .skiptranslate { display: none !important; }
-        .goog-te-banner-frame { display: none !important; }
-        .goog-te-menu-frame { display: none !important; }
-        
-        /* 翻譯小工具容器樣式 */
-        #google_translate_element {
-            margin-left: auto;
-            flex-shrink: 0; /* 防止翻譯元件被壓縮 */
-            position: relative;
-            z-index: 10001; /* 比側邊欄更高的層級 */
-            min-width: 80px; /* 減少最小寬度 */
-            max-width: 120px; /* 減少最大寬度 */
-            display: flex !important;
-            align-items: center !important;
-        }
+        iframe.goog-te-menu-frame { display: none !important; } /* 隱藏舊的 iframe */
         
         /* 美化 Google 翻譯的下拉選單 */
         #google_translate_element .goog-te-gadget-simple {
             background-color: #34495e !important;
             border: 1px solid #465a70 !important;
-            padding: 6px 8px !important; /* 增加內邊距 */
+            padding: 4px 8px !important;
             border-radius: 4px !important;
-            font-size: 12px !important;
-            color: #ecf0f1 !important;
+            cursor: pointer !important;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
             white-space: nowrap !important;
-            display: inline-flex !important; /* 改為 flex 佈局 */
-            align-items: center !important; /* 垂直居中 */
-            width: auto !important;
-            min-width: 80px !important; /* 減少最小寬度 */
-            max-width: 120px !important; /* 減少最大寬度 */
-            overflow: visible !important; /* 改為可見 */
-            line-height: 1 !important; /* 固定行高 */
+            min-width: 70px !important;
         }
-        
-        #google_translate_element .goog-te-gadget-simple span {
-            color: #ecf0f1 !important;
-            font-size: 12px !important; /* 增大字體 */
-            white-space: nowrap !important;
-            display: inline !important;
-            vertical-align: middle !important;
-            line-height: 1 !important;
-        }
-        
+        #google_translate_element .goog-te-gadget-simple span,
         #google_translate_element .goog-te-gadget-simple a {
             color: #ecf0f1 !important;
-            text-decoration: none !important;
-            white-space: nowrap !important;
-            display: inline !important;
-        }
-        
-        /* 確保下拉箭頭正確顯示 */
-        #google_translate_element .goog-te-gadget-simple .goog-te-menu-value {
-            color: #ecf0f1 !important;
-            text-decoration: none !important;
-            white-space: nowrap !important;
-            display: inline-flex !important; /* 改為 flex */
-            align-items: center !important; /* 垂直居中 */
-            max-width: none !important; /* 移除寬度限制 */
-            overflow: visible !important; /* 允許顯示 */
-            text-overflow: unset !important; /* 移除省略號 */
-            line-height: 1 !important;
-        }
-        
-        #google_translate_element .goog-te-gadget-simple .goog-te-menu-value:hover {
+            font-size: 12px !important;
             text-decoration: none !important;
         }
-        
-        /* 強制顯示下拉箭頭 */
-        #google_translate_element .goog-te-gadget-simple .goog-te-menu-value span[style*="color: rgb(118, 118, 118)"] {
-            color: #ecf0f1 !important;
-        }
-        
-        /* 確保箭頭在同一行 */
-        #google_translate_element .goog-te-gadget-simple .goog-te-menu-value span {
-            white-space: nowrap !important;
-            display: inline !important;
-            vertical-align: middle !important;
-            line-height: 1 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        
-        /* 下拉選單樣式 */
-        .goog-te-menu-value {
-            color: #ecf0f1 !important;
-        }
-        
-        .goog-te-menu-value span {
-            color: #ecf0f1 !important;
-        }
-        
-        /* 隱藏 Google 圖示 */
         #google_translate_element .goog-te-gadget-icon {
-            display: none !important;
-        }
-        
-        /* 下拉箭頭樣式 */
-        #google_translate_element .goog-te-combo {
-            background-color: #34495e !important;
-            border: 1px solid #465a70 !important;
-            color: #ecf0f1 !important;
-            padding: 4px !important;
-            border-radius: 4px !important;
-            font-size: 12px !important;
-        }
-        
-        /* 強制覆蓋所有 Google 翻譯子元素 - 修正版本 */
-        .goog-te-gadget-simple * {
-            color: #ecf0f1 !important;
-            border-color: #465a70 !important;
-        }
-        
-        /* 確保下拉選單可見 */
-        #google_translate_element select {
-            background-color: #34495e !important;
-            color: #ecf0f1 !important;
-            border: 1px solid #465a70 !important;
-            border-radius: 4px !important;
-            padding: 4px 8px !important;
-            font-size: 12px !important;
-            min-width: 120px !important;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-        
-        /* 確保翻譯選單選項可見 */
-        #google_translate_element select option {
-            background-color: #34495e !important;
-            color: #ecf0f1 !important;
-            padding: 4px !important;
-        }
-        
-        /* 修正 Google 翻譯選單的樣式衝突 */
-        #google_translate_element .skiptranslate {
-            display: block !important;
-        }
-        
-        #google_translate_element iframe {
-            display: none !important;
-        }
-        
-        /* 額外的強制顯示樣式 */
-        #google_translate_element,
-        #google_translate_element *,
-        .goog-te-gadget,
-        .goog-te-gadget *,
-        .goog-te-combo {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            pointer-events: auto !important; /* 確保可以點擊 */
-            z-index: 9999 !important; /* 確保在最上層 */
-        }
-        
-        /* 確保容器本身可見且可點擊 */
-        #google_translate_element .goog-te-gadget {
-            display: inline-block !important;
-            pointer-events: auto !important;
-        }
-        
-        /* 防止被其他樣式隱藏 */
-        .goog-te-gadget-simple {
-            display: inline-block !important;
-            visibility: visible !important;
-            pointer-events: auto !important;
-        }
-        
-        /* 確保下拉選單完全可用 */
-        #google_translate_element select {
-            background-color: #34495e !important;
-            color: #ecf0f1 !important;
-            border: 1px solid #465a70 !important;
-            border-radius: 4px !important;
-            padding: 4px 8px !important;
-            font-size: 12px !important;
-            min-width: 120px !important;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            pointer-events: auto !important;
-            cursor: pointer !important;
-            z-index: 10000 !important;
-        }
-        
-        /* 響應式調整 */
-        @media (max-width: 768px) {
-            .sidebar-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            #sidebar-menu h2 {
-                font-size: 16px; /* 小螢幕時稍微縮小 */
-            }
-            
-            #google_translate_element {
-                margin-left: 0;
-                width: 100%;
-                min-width: 140px; /* 小螢幕時也保持足夠寬度 */
-            }
-            
-            #google_translate_element .goog-te-gadget-simple {
-                min-width: 140px !important;
-                max-width: 160px !important;
-            }
-        }
-        
-        /* 特別處理 Google 翻譯的佈局問題 */
-        .goog-te-combo,
-        .goog-te-gadget-simple .goog-te-menu-value,
-        .goog-te-gadget-simple .goog-te-menu-value span {
-            white-space: nowrap !important;
-            display: inline-block !important;
-            vertical-align: middle !important;
-        }
-        
-        /* 修正側邊欄中翻譯選單的佈局 */
-        .sidebar-header {
-            flex-wrap: nowrap !important;
-            min-height: 40px;
-        }
-        
-        /* 確保翻譯元素在正確位置 */
-        #google_translate_element {
-            white-space: nowrap;
-            overflow: visible !important;
-        }
-        
-        /* 特別處理 Google 翻譯的換行問題 */
-        #google_translate_element * {
-            line-height: 1.2 !important;
-        }
-        
-        /* 強制單行顯示 */
-        .goog-te-gadget-simple,
-        .goog-te-gadget-simple * {
-            white-space: nowrap !important;
-            word-wrap: normal !important;
-            word-break: keep-all !important;
-        }
-        
-        /* 隱藏 Google 翻譯的初始提示文字 */
-        .goog-te-gadget-simple .goog-te-menu-value span:first-child {
-            display: none !important;
-        }
-        
-        /* 隱藏包含 "請選擇語言" 或 "Select Language" 的文字 */
-        .goog-te-gadget-simple span:empty,
-        .goog-te-gadget-simple span[style*="color: rgb(118, 118, 118)"]:not(:last-child) {
-            display: none !important;
+            display: none !important; /* 隱藏 Google 圖示 */
         }
 
+        /* ★ 關鍵修正：提高彈出的語言選單的堆疊層級 */
+        /* Google 會在 body 結尾建立一個 div 來放語言選單，我們需要選中它 */
+        body > .goog-te-menu-frame {
+            z-index: 1001 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+            border-radius: 6px !important;
+            border: 1px solid #465a70 !important;
+        }
+        /* 美化選單內的項目 */
+        .goog-te-menu2 {
+            background-color: #2c3e50 !important;
+        }
+        .goog-te-menu2-item div, .goog-te-menu2-item:link div, .goog-te-menu2-item:visited div, .goog-te-menu2-item:active div {
+            color: #ecf0f1 !important;
+        }
+        .goog-te-menu2-item-selected div, .goog-te-menu2-item:hover div {
+            background-color: #34495e !important;
+        }
     </style>
 </head>
 <body>
@@ -931,197 +714,72 @@
         </section>
     </main>     
 
+    <!-- Google 翻譯腳本載入 -->
+    <script type="text/javascript">
+        // 確保 Google 翻譯腳本正確載入
+        function loadGoogleTranslate() {
+            if (typeof google !== 'undefined' && google.translate) {
+                googleTranslateElementInit();
+            } else {
+                console.log('正在載入 Google 翻譯腳本...');
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+                script.onerror = function() {
+                    console.error('Google 翻譯腳本載入失敗');
+                };
+                document.head.appendChild(script);
+            }
+        }
+        
+        // 頁面載入完成後嘗試載入翻譯功能
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadGoogleTranslate);
+        } else {
+            loadGoogleTranslate();
+        }
+    </script>
+
     <script>
         function googleTranslateElementInit() {
-            console.log('Google 翻譯初始化開始...');
-            console.log('當前頁面 URL:', window.location.href);
-            console.log('當前協議:', window.location.protocol);
-            console.log('當前主機:', window.location.host);
-            
             try {
                 new google.translate.TranslateElement({
                     pageLanguage: 'zh-TW',
-                    includedLanguages: 'zh-TW,en,ja,zh-CN,ko,th,vi,id,ms',
-                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                    autoDisplay: false,
-                    multilanguagePage: true
+                    includedLanguages: 'zh-TW,en,ja,zh-CN',
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
                 }, 'google_translate_element');
                 
-                console.log('Google 翻譯元素已創建');
+                console.log('Google 翻譯小工具已初始化');
                 
-                // 更強力的樣式和功能確保
-                const ensureTranslateWorks = () => {
-                    // 尋找所有可能的翻譯元素
-                    const container = document.querySelector('#google_translate_element');
-                    const selectElement = document.querySelector('#google_translate_element select');
-                    const gadgetSimple = document.querySelector('#google_translate_element .goog-te-gadget-simple');
-                    const comboElement = document.querySelector('#google_translate_element .goog-te-combo');
-                    
-                    console.log('檢查翻譯元素:', {
-                        container: !!container,
-                        select: !!selectElement,
-                        gadget: !!gadgetSimple,
-                        combo: !!comboElement
-                    });
-                    
-                    if (container) {
-                        // 強制容器樣式
-                        container.style.display = 'block';
-                        container.style.visibility = 'visible';
-                        container.style.opacity = '1';
-                        container.style.pointerEvents = 'auto';
-                        container.style.zIndex = '10001';
-                        container.style.position = 'relative';
-                        
-                        // 處理所有子元素
-                        const allElements = container.querySelectorAll('*');
-                        allElements.forEach(el => {
-                            el.style.pointerEvents = 'auto';
-                            el.style.visibility = 'visible';
-                            el.style.opacity = '1';
-                            el.style.zIndex = '9999';
-                        });
-                    }
-                    
-                    if (selectElement) {
-                        console.log('找到 select 元素，設定樣式...');
-                        selectElement.style.display = 'block';
-                        selectElement.style.visibility = 'visible';
-                        selectElement.style.opacity = '1';
-                        selectElement.style.backgroundColor = '#34495e';
-                        selectElement.style.color = '#ecf0f1';
-                        selectElement.style.border = '1px solid #465a70';
-                        selectElement.style.borderRadius = '4px';
-                        selectElement.style.padding = '4px 8px';
-                        selectElement.style.fontSize = '12px';
-                        selectElement.style.minWidth = '120px';
-                        selectElement.style.pointerEvents = 'auto';
-                        selectElement.style.cursor = 'pointer';
-                        selectElement.style.zIndex = '10000';
-                        
-                        return true;
-                    }
-                    
-                    if (gadgetSimple) {
-                        console.log('找到 gadget 元素，設定樣式...');
-                        gadgetSimple.style.display = 'inline-flex'; /* 改為 flex */
-                        gadgetSimple.style.alignItems = 'center'; /* 垂直居中 */
-                        gadgetSimple.style.visibility = 'visible';
-                        gadgetSimple.style.opacity = '1';
-                        gadgetSimple.style.pointerEvents = 'auto';
-                        gadgetSimple.style.backgroundColor = '#34495e';
-                        gadgetSimple.style.border = '1px solid #465a70';
-                        gadgetSimple.style.borderRadius = '4px';
-                        gadgetSimple.style.padding = '6px 8px'; /* 增加內邊距 */
-                        gadgetSimple.style.fontSize = '12px'; /* 增大字體 */
-                        gadgetSimple.style.color = '#ecf0f1';
-                        gadgetSimple.style.whiteSpace = 'nowrap';
-                        gadgetSimple.style.minWidth = '80px'; /* 減少最小寬度 */
-                        gadgetSimple.style.maxWidth = '120px'; /* 減少最大寬度 */
-                        gadgetSimple.style.overflow = 'visible'; /* 改為可見 */
-                        gadgetSimple.style.lineHeight = '1'; /* 固定行高 */
-                        gadgetSimple.style.wordWrap = 'normal';
-                        gadgetSimple.style.wordBreak = 'keep-all';
-                        
-                        // 處理內部元素
-                        const spans = gadgetSimple.querySelectorAll('span');
-                        spans.forEach(span => {
-                            span.style.color = '#ecf0f1';
-                            span.style.fontSize = '12px'; /* 增大字體 */
-                            span.style.whiteSpace = 'nowrap';
-                            span.style.display = 'inline';
-                            span.style.verticalAlign = 'middle';
-                            span.style.lineHeight = '1';
-                            span.style.margin = '0';
-                            span.style.padding = '0';
-                        });
-                        
-                        const links = gadgetSimple.querySelectorAll('a');
-                        links.forEach(link => {
-                            link.style.color = '#ecf0f1';
-                            link.style.textDecoration = 'none';
-                            link.style.whiteSpace = 'nowrap';
-                            link.style.display = 'inline';
-                        });
-                        
-                        // 特別處理選單值元素
-                        const menuValue = gadgetSimple.querySelector('.goog-te-menu-value');
-                        if (menuValue) {
-                            menuValue.style.whiteSpace = 'nowrap';
-                            menuValue.style.display = 'inline-flex'; /* 改為 flex */
-                            menuValue.style.alignItems = 'center'; /* 垂直居中 */
-                            menuValue.style.maxWidth = 'none'; /* 移除寬度限制 */
-                            menuValue.style.overflow = 'visible'; /* 允許顯示 */
-                            menuValue.style.textOverflow = 'unset'; /* 移除省略號 */
-                            menuValue.style.lineHeight = '1';
-                            
-                            // 隱藏 "請選擇語言" 相關文字
-                            const spans = menuValue.querySelectorAll('span');
-                            spans.forEach(span => {
-                                if (span.textContent && (
-                                    span.textContent.includes('請選擇語言') || 
-                                    span.textContent.includes('Select Language') ||
-                                    span.textContent.includes('Choose Language') ||
-                                    span.textContent.trim() === '' && !span.querySelector('img')
-                                )) {
-                                    span.style.display = 'none';
-                                }
-                            });
-                        }
-                    }
-                    
-                    return false;
-                };
-                
-                // 立即檢查一次
-                setTimeout(ensureTranslateWorks, 100);
-                
-                // 持續檢查直到找到並設定完成
-                const checkInterval = setInterval(() => {
-                    if (ensureTranslateWorks()) {
-                        clearInterval(checkInterval);
-                        console.log('Google 翻譯設定完成');
-                    }
-                }, 300);
-                
-                // 10秒後停止檢查
+                // 確保翻譯小工具正確顯示
                 setTimeout(() => {
-                    clearInterval(checkInterval);
-                    console.log('Google 翻譯檢查結束');
-                    
-                    // 檢查是否成功載入完整的 Google 翻譯功能
-                    const googleWidget = document.querySelector('#google_translate_element .goog-te-gadget-simple');
-                    const selectElement = document.querySelector('#google_translate_element select');
-                    
-                    if (googleWidget) {
-                        console.log('Google 翻譯載入成功');
-                        // 隱藏 "請選擇語言" 文字，只顯示當前語言
-                        const menuValue = googleWidget.querySelector('.goog-te-menu-value');
-                        if (menuValue) {
-                            // 隱藏初始的 "請選擇語言" 文字
-                            const spans = menuValue.querySelectorAll('span');
-                            spans.forEach(span => {
-                                if (span.textContent && (span.textContent.includes('請選擇語言') || span.textContent.includes('Select Language'))) {
-                                    span.style.display = 'none';
-                                }
-                            });
-                        }
-                    } else {
-                        console.log('Google 翻譯載入失敗');
-                    }
-                }, 10000);
-                
+                    ensureTranslateWorks();
+                }, 1000);
             } catch (error) {
-                console.error('Google 翻譯初始化錯誤:', error);
-                console.log('可能原因：');
-                console.log('1. Live Server 環境限制');
-                console.log('2. 需要 HTTPS 連接');
-                console.log('3. 跨域政策限制');
-                
-                // 顯示錯誤提示給用戶
-                const translateElement = document.getElementById('google_translate_element');
-                if (translateElement) {
-                    translateElement.innerHTML = '<span style="color: #ff6b6b; font-size: 11px;">翻譯功能需在正式環境下使用</span>';
+                console.error('Google 翻譯初始化失敗:', error);
+            }
+        }
+        
+        function ensureTranslateWorks() {
+            const translateElement = document.getElementById('google_translate_element');
+            if (translateElement) {
+                const gadget = translateElement.querySelector('.goog-te-gadget-simple');
+                if (gadget) {
+                    // 強制設定翻譯小工具的樣式
+                    gadget.style.display = 'inline-block';
+                    gadget.style.visibility = 'visible';
+                    gadget.style.opacity = '1';
+                    gadget.style.pointerEvents = 'auto';
+                    gadget.style.zIndex = '1000';
+                    console.log('翻譯小工具樣式已設定');
+                } else {
+                    console.warn('翻譯小工具未找到，嘗試重新載入');
+                    // 如果小工具沒有載入，嘗試重新初始化
+                    setTimeout(() => {
+                        if (window.google && window.google.translate) {
+                            googleTranslateElementInit();
+                        }
+                    }, 2000);
                 }
             }
         }
@@ -1626,6 +1284,6 @@
     <footer id="page-footer">
         <span>v1.2.6</span> | <span>Copyright © 2025 KL </span>
     </footer>
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script> 
+    
 </body>
 </html>
