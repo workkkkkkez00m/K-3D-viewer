@@ -122,14 +122,14 @@
             background-color: #161b22; border: 2px solid #30363d; border-radius: 8px;
             padding: 0; position: relative; 
             width: clamp(250px, 25vw, 280px);  /* 響應式寬度 */
-            min-height: clamp(350px, 40vh, 400px);  /* 響應式高度 */
+            min-height: clamp(420px, 45vh, 480px);  /* 增加最小高度，確保有足夠空間 */
             perspective: 1000px;
         }
         .flipper {
             position: relative;
             width: 100%;
-            height: calc(100% - 80px); /* 減去標題和狀態列的高度 */
-            margin-top: 80px; /* 為標題和狀態列預留空間 */
+            height: calc(100% - 65px); 
+            margin-top: 65px; 
             transition: transform 0.6s;
             transform-style: preserve-3d;
         }
@@ -145,11 +145,8 @@
             backface-visibility: hidden;
             display: flex;
             background-color: #161b22;
-            border: 2px solid #30363d;
-            border-radius: 8px;
-            border-top: none; /* 移除上邊框，因為上方有標題區 */
-            border-top-left-radius: 0; /* 移除上方圓角 */
-            border-top-right-radius: 0; /* 移除上方圓角 */
+            border: none; /* 隱藏邊框以保持整體一致性 */
+            border-radius: 0; /* 移除圓角 */
             padding: 10px;
             box-sizing: border-box;
         }
@@ -163,10 +160,11 @@
             flex-direction: column;
             overflow: hidden; /* 確保內容不會溢出卡片邊界 */
             position: relative; /* 確保子元素的定位基準 */
+            padding-top: 20px; /* 增加背面的上內邊距，往下移動5px */
         }
         /* 背面進階功能的樣式 */
         .advanced-controls {
-            padding-top: 20px; /* 減少上方間距 */
+            padding-top: 5px; /* 大幅減少上方間距 */
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -258,17 +256,17 @@
             flex: 1;
             display: flex;
             flex-direction: column-reverse;
-            margin-top: 40px;
+            margin-top: 10px; /* 減少上邊距 */
             border-right: 1px solid #30363d;
-            padding-right: 8px;
+            padding-right: clamp(4px, 1vw, 8px); /* 響應式內邊距 */
         }
         
         /* 車廂動畫側 */
         .elevator-side {
-            flex: 0 0 80px;
+            flex: 0 0 clamp(60px, 15vw, 80px); /* 響應式寬度 */
             display: flex;
             flex-direction: column-reverse;
-            margin-top: 40px;
+            margin-top: 10px; /* 減少上邊距 */
             position: relative;
             background-color: #0d1117;
             border-radius: 4px;
@@ -280,16 +278,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 8px;
+            padding: 0 clamp(4px, 1.5vw, 8px); /* 響應式內邊距 */
             border-bottom: 1px dashed #30363d;
             transition: all 0.3s ease;
-            min-height: 35px;
+            min-height: clamp(25px, 6vh, 35px); /* 響應式最小高度 */
         }
         .floor:last-child { border-bottom: 1px dashed #30363d; }
-        .floor-name { font-size: 16px; font-weight: bold; color: #d1d5d8; }
+        .floor-name { 
+            font-size: clamp(12px, 3vw, 16px); /* 響應式字體大小 */
+            font-weight: bold; 
+            color: #d1d5d8; 
+        }
         .hall-call-buttons button {
             background: none; border: none; color: #65717e;
-            font-size: 16px; cursor: default;
+            font-size: clamp(12px, 3vw, 16px); /* 響應式字體大小 */
+            cursor: default;
         }
         .hall-call-buttons button.active { color: #f1c40f; }
 
@@ -300,10 +303,10 @@
             justify-content: center;
             align-items: center;
             border-bottom: 1px solid #21262d;
-            font-size: 12px;
+            font-size: clamp(8px, 2vw, 12px); /* 響應式字體大小 */
             color: #6e7681;
             transition: all 0.3s ease;
-            min-height: 35px;
+            min-height: clamp(25px, 6vh, 35px); /* 響應式最小高度 */
         }
         .shaft-floor:last-child { border-bottom: 1px solid #21262d; }
 
@@ -334,7 +337,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8px;
+            font-size: clamp(6px, 1.5vw, 8px); /* 響應式字體大小 */
             color: #495057;
         }
         
@@ -353,10 +356,10 @@
             transform: translateX(-50%);
             color: #212529;
             font-weight: bold;
-            font-size: 8px;
+            font-size: clamp(6px, 1.5vw, 8px); /* 響應式字體大小 */
             z-index: 11;
             background: rgba(255,255,255,0.9);
-            padding: 1px 2px;
+            padding: clamp(1px, 0.5vw, 2px); /* 響應式內邊距 */
             border-radius: 2px;
         }
 
@@ -396,13 +399,17 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            padding: 8px 12px;
+            padding: 6px 10px; /* 減少內邊距，讓按鈕更緊湊 */
             background-color: #21262d;
             border: 1px solid #30363d;
             border-radius: 4px;
             color: #8b949e;
-            font-size: 13px;
+            font-size: 12px; /* 稍微減少字體大小 */
             transition: all 0.3s ease;
+            white-space: nowrap; /* 防止文字換行 */
+            overflow: hidden; /* 隱藏溢出的文字 */
+            text-overflow: ellipsis; /* 溢出時顯示省略號 */
+            min-width: 0; /* 允許 flex 項目縮小 */
         }
         
         .emergency-call-light {
@@ -447,14 +454,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 8px 12px;
+            padding: 6px 10px; /* 減少內邊距，讓按鈕更緊湊 */
             background-color: #21262d;
             border: 1px solid #30363d;
             border-radius: 4px;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 12px; /* 稍微減少字體大小 */
             text-align: center;
             transition: all 0.3s ease;
+            white-space: nowrap; /* 防止文字換行 */
+            overflow: hidden; /* 隱藏溢出的文字 */
+            text-overflow: ellipsis; /* 溢出時顯示省略號 */
+            min-width: 0; /* 允許 flex 項目縮小 */
         }
         
         .run-status.fault { 
@@ -486,7 +497,7 @@
 
         /* 調整樓層區塊的上邊距 */
         .floors-side, .elevator-side {
-            margin-top: 0; /* 移除上邊距，因為標題和狀態列已經在外面 */
+            margin-top: 10px; /* 設定適當的上邊距，避免與狀態列重疊 */
         }
 
         /* ★★★ Modal 樣式 ★★★ */
@@ -661,6 +672,41 @@
                 min-height: clamp(300px, 35vh, 350px);
             }
             
+            /* 調整正面卡片的樓層和車廂區域 */
+            .floors-side {
+                padding-right: 4px;
+            }
+            
+            .elevator-side {
+                flex: 0 0 clamp(50px, 12vw, 70px);
+            }
+            
+            .floor {
+                min-height: clamp(20px, 5vh, 30px);
+                padding: 0 4px;
+            }
+            
+            .floor-name {
+                font-size: clamp(10px, 2.5vw, 14px);
+            }
+            
+            .hall-call-buttons button {
+                font-size: clamp(10px, 2.5vw, 14px);
+            }
+            
+            .shaft-floor {
+                min-height: clamp(20px, 5vh, 30px);
+                font-size: clamp(6px, 1.5vw, 10px);
+            }
+            
+            .car-status {
+                font-size: clamp(5px, 1vw, 7px);
+            }
+            
+            .elevator-door {
+                font-size: clamp(5px, 1vw, 7px);
+            }
+            
             .manual-controls {
                 padding: 0 5px; /* 減少內邊距 */
                 gap: 10px; /* 減少間距 */
@@ -699,7 +745,50 @@
         @media (max-width: 480px) {
             .elevator-unit {
                 width: clamp(180px, 90vw, 220px);
-                min-height: clamp(280px, 50vh, 320px);
+                min-height: clamp(350px, 55vh, 400px); /* 在小螢幕上增加最小高度 */
+            }
+            
+            .flipper {
+                height: calc(100% - 65px); /* 在小螢幕上也進一步減少空間預留 */
+                margin-top: 65px;
+            }
+            
+            /* 進一步調整正面卡片的樓層和車廂區域 */
+            .floors-side {
+                padding-right: 3px;
+                margin-top: 5px; /* 在小螢幕上減少上邊距 */
+            }
+            
+            .elevator-side {
+                flex: 0 0 clamp(40px, 10vw, 60px);
+                margin-top: 5px; /* 在小螢幕上減少上邊距 */
+            }
+            
+            .floor {
+                min-height: clamp(18px, 4vh, 25px);
+                padding: 0 3px;
+            }
+            
+            .floor-name {
+                font-size: clamp(8px, 2vw, 12px);
+            }
+            
+            .hall-call-buttons button {
+                font-size: clamp(8px, 2vw, 12px);
+            }
+            
+            .shaft-floor {
+                min-height: clamp(18px, 4vh, 25px);
+                font-size: clamp(5px, 1vw, 8px);
+            }
+            
+            .car-status {
+                font-size: clamp(4px, 0.8vw, 6px);
+                padding: 0.5px 1px;
+            }
+            
+            .elevator-door {
+                font-size: clamp(4px, 0.8vw, 6px);
             }
             
             .manual-controls {
@@ -736,6 +825,49 @@
                 padding: 15px 5px 10px 5px;
             }
         }
+        /* ★★★ 語言選擇器樣式 ★★★ */      
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 50px;
+            border-bottom: 1px solid #728aa2;
+            padding-bottom: 10px;
+        }
+        #sidebar-menu h2 {
+            color: white;
+            margin: 0; /* 移除舊的邊距和邊框 */
+            padding: 0;
+            border: none;
+            font-size: 18px; /* 預設字體大小 */
+            white-space: nowrap; /* 防止換行 */
+            overflow: hidden; /* 隱藏溢出內容 */
+            text-overflow: ellipsis; /* 如果必要時顯示省略號 */
+            transition: font-size 0.3s ease; /* 平滑的字體大小變化 */
+        }
+        
+        /* 英語和日語的字體縮小設定 */
+        html[lang="en"] #sidebar-menu h2,
+        html[lang="ja"] #sidebar-menu h2 {
+            font-size: 14px; /* 縮小字體以適應較長的文字 */
+        }
+        
+        /* 額外的安全設定，針對特別長的文字 */
+        #sidebar-menu h2[data-i18n="systemMenu"] {
+            max-width: 150px; /* 限制最大寬度 */
+            min-height: 20px; /* 確保有足夠的高度 */
+        }
+        
+        #language-selector {
+            width: auto; /* 讓寬度自適應內容 */
+            background-color: #47637e;
+            color: #ecf0f1;
+            border: 1px solid #465a70;
+            padding: 4px 8px; /* 縮小內邊距 */
+            border-radius: 4px;
+            font-size: 12px; /* 縮小字體 */
+        }
+
 
     </style>
 </head>
@@ -743,7 +875,7 @@
     <header id="top-banner">
         <button id="menu-toggle-btn" title="展開選單">☰</button>
         <a href="https://workkkkkkez00m.github.io/K-3D-viewer/index.html" id="home-link-title">
-            <h1 id="project-title">智慧住宅中央監控系統 </h1>
+            <h1 id="project-title" data-i18n="projectTitle">智慧住宅中央監控系統 </h1>
         </a>
         <div class="header-right-items">
             <div id="datetime-container"></div>
@@ -753,10 +885,20 @@
 
     <nav id="sidebar-menu">
         <button id="close-menu-btn">&times;</button>
-        <h2>系統選單</h2>
+        <div class="sidebar-header">
+            <h2 data-i18n="systemMenu">系統選單</h2>
+            <div class="language-selector-container">
+                <select id="language-selector">
+                    <option value="zh-TW">繁體中文</option>
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                    <option value="zh-CN">简体中文</option>
+                </select>
+            </div>
+        </div>    
         <ul>            
             <li class="system-category">
-                <a href="#">防盜及求救系統</a>
+                <a href="#" data-i18n="systemTheft">防盜及求救系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../theft_prevention/1f.html">1F</a></li>
                     <li><a href="../theft_prevention/2f.html">2F</a></li>
@@ -766,7 +908,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">攝影監視系統</a>
+                <a href="#" data-i18n="systemCCTV">攝影監視系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../cctv/1f.html">1F</a></li>
                     <li><a href="../cctv/2f.html">2F</a></li>
@@ -776,7 +918,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">門禁保全系統</a>
+                <a href="#" data-i18n="systemAccess">門禁保全系統</a>
                 <ul class="floor-submenu">
                      <li><a href="../access_control/1f.html">1F</a></li>
                     <li><a href="../access_control/2f.html">2F</a></li>
@@ -786,7 +928,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">影像對講系統</a>
+                <a href="#" data-i18n="systemIntercom">影像對講系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../video_intercom/1f.html">1F</a></li>
                     <li><a href="../video_intercom/2f.html">2F</a></li>
@@ -796,7 +938,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">消防火警系統</a>
+                <a href="#" data-i18n="systemFire">消防火警系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../fire_alarm/1f.html">1F</a></li>
                     <li><a href="../fire_alarm/2f.html">2F</a></li>
@@ -806,23 +948,23 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">給排水系統</a>
+                <a href="#" data-i18n="systemPlumbing">給排水系統</a>
                 <ul class="floor-submenu">
                    <li><a href="../plumbing_drainage/b3f.html">B3F</a></li>                   
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">停車管理系統</a>
+                <a href="#" data-i18n="systemParking">停車管理系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../parking_management/b1f.html">B1F</a></li>
                     <li><a href="../parking_management/b2f.html">B2F</a></li>
                     <li><a href="../parking_management/b3f.html">B3F</a></li>                   
                 </ul>
             </li>   
-            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;">能源管理儀表板</a></li>            
-            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;">電梯監控系統</a></li>
-            <li><a id="back-to-home-btn" href="../index.html">‹ 回首頁</a></li>
-        </ul>
+            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;" data-i18n="dashboardEnergy">能源管理儀表板</a></li>            
+            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;" data-i18n="dashboardElevator">電梯監控系統</a></li>
+            <li><a id="back-to-home-btn" href="..K-3D-viewer/index.html" data-i18n="backToHome">‹ 回首頁</a></li>
+        </ul>  
     </nav>
 
     <main id="content-wrapper">
@@ -844,13 +986,13 @@
     <!-- ★ 新增：緊急呼叫 Modal -->
     <div id="emergency-modal" class="modal-overlay">
         <div class="modal-content">
-            <h3 id="emergency-modal-title">緊急呼叫處理</h3>
-            <div class="video-placeholder">影像連線中...</div>
+            <h3 id="emergency-modal-title" data-i18n="emergencyModalTitle">緊急呼叫處理</h3>
+            <div class="video-placeholder" data-i18n="videoConnecting">影像連線中...</div>
             <div class="modal-buttons">
-                <button id="modal-resolve-btn" class="adv-btn resolve">事件解除</button>
+                <button id="modal-resolve-btn" class="adv-btn resolve" data-i18n="resolveIncident">事件解除</button>
                 <button id="modal-call-btn" class="adv-btn call">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 14q-1.25 0-2.125-.875T9 11V5q0-1.25.875-2.125T12 2q1.25 0 2.125.875T15 5v6q0 1.25-.875 2.125T12 14Zm-1 7v-3.075q-2.6-.35-4.3-2.325T4 11H6q0 2.075 1.463 3.538T11 16v-2h2v2q2.075-.537 3.538-1.962T18 11h2q0 2.925-1.7 4.9T14 17.925V21Z"/></svg>
-                    <span>即時通話</span>
+                    <span data-i18n="liveCall">即時通話</span>
                 </button>
             </div>
         </div>
@@ -858,6 +1000,294 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // ★★★ 多國語言功能 ★★★
+            const translations = {
+                'zh-TW': {
+                    pageTitleElevator: '電梯監控系統',
+                    projectTitle: '智慧住宅中央監控系統',
+                    systemMenu: '系統選單',
+                    dashboardEnergy: '能源管理儀表板',
+                    dashboardElevator: '電梯監控系統',
+                    systemTheft: '防盜及求救系統',
+                    systemCCTV: '攝影監視系統',
+                    systemAccess: '門禁保全系統',
+                    systemIntercom: '影像對講系統',
+                    systemFire: '消防火警系統',
+                    systemPlumbing: '給排水系統',
+                    systemParking: '停車管理系統',
+                    backToHome: '‹ 回首頁',
+                    emergencyCall: '緊急呼叫',
+                    runStatus: '運轉狀態',
+                    // 緊急呼叫彈出視窗翻譯
+                    emergencyModalTitle: '緊急呼叫處理',
+                    videoConnecting: '影像連線中...',
+                    resolveIncident: '事件解除',
+                    liveCall: '即時通話',
+                    resolving: '解除中...',
+                    resolveFailed: '解除失敗',
+                    resolveFailedMsg: '解除失敗，請查看主控台錯誤訊息。',
+                    // 電梯名稱翻譯
+                    elevator1: '1號昇降梯',
+                    elevator2: '2號昇降梯',
+                    elevator3: '3號無障礙昇降梯',
+                    elevator4: '4號無障礙昇降梯',
+                    elevator5: '5號緊急昇降梯',
+                    advHeader: '進階功能',
+                    advCarFloor: '車廂樓層',
+                    advDoorStatus: '電梯門狀態',
+                    advRunTime: '本日運轉時間',
+                    advStartupCount: '本日啟動次數',
+                    exportRecords: '紀錄匯出',
+                    exportLog: '紀錄匯出',
+                    manualMode: '手動模式',
+                    closeManualMode: '關閉手動',
+                    manualUp: '▲',
+                    manualStop: '■',
+                    manualDown: '▼',
+                    manualOpen: '開門',
+                    manualClose: '關門',
+                    // 動態狀態文字
+                    statusNormal: '自動運轉',
+                    statusStandby: '自動休止',
+                    statusPowerOff: '停電運轉',
+                    statusFault: '電梯故障',
+                    statusManual: '手動運轉',
+                    statusPowerOutageStop: '停電停止',
+                    doorOpen: '開啟',
+                    doorClosed: '關閉',
+                    // 時間和計數單位翻譯
+                    unitMinute: '分鐘',
+                    unitTimes: '次'
+                },
+                'en': {
+                    pageTitleElevator: 'Elevator Monitoring System',
+                    projectTitle: 'Smart Housing Central Monitoring System',
+                    systemMenu: 'System Menu',
+                    dashboardEnergy: 'Energy Dashboard',
+                    dashboardElevator: 'Elevator Monitoring',
+                    systemTheft: 'Security System',
+                    systemCCTV: 'CCTV System',
+                    systemAccess: 'Access Control',
+                    systemIntercom: 'Video Intercom',
+                    systemFire: 'Fire Alarm System',
+                    systemPlumbing: 'Plumbing System',
+                    systemParking: 'Parking System',
+                    backToHome: '‹ Back to Home',
+                    emergencyCall: 'Emergency Call',
+                    runStatus: 'Run Status',
+                    // 緊急呼叫彈出視窗翻譯
+                    emergencyModalTitle: 'Emergency Call Handling',
+                    videoConnecting: 'Video connecting...',
+                    resolveIncident: 'Resolve Incident',
+                    liveCall: 'Live Call',
+                    resolving: 'Resolving...',
+                    resolveFailed: 'Resolution Failed',
+                    resolveFailedMsg: 'Resolution failed, please check console for error details.',
+                    // 電梯名稱翻譯
+                    elevator1: 'Elevator No.1',
+                    elevator2: 'Elevator No.2',
+                    elevator3: 'Elevator No.3 (Accessible)',
+                    elevator4: 'Elevator No.4 (Accessible)',
+                    elevator5: 'Elevator No.5 (Emergency)',
+                    advHeader: 'Advanced',
+                    advCarFloor: 'Car Floor',
+                    advDoorStatus: 'Door Status',
+                    advRunTime: 'Runtime Today',
+                    advStartupCount: 'Starts Today',
+                    exportRecords: 'Export Log',
+                    exportLog: 'Export Log',
+                    manualMode: 'Manual Mode',
+                    closeManualMode: 'Exit Manual',
+                    manualUp: '▲',
+                    manualStop: '■',
+                    manualDown: '▼',
+                    manualOpen: 'Open',
+                    manualClose: 'Close',
+                    statusNormal: 'Auto',
+                    statusStandby: 'Standby',
+                    statusPowerOff: 'Power Outage',
+                    statusFault: 'Fault',
+                    statusManual: 'Manual',
+                    statusPowerOutageStop: 'Power Stop',
+                    doorOpen: 'Open',
+                    doorClosed: 'Closed',
+                    // 時間和計數單位翻譯
+                    unitMinute: 'min',
+                    unitTimes: 'times'
+                },
+                'ja': {
+                    pageTitleElevator: 'エレベーター監視システム',
+                    projectTitle: 'スマート住宅中央監視システム',
+                    systemMenu: 'システムメニュー',
+                    dashboardEnergy: 'エネルギー管理',
+                    dashboardElevator: 'エレベーター監視',
+                    systemTheft: '防犯システム',
+                    systemCCTV: '監視カメラ',
+                    systemAccess: 'アクセス制御',
+                    systemIntercom: 'ビデオインターホン',
+                    systemFire: '火災警報',
+                    systemPlumbing: '給排水システム',
+                    systemParking: '駐車場管理',
+                    backToHome: '‹ ホームに戻る',
+                    emergencyCall: '緊急呼び出し',
+                    runStatus: '運転状態',
+                    // 緊急呼叫彈出視窗翻譯
+                    emergencyModalTitle: '緊急呼び出し対応',
+                    videoConnecting: '映像接続中...',
+                    resolveIncident: '事案解除',
+                    liveCall: 'ライブ通話',
+                    resolving: '解除中...',
+                    resolveFailed: '解除失敗',
+                    resolveFailedMsg: '解除に失敗しました。コンソールのエラー詳細をご確認ください。',
+                    // 電梯名稱翻譯
+                    elevator1: '1号エレベーター',
+                    elevator2: '2号エレベーター',
+                    elevator3: '3号エレベーター（バリアフリー）',
+                    elevator4: '4号エレベーター（バリアフリー）',
+                    elevator5: '5号エレベーター（緊急用）',
+                    advHeader: '詳細機能',
+                    advCarFloor: '現在階',
+                    advDoorStatus: 'ドア状態',
+                    advRunTime: '本日の稼働時間',
+                    advStartupCount: '本日の起動回数',
+                    exportRecords: 'ログ出力',
+                    exportLog: 'ログ出力',
+                    manualMode: '手動モード',
+                    closeManualMode: '手動解除',
+                    manualUp: '▲',
+                    manualStop: '■',
+                    manualDown: '▼',
+                    manualOpen: '開',
+                    manualClose: '閉',
+                    statusNormal: '自動運転',
+                    statusStandby: '自動休止',
+                    statusPowerOff: '停電運転',
+                    statusFault: '故障',
+                    statusManual: '手動運転',
+                    statusPowerOutageStop: '停電停止',
+                    doorOpen: '開',
+                    doorClosed: '閉',
+                    // 時間和計數單位翻譯
+                    unitMinute: '分',
+                    unitTimes: '回'
+                },
+                'zh-CN': {
+                    pageTitleElevator: '电梯监控系统',
+                    projectTitle: '智慧住宅中央监控系统',
+                    systemMenu: '系统菜单',
+                    dashboardEnergy: '能源管理仪表板',
+                    dashboardElevator: '电梯监控系统',
+                    systemTheft: '防盗及求救系统',
+                    systemCCTV: '摄影监控系统',
+                    systemAccess: '门禁保全系统',
+                    systemIntercom: '影像对讲系统',
+                    systemFire: '消防火警系统',
+                    systemPlumbing: '给排水系统',
+                    systemParking: '停车管理系统',
+                    backToHome: '‹ 返回首页',
+                    emergencyCall: '紧急呼叫',
+                    runStatus: '运转状态',
+                    // 緊急呼叫彈出視窗翻譯
+                    emergencyModalTitle: '紧急呼叫处理',
+                    videoConnecting: '影像连线中...',
+                    resolveIncident: '事件解除',
+                    liveCall: '实时通话',
+                    resolving: '解除中...',
+                    resolveFailed: '解除失败',
+                    resolveFailedMsg: '解除失败，请查看控制台错误信息。',
+                    // 電梯名稱翻譯
+                    elevator1: '一号电梯',
+                    elevator2: '二号电梯',
+                    elevator3: '三号无障碍电梯',
+                    elevator4: '四号无障碍电梯',
+                    elevator5: '五号紧急电梯',
+                    advHeader: '进阶功能',
+                    advCarFloor: '轿厢楼层',
+                    advDoorStatus: '电梯门状态',
+                    advRunTime: '本日运转时间',
+                    advStartupCount: '本日启动次数',
+                    exportRecords: '记录导出',
+                    exportLog: '记录导出',
+                    manualMode: '手动模式',
+                    closeManualMode: '关闭手动',
+                    manualUp: '▲',
+                    manualStop: '■',
+                    manualDown: '▼',
+                    manualOpen: '开门',
+                    manualClose: '关门',
+                    statusNormal: '自动运转',
+                    statusStandby: '自动休止',
+                    statusPowerOff: '停电运转',
+                    statusFault: '电梯故障',
+                    statusManual: '手动运转',
+                    statusPowerOutageStop: '停电停止',
+                    doorOpen: '开启',
+                    doorClosed: '关闭',
+                    // 時間和計數單位翻譯
+                    unitMinute: '分钟',
+                    unitTimes: '次'
+                }
+            };
+            
+            let currentLanguage = 'zh-TW';
+
+            function setLanguage(lang) {
+                currentLanguage = lang;
+                localStorage.setItem('preferredLanguage', lang);
+                
+                // 0. 更新HTML的lang屬性，以便CSS語言選擇器能正常工作
+                document.documentElement.setAttribute('lang', lang);
+                
+                // 1. 翻譯所有靜態標籤
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations[lang] && translations[lang][key]) {
+                        el.textContent = translations[lang][key];
+                    }
+                });
+                
+                // 2. 動態調整側邊欄標題字體大小
+                adjustSidebarTitleFontSize();
+                
+                // 3. 觸發一次數據更新，來翻譯所有動態內容
+                updateElevatorStatus();
+            }
+
+            function adjustSidebarTitleFontSize() {
+                const sidebarTitle = document.querySelector('#sidebar-menu h2');
+                if (!sidebarTitle) return;
+                
+                // 重置字體大小為預設值
+                sidebarTitle.style.fontSize = '';
+                
+                // 檢查文字是否溢出
+                const containerWidth = sidebarTitle.parentElement.offsetWidth - 120; // 減去語言選擇器的空間
+                const textWidth = sidebarTitle.scrollWidth;
+                
+                if (textWidth > containerWidth) {
+                    // 如果文字溢出，縮小字體
+                    sidebarTitle.style.fontSize = '14px';
+                    
+                    // 如果還是溢出，進一步縮小
+                    if (sidebarTitle.scrollWidth > containerWidth) {
+                        sidebarTitle.style.fontSize = '12px';
+                    }
+                }
+            }
+
+            function initI18n() {
+                const languageSelector = document.getElementById('language-selector');
+                const savedLang = localStorage.getItem('preferredLanguage');
+                if (savedLang && translations[savedLang]) {
+                    languageSelector.value = savedLang;
+                    setLanguage(savedLang);
+                } else {
+                    setLanguage('zh-TW');
+                }
+                languageSelector.addEventListener('change', (e) => {
+                    setLanguage(e.target.value);
+                });
+            }
             // --- 全局樓層列表定義（從低樓層到高樓層） ---
             const allFloors = ['B3F', 'B2F', 'B1F', '1F', '2F', '3F', '4F', '5F'];
             
@@ -997,11 +1427,16 @@
                         }
                     });
 
-                    // ★ 更新背面卡片的數據
+                    // ★ 更新背面卡片的數據（使用多語言翻譯）
                     advCarFloor.textContent = data.currentFloor;
-                    advDoorStatus.textContent = data.doorStatus === 'open' ? '開啟' : '關閉';
-                    advRunTime.textContent = `${data.runTime} 分鐘`;
-                    advStartupCount.textContent = `${data.startupCount} 次`;
+                    const doorStatusKey = data.doorStatus === 'open' ? 'doorOpen' : 'doorClosed';
+                    advDoorStatus.textContent = translations[currentLanguage] ? translations[currentLanguage][doorStatusKey] : (data.doorStatus === 'open' ? '開啟' : '關閉');
+                    
+                    // 使用多語言翻譯的時間和計數單位
+                    const minuteUnit = translations[currentLanguage] ? translations[currentLanguage]['unitMinute'] : '分鐘';
+                    const timesUnit = translations[currentLanguage] ? translations[currentLanguage]['unitTimes'] : '次';
+                    advRunTime.textContent = `${data.runTime} ${minuteUnit}`;
+                    advStartupCount.textContent = `${data.startupCount} ${timesUnit}`;
 
                     // ★★★ 更新狀態列 ★★★
                     const emergencyCallEl = unit.querySelector('.emergency-call');
@@ -1012,7 +1447,16 @@
                     
                     // 只有在非手動模式時才更新運轉狀態
                     if (!isManualMode) {
-                        runStatusEl.textContent = data.runStatus;
+                        // 根據當前語言翻譯運轉狀態
+                        let statusText = data.runStatus;
+                        if (translations[currentLanguage]) {
+                            if (data.runStatus === '電梯故障') statusText = translations[currentLanguage]['statusFault'];
+                            else if (data.runStatus === '停電運轉') statusText = translations[currentLanguage]['statusPowerOff'];
+                            else if (data.runStatus === '自動休止') statusText = translations[currentLanguage]['statusStandby'];
+                            else if (data.runStatus === '自動運轉') statusText = translations[currentLanguage]['statusNormal'];
+                        }
+                        
+                        runStatusEl.textContent = statusText;
                         runStatusEl.className = 'run-status'; // 先重置 class
                         runStatusEl.style.backgroundColor = '';
                         runStatusEl.style.borderColor = '';
@@ -1085,11 +1529,11 @@
 
                 // 設置完整的電梯HTML結構
                 elevatorUnit.innerHTML = `
-                    <div class="elevator-header">${data.name}</div>
+                    <div class="elevator-header" data-i18n="elevator${data.id}">${data.name}</div>
                     <div class="status-bar">
                         <div class="emergency-call">
                             <div class="emergency-call-light"></div>
-                            <span>緊急呼叫</span>
+                            <span data-i18n="emergencyCall">緊急呼叫</span>
                         </div>
                         <div class="run-status"></div>
                     </div>
@@ -1110,34 +1554,34 @@
                         <div class="back">
                             <div class="advanced-controls">
                                 <div class="adv-data-item">
-                                    <span class="label">車廂樓層</span>
+                                    <span class="label" data-i18n="advCarFloor">車廂樓層</span>
                                     <span class="value adv-car-floor">--</span>
                                 </div>
                                 <div class="adv-data-item">
-                                    <span class="label">電梯門狀態</span>
+                                    <span class="label" data-i18n="advDoorStatus">電梯門狀態</span>
                                     <span class="value adv-door-status">--</span>
                                 </div>
                                 <div class="adv-data-item">
-                                    <span class="label">本日運轉時間</span>
+                                    <span class="label" data-i18n="advRunTime">本日運轉時間</span>
                                     <span class="value adv-run-time">--</span>
                                 </div>
                                 <div class="adv-data-item">
-                                    <span class="label">本日啟動次數</span>
+                                    <span class="label" data-i18n="advStartupCount">本日啟動次數</span>
                                     <span class="value adv-startup-count">--</span>
                                 </div>
                                 <div class="adv-buttons">
-                                    <button class="adv-btn">紀錄匯出</button>
-                                    <button class="adv-btn manual-toggle">手動模式</button>
+                                    <button class="adv-btn" data-i18n="exportRecords">紀錄匯出</button>
+                                    <button class="adv-btn manual-toggle" data-i18n="manualMode">手動模式</button>
                                 </div>
                                 <div class="manual-controls" style="display: none;">
                                     <div class="manual-controls-row">
-                                        <button class="adv-btn manual-up">▲</button>
-                                        <button class="adv-btn manual-stop">■</button>
-                                        <button class="adv-btn manual-down">▼</button>
+                                        <button class="adv-btn manual-up" data-i18n="manualUp">▲</button>
+                                        <button class="adv-btn manual-stop" data-i18n="manualStop">■</button>
+                                        <button class="adv-btn manual-down" data-i18n="manualDown">▼</button>
                                     </div>
                                     <div class="door-buttons">
-                                        <button class="adv-btn manual-open">開門</button>
-                                        <button class="adv-btn manual-close">關門</button>
+                                        <button class="adv-btn manual-open" data-i18n="manualOpen">開門</button>
+                                        <button class="adv-btn manual-close" data-i18n="manualClose">關門</button>
                                     </div>
                                 </div>
                             </div>
@@ -1174,9 +1618,10 @@
                     const isVisible = manualControls.style.display !== 'none';
                     const willBeManualMode = !isVisible;
                     
-                    // 先禁用按鈕，防止重複點擊
+                    // 先禁用按鈕，防止重複點擊（使用多語言文字）
                     manualToggleBtn.disabled = true;
-                    manualToggleBtn.textContent = willBeManualMode ? '切換中...' : '關閉中...';
+                    const switchingText = willBeManualMode ? '切換中...' : '關閉中...';
+                    manualToggleBtn.textContent = switchingText;
                     
                     try {
                         // 調用後端 API 切換手動模式
@@ -1210,10 +1655,11 @@
                         manualToggleBtn.style.borderColor = actualManualMode ? '#8b5cf6' : '#30363d';
                         manualToggleBtn.style.color = actualManualMode ? '#c084fc' : '#c9d1d9';
                         
-                        // 更新運轉狀態顯示
+                        // 更新運轉狀態顯示（使用多語言翻譯）
                         const runStatusEl = elevatorUnit.querySelector('.run-status');
                         if (actualManualMode) {
-                            runStatusEl.textContent = '手動運轉';
+                            const manualStatusText = translations[currentLanguage] ? translations[currentLanguage]['statusManual'] : '手動運轉';
+                            runStatusEl.textContent = manualStatusText;
                             runStatusEl.className = 'run-status';
                             runStatusEl.style.backgroundColor = '#2d1b2d';
                             runStatusEl.style.borderColor = '#8b5cf6';
@@ -1229,9 +1675,11 @@
                         // 發生錯誤時保持原狀態
                         elevatorUnit.dataset.manualMode = isVisible;
                     } finally {
-                        // 恢復按鈕狀態
+                        // 恢復按鈕狀態（使用多語言翻譯）
                         const finalManualMode = elevatorUnit.dataset.manualMode === 'true';
-                        manualToggleBtn.textContent = finalManualMode ? '關閉手動' : '手動模式';
+                        const manualModeText = translations[currentLanguage] ? translations[currentLanguage]['manualMode'] : '手動模式';
+                        const closeManualModeText = translations[currentLanguage] ? translations[currentLanguage]['closeManualMode'] : '關閉手動';
+                        manualToggleBtn.textContent = finalManualMode ? closeManualModeText : manualModeText;
                         manualToggleBtn.disabled = false;
                     }
                 });
@@ -1297,6 +1745,9 @@
                 // 添加到儀表板
                 dashboard.appendChild(elevatorUnit);
             });
+            
+            // 對新創建的電梯UI元素應用當前語言設定
+            setLanguage(currentLanguage);
         }
 
         async function sendManualCommand(elevatorId, command) {
@@ -1334,7 +1785,9 @@
         // ★★★ 緊急呼叫相關函式 ★★★
         function openEmergencyModal(elevatorData) {
             currentEmergencyElevator = elevatorData;
-            emergencyModalTitle.textContent = `緊急呼叫處理 - ${elevatorData.name}`;
+            const titleText = translations[currentLanguage] ? translations[currentLanguage]['emergencyModalTitle'] : '緊急呼叫處理';
+            const elevatorName = translations[currentLanguage] ? translations[currentLanguage][`elevator${elevatorData.id}`] : elevatorData.name;
+            emergencyModalTitle.textContent = `${titleText} - ${elevatorName}`;
             emergencyModal.classList.add('visible');
         }
 
@@ -1347,7 +1800,12 @@
         async function handleResolveEmergency() {
             if (!currentEmergencyElevator) return;
 
-            modalResolveBtn.textContent = '解除中...';
+            const resolvingText = translations[currentLanguage] ? translations[currentLanguage]['resolving'] : '解除中...';
+            const resolveFailedText = translations[currentLanguage] ? translations[currentLanguage]['resolveFailed'] : '解除失敗';
+            const resolveFailedMsgText = translations[currentLanguage] ? translations[currentLanguage]['resolveFailedMsg'] : '解除失敗，請查看主控台錯誤訊息。';
+            const resolveIncidentText = translations[currentLanguage] ? translations[currentLanguage]['resolveIncident'] : '事件解除';
+
+            modalResolveBtn.textContent = resolvingText;
             modalResolveBtn.disabled = true;
 
             try {
@@ -1355,15 +1813,15 @@
                     method: 'POST',
                 });
                 if (!response.ok) {
-                    throw new Error('解除失敗');
+                    throw new Error(resolveFailedText);
                 }
                 // 立即更新前端狀態，提供即時反饋
                 updateElevatorStatus();
             } catch (error) {
                 console.error("解除緊急呼叫失敗:", error);
-                alert("解除失敗，請查看主控台錯誤訊息。");
+                alert(resolveFailedMsgText);
             } finally {
-                modalResolveBtn.textContent = '事件解除';
+                modalResolveBtn.textContent = resolveIncidentText;
                 modalResolveBtn.disabled = false;
                 closeEmergencyModal();
             }
@@ -1451,6 +1909,7 @@
         });
 
             // --- 啟動基本功能 ---
+            initI18n(); // 初始化多語言功能
             updateDateTime();
             setInterval(updateDateTime, 1000);
             setupSidebarMenu();
@@ -1459,7 +1918,7 @@
         });
     </script>
     <footer id="page-footer">
-        <span>v1.2.1</span> | <span>Copyright © 2025 KL </span>
+        <span>v1.2.6</span> | <span>Copyright © 2025 KL </span>
     </footer>
 </body>
 </html>
