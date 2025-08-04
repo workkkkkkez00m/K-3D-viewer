@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智慧住宅中央監控系統 - B2F</title>
+    <title>智慧住宅中央監控系統 - 1F</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
@@ -127,183 +127,140 @@
             background-color: rgba(0, 0, 0, 0.5); color: #cccccc; font-size: 16px;
             font-weight: bold; border-radius: 5px; z-index: 10; pointer-events: none;
         }
-        /* --- ★★★ 停車狀態標籤樣式 ★★★ --- */
+        /* 1. 狀態標籤的基礎樣式 (現在是 Flexbox 容器) */
         #labels-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
 
         .status-label {
             position: absolute;
-            width: 19px;
-            height: 19px;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            width: 36px;   /* 固定寬度 */   
+            height: 36px; /* 固定高度 */
+            padding: 0 ; 
+            color: white;
+            border-radius: 50%; /* 形成圓形 */
+            border: 1px solid rgba(255, 255, 255, 0.3);
             user-select: none;
-            pointer-events: none;
+            pointer-events: auto; /* ★ 允許標籤接收點擊事件 */
             transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
                 padding 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
                 border-radius 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
                 background-color 0.3s;
+            cursor: pointer;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                padding 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                border-radius 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                background-color 0.3s;
+            overflow: hidden; /* 隱藏超出的文字內容 */
+        }
+        .status-running { background-color: rgba(46, 204, 113, 0.8); }
+        .status-stopped { background-color: rgba(63, 63, 63, 0.8); }
+
+        .pump-icon {
+            width: 36px; /* 圖示寬度等於標籤高度，形成正圓形 */
+            height: 36px;
+            flex-shrink: 0; /* 防止圖示被壓縮 */
             display: flex;
             align-items: center;
             justify-content: center;
         }
+        .pump-icon svg { width: 22px; height: 22px; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .pump-icon.is-running svg { animation: spin 2s linear infinite; }
 
-        /* --- ★★★ 車道號誌標籤樣式 ★★★ --- */
-        .traffic-light-label {
-            position: absolute;
-            width: 25px;
-            height: 50px;
-            background-color: rgba(0, 0, 0, 0.743);
-            border: 2px solid rgba(255, 255, 255, 0.611);
-            border-radius: 15px;
-            user-select: none;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-around;
-            padding: 3px;
-            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                padding 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                border-radius 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                background-color 0.3s;
+        /* 文字詳情區塊的樣式 */
+        .pump-details {
+            padding-left: 8px;
+            white-space: nowrap; /* 防止文字換行 */
+            opacity: 0; /* 預設透明 */
+            max-width: 0; /* ★ 預設最大寬度為 0，實現收合效果 */
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-        
-        .traffic-light-label .light-indicator {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #333;
-            transition: all 0.3s;
-        }
-        
-        .traffic-light-label .light-indicator.red-active {
-            background-color: #e74c3c;
-            box-shadow: 0 0 10px #e74c3c;
-        }
-        
-        .traffic-light-label .light-indicator.green-active {
-            background-color: #2ecc71;
-            box-shadow: 0 0 10px #2ecc71;
-        }
-        /* ★ 1. 空位狀態 (綠燈) - 燈泡效果 ★ */
-        .status-available {
-            background: radial-gradient(circle at 70% 30%, #85ff8d, #1dd369 60%);
-            box-shadow: 0 0 8px 2px rgba(49, 255, 135, 0.7);
+        /* 當標籤被展開時，讓標籤本身的寬度變寬 */
+        .status-label.expanded {
+            width: auto; /* 讓寬度由內容自動撐開 */
+            padding: 0 12px 0 0; /* 恢復右側的 padding */
+            border-radius: 18px;
+            z-index: 101;
         }
 
-        /* ★ 2. 有車狀態 (紅燈) - 燈泡效果 ★ */
-        .status-occupied {
-            background: radial-gradient(circle at 70% 30%, #ff6a6ac9, #e73c3c 60%);
-            box-shadow: 0 0 8px 2px rgba(231, 60, 60, 0.7);
+        /* ★ 當標籤被展開時，顯示文字詳情 */
+        .status-label.expanded .pump-details {
+            opacity: 1;
+            max-width: 200px; /* ★ 展開時的最大寬度 */
         }
 
-        /* ★ 3. 故障狀態 (黃燈) ★ */
+        .pump-details .status { font-weight: normal; opacity: 0.9; }
+
+        /* 1. 故障狀態的樣式 (黃色) */
         .status-fault {
-            background-color: #FFC107;
-            border-color: white;
+            background-color: #fffb07; /* 黃色 */
+            border-color: rgba(255, 255, 255, 0.7);            
         }
-        /* ★ 4. 故障狀態的閃爍光暈動畫 ★ */
+        
+
+        /* 2. 故障狀態的閃爍光暈動畫 */
         .status-fault.pulsing {
-            animation: pulse-yellow 1.5s infinite;
+            animation: pulse-yellow 1.0s infinite;
         }
+
         @keyframes pulse-yellow {
             0% {
-                box-shadow: 0 0 0 0 rgba(255, 243, 7, 0.816);
+                box-shadow: 0 0 0 0 rgb(255, 0, 0);
             }
             70% {
-                box-shadow: 0 0 0 10px rgba(255, 7, 7, 0.259);
+                box-shadow: 0 0 0 10px rgba(255, 234, 0, 0.561);
             }
             100% {
-                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.401);
+                box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.266);
             }
         }
+        /* 3. 驚嘆號圖示的樣式 */
         .fault-icon {
-            color: black;
-            font-size: 20px;
+            color: rgb(0, 0, 0);
+            font-size: 26px;
             font-weight: 500;
+            line-height: 1;
         }
 
-        /* --- ★★★ 車道號誌樣式 ★★★ --- */
-        #traffic-light-container {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(22, 27, 34, 0.8);
-            backdrop-filter: blur(5px);
-            border: 1px solid #30363d;
-            border-radius: 10px;
-            padding: 15px;
-            z-index: 101;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .traffic-light-box {
-            width: 50px;
-            height: 100px;
-            background-color: #0d1117;
-            border-radius: 8px;
-            padding: 5px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            align-items: center;
-        }
-        .light {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: #30363d; /* 預設的暗燈顏色 */
-            transition: background-color 0.3s, box-shadow 0.3s;
-        }
-        .light.red.active {
-            background-color: #e74c3c;
-            box-shadow: 0 0 15px #e74c3c;
-        }
-        .light.green.active {
-            background-color: #2ecc71;
-            box-shadow: 0 0 15px #2ecc71;
-        }
-        .traffic-light-info .title {
-            font-size: 14px;
-            color: #8b949e;
-        }
-        .traffic-light-info .status-text {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .traffic-light-info .status-text.red { color: #e74c3c; }
-        .traffic-light-info .status-text.green { color: #2ecc71; }
-
-        /* ★ 車道號誌資訊卡樣式 */
-        .traffic-light-card {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background-color: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 15px;
-        }
-
-        /* --- ★★★ 彈出式資訊面板樣式 ★★★ --- */
+        /* --- ★★★ 全新的彈出式資訊面板樣式 ★★★ --- */
         #info-panel {
-            position: fixed; top: 60px; bottom: 0; right: -400px; width: 380px;
-            background-color: rgba(22, 27, 34, 0.9); backdrop-filter: blur(8px);
-            border-left: 1px solid #30363d; padding: 20px; box-sizing: border-box;
-            overflow-y: auto; transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 500;
+            position: fixed;
+            top: 60px; /* 避開頂部橫幅 */
+            bottom: 0;
+            right: -400px; /* 預設隱藏在右側 */
+            width: 380px;
+            background-color: rgba(60, 78, 101, 0.553);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-left: 1px solid #30363d;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 500;
         }
-        #info-panel.open { right: 0; }
-        #info-panel h2 { color: white; margin-top: 0; padding-bottom: 10px; border-bottom: 1px solid #30363d; }
-        .parking-stats-card {
-            background-color: #0d1117; border: 1px solid #30363d;
-            border-radius: 8px; padding: 20px; text-align: center;
+        #info-panel.open {
+            right: 0; /* 彈入畫面 */
         }
-        .parking-stats-card .label { font-size: 16px; color: #8b949e; margin-bottom: 10px; }
-        .parking-stats-card .value { font-size: 48px; font-weight: bold; }
-        .parking-stats-card .value.green { color: #2ecc71; }
-        .parking-stats-card .unit { font-size: 18px; margin-left: 8px; }
+        #info-panel h2 {
+            color: white; margin-top: 0; padding-bottom: 10px;
+            border-bottom: 1px solid #30363d;
+        }
+        .pump-card-list { display: flex; flex-direction: column; gap: 15px; }
+        .pump-card { background-color: #0d1117af; border: 1px solid #30363d; border-radius: 8px; padding: 20px; }
+        .pump-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 15px; }
+        .pump-card-title { font-size: 18px; font-weight: bold; }
+        .pump-card-status { padding: 4px 10px; border-radius: 12px; font-size: 14px; font-weight: bold; }
+        .pump-card-body { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .pump-data-item .label { font-size: 14px; color: #8b949e; }
+        .pump-data-item .value { font-size: 24px; font-weight: 600; color: #c9d1d9; }
+        .status-running { background-color: #2ea043; color: white; }
+        .status-stopped { background-color: #6e7681; color: white; }
+        .status-fault { background-color: #FFC107; color: black; }
 
         /* 彈出面板的切換按鈕 */
         #info-panel-toggle {
@@ -366,7 +323,8 @@
             width: 100%; height: 100%;
             pointer-events: none; /* 讓滑鼠可以穿透此容器 */
         }
-                
+
+        
         /*icon*/
         .header-right-items {
             display: flex;
@@ -481,13 +439,7 @@
                     <li><a href="../parking_management/b2f.html">B2F</a></li>
                     <li><a href="../parking_management/b3f.html">B3F</a></li>                   
                 </ul>
-            </li>            
-            <li class="system-category">
-                <a href="#">空調控制系統</a>
-                <ul class="floor-submenu">
-                    <li><a href="../air_conditioning_control/1f.html">1F</a></li>
-                </ul>
-            </li>   
+            </li>
             <li class="system-category">
                 <a href="#">空調控制系統</a>
                 <ul class="floor-submenu">
@@ -509,46 +461,15 @@
         <button id="side-view-btn">側視圖</button>
     </div>
     <div id="controls-helper">左鍵: 選轉 | 右鍵: 平移 | 滾輪: 縮放</div>
-    <div id="floor-indicator">當前樓層: 停車管理系統 - B2F</div>
+    <div id="floor-indicator">當前樓層: 空調控制系統 - 1F</div>
     <div id="labels-container"></div>
 
     <!-- 彈出式資訊面板和切換按鈕 -->
     <button id="info-panel-toggle">‹</button>
     <aside id="info-panel">
-        <h2>B2F 停車資訊</h2>
-        <div class="parking-stats-card">
-            <div class="label">本層總車位數</div>
-            <div class="value"><span id="total-spaces">--</span><span class="unit">格</span></div>
-        </div>
-        <br>
-        <div class="parking-stats-card">
-            <div class="label">目前空位數</div>
-            <div class="value green"><span id="available-spaces">--</span><span class="unit">格</span></div>
-        </div>
-        </div>
-        <hr style="border-color: #30363d; margin: 20px 0;">
-    
-        <!-- ★ 上行車道號誌的資訊卡 -->
-        <div class="traffic-light-card">
-            <div class="traffic-light-box">
-                <div id="light-red-up" class="light red"></div>
-                <div id="light-green-up" class="light green"></div>
-            </div>
-            <div class="traffic-light-info">
-                <div class="title">上行車道狀態</div>
-                <div id="light-status-text-up" class="status-text">--</div>
-            </div>
-        </div>    
-        <!-- ★ 下行車道號誌的資訊卡 -->
-        <div class="traffic-light-card" style="margin-top: 15px;">
-            <div class="traffic-light-box">
-                <div id="light-red-down" class="light red"></div>
-                <div id="light-green-down" class="light green"></div>
-            </div>
-            <div class="traffic-light-info">
-                <div class="title">下行車道狀態</div>
-                <div id="light-status-text-down" class="status-text">--</div>
-            </div>
+        <h2>B3F 泵浦狀態</h2>
+        <div class="pump-card-list">
+            <!-- JavaScript 將會在這裡動態填入資訊卡 -->
         </div>
     </aside>
 
@@ -565,8 +486,7 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         const controls = new OrbitControls(camera, renderer.domElement);
         let model;                        
-        let monitoringPoints = [];
-        let trafficLights = [];        
+        let monitoringPoints = [];        
         
         const labelsContainer = document.getElementById('labels-container');
         const infoPanel = document.getElementById('info-panel');
@@ -580,20 +500,9 @@
         const topViewBtn = document.getElementById('top-view-btn');
         const sideViewBtn = document.getElementById('side-view-btn');        
         const iconsContainer = document.getElementById('alarm-icons-container');
-        const totalSpacesEl = document.getElementById('total-spaces');
-        const availableSpacesEl = document.getElementById('available-spaces');
-        // ★ 上行車道號誌 DOM 元素
-        const lightRedUpUI = document.getElementById('light-red-up');
-        const lightGreenUpUI = document.getElementById('light-green-up');
-        const lightStatusTextUpUI = document.getElementById('light-status-text-up');
-        // ★ 下行車道號誌 DOM 元素  
-        const lightRedDownUI = document.getElementById('light-red-down');
-        const lightGreenDownUI = document.getElementById('light-green-down');
-        const lightStatusTextDownUI = document.getElementById('light-status-text-down');
-        const redLightMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0xff0000, emissiveIntensity: 1 });
-        const greenLightMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00, emissive: 0x00ff00, emissiveIntensity: 1 });
-        const offLightMaterial = new THREE.MeshStandardMaterial({ color: 0x222222, emissive: 0x222222, emissiveIntensity: 0.1 });
-        
+
+        const minDistance = 10, maxDistance = 80, minScale = 0.8, maxScale = 1.3;
+
         // --- 初始化函式 ---
         function init() {
             scene.background = new THREE.Color(0x0d1117);
@@ -620,7 +529,7 @@
             const dracoLoader = new DRACOLoader();
             dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
             loader.setDRACOLoader(dracoLoader);
-            const modelPath = 'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/parking_management/b2f_model.glb';
+            const modelPath = 'https://media.githubusercontent.com/media/workkkkkkez00m/K-3D-viewer/main/models/air_conditioning_control/1f_model.glb';
             loader.load(
                 modelPath,
                 (gltf) => {
@@ -631,7 +540,7 @@
                     scene.add(model);
                     console.log('模型載入成功！');
                     // 模型載入完成後立即執行一次狀態更新
-                    updateParkingStatus();
+                    updatePlumbingStatus();
                 },
                 undefined,
                 (error) => console.error(`模型載入失敗: ${modelPath}`, error)
@@ -641,19 +550,14 @@
             setupEventListeners();
             updateDateTime();
             setInterval(updateDateTime, 1000);           
-            updateParkingStatus();
-            setInterval(updateParkingStatus, 1000); // ★ 更新頻率改為1秒
+            setInterval(updatePlumbingStatus, 4000);
             // ★ 啟動彈出面板功能
             setupInfoPanelToggle();
-            // ★ 啟動車道號誌的定時更新
-            updateTrafficLightStatus();
-            setInterval(updateTrafficLightStatus, 5000);
         }
         
         // --- 動畫迴圈 ---
         function animate() {
             requestAnimationFrame(animate);
-            controls.target.y = 0;
             controls.update();
 
             for (const point of monitoringPoints) {
@@ -661,79 +565,43 @@
                     const position = new THREE.Vector3();
                     new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
                     
-                    // ★ 修復：檢查物件是否在攝影機視野內
-                    const cameraPosition = camera.position.clone();
-                    const objectDirection = position.clone().sub(cameraPosition).normalize();
-                    const cameraDirection = new THREE.Vector3();
-                    camera.getWorldDirection(cameraDirection);
+                    const distance = camera.position.distanceTo(position);
+                    const scale = maxScale - (maxScale - minScale) * Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
                     
-                    // 計算物件是否在攝影機前方（點積 > 0 表示在前方）
-                    const dotProduct = objectDirection.dot(cameraDirection);
+                    position.project(camera);
+                    const x = (position.x * 0.5 + 0.5) * window.innerWidth;
+                    const y = (position.y * -0.5 + 0.5) * window.innerHeight;
                     
-                    if (dotProduct > 0) {
-                        // 物件在攝影機前方，正常顯示
-                        position.project(camera);
-                        
-                        // 檢查投影後的座標是否在螢幕範圍內 (-1 到 1)
-                        if (position.x >= -1 && position.x <= 1 && position.y >= -1 && position.y <= 1) {
-                            const x = (position.x * 0.5 + 0.5) * window.innerWidth;
-                            const y = (position.y * -0.5 + 0.5) * window.innerHeight;
-                            point.element.style.transform = `translate(-50%, 130%) translate(${x}px, ${y}px)`;
-                            point.element.style.visibility = 'visible';
-                        } else {
-                            // 物件投影在螢幕範圍外，隱藏標籤
-                            point.element.style.visibility = 'hidden';
-                        }
-                    } else {
-                        // 物件在攝影機後方，隱藏標籤
-                        point.element.style.visibility = 'hidden';
-                    }
-                }
-            }
-            // ★ 更新車道號誌標籤位置
-            for (const light of trafficLights) {
-                if (light.targetObject && light.element) {
-                    const position = new THREE.Vector3();
-                    new THREE.Box3().setFromObject(light.targetObject).getCenter(position);
+                    point.element.style.transform = `translate(-50%, 0%) translate(${x}px, ${y}px) scale(${scale})`;
                     
-                    const cameraPosition = camera.position.clone();
-                    const objectDirection = position.clone().sub(cameraPosition).normalize();
-                    const cameraDirection = new THREE.Vector3();
-                    camera.getWorldDirection(cameraDirection);
-                    
-                    const dotProduct = objectDirection.dot(cameraDirection);
-                    
-                    if (dotProduct > 0) {
-                        position.project(camera);
-                        
-                        if (position.x >= -1 && position.x <= 1 && position.y >= -1 && position.y <= 1) {
-                            const x = (position.x * 0.5 + 0.5) * window.innerWidth;
-                            const y = (position.y * -0.5 + 0.5) * window.innerHeight;
-                            light.element.style.transform = `translate(-50%, 20%) translate(${x}px, ${y}px)`;
-                            light.element.style.visibility = 'visible';
-                        } else {
-                            light.element.style.visibility = 'hidden';
-                        }
-                    } else {
-                        light.element.style.visibility = 'hidden';
-                    }
                 }
             }
             renderer.render(scene, camera);
         }
 
         // --- 核心功能函式 ---
-        async function updateParkingStatus() {
+        async function updatePlumbingStatus() {
             try {
-                const response = await fetch('http://localhost:3000/api/parking/b2f');
+                console.log('正在更新泵浦狀態...');
+                const response = await fetch('http://localhost:3000/api/plumbing/b3f');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const latestData = await response.json();
+                console.log('收到 API 資料:', latestData);
 
-                // 更新數據
+                // 處理資料更新
                 latestData.forEach(newPoint => {
                     const existingPoint = monitoringPoints.find(p => p.id === newPoint.id);
                     if (existingPoint) {
+                        // 更新所有屬性，不只是 status
                         existingPoint.status = newPoint.status;
-                        // ★ 關鍵修復：更新狀態後立即更新標籤外觀
+                        existingPoint.powerConsumption = newPoint.powerConsumption;
+                        existingPoint.waterLevel = newPoint.waterLevel;
+                        existingPoint.locationName = newPoint.locationName;
+                        
                         if (existingPoint.element) {
                             updateLabelAppearance(existingPoint);
                         }
@@ -741,15 +609,24 @@
                         monitoringPoints.push({ ...newPoint, name: newPoint.name, targetObject: null, element: null });
                     }
                 });
-
-                // 更新資訊卡
+                
+                // ★ 更新資訊卡視圖
                 updateInfoCards(monitoringPoints);
 
                 if (model) {
                     bindObjectsToPoints();
                 }
+                
+                console.log('泵浦狀態更新完成，當前監控點數量:', monitoringPoints.length);
+
             } catch (error) {
-                console.error("更新停車位狀態失敗:", error);
+                console.error("API 連接失敗:", error);
+                // 顯示連線錯誤
+                showConnectionError();
+                
+                if (error.message.includes('fetch')) {
+                    console.warn('API 伺服器可能未啟動，請檢查 localhost:3000 是否正常運行');
+                }
             }
         }
 
@@ -768,15 +645,35 @@
             `;
         }
 
-        // ★ 更新資訊卡畫面的函式
+        // ★ 新增：更新資訊卡畫面的函式
         function updateInfoCards(points) {
-            const total = points.length;
-            const available = points.filter(p => p.status === '空位').length;
-            totalSpacesEl.textContent = total;
-            availableSpacesEl.textContent = available;
+            pumpCardList.innerHTML = ''; // 清空舊卡片
+            points.forEach(point => {
+                const card = document.createElement('div');
+                card.className = 'pump-card';
+                const statusClass = point.status === '運轉中' ? 'status-running' : (point.status === '故障' ? 'status-fault' : 'status-stopped');
+                const waterLevelColor = point.waterLevel === '高高' ? '#e74c3c' : (point.waterLevel === '高' ? '#f1c40f' : '#3498db');
+                card.innerHTML = `
+                    <div class="pump-card-header">
+                        <div class="pump-card-title">${point.locationName}</div>
+                        <div class="pump-card-status ${statusClass}">${point.status}</div>
+                    </div>
+                    <div class="pump-card-body">
+                        <div class="pump-data-item">
+                            <div class="label">即時耗電量</div>
+                            <div class="value">${Number(point.powerConsumption).toFixed(2)} kW</div>
+                        </div>
+                        <div class="pump-data-item">
+                            <div class="label">目前水位</div>
+                            <div class="value" style="color: ${waterLevelColor};">${point.waterLevel}</div>
+                        </div>
+                    </div>
+                `;
+                pumpCardList.appendChild(card);
+            });
         }
 
-        // ★ 設定彈出面板的事件
+        // ★ 新增：設定彈出面板的事件
         function setupInfoPanelToggle() {
             infoPanelToggle.addEventListener('click', () => {
                 infoPanel.classList.toggle('open');
@@ -791,12 +688,9 @@
                 const point = monitoringPoints.find(p => p.name === object.name && !p.targetObject);
                 if (point) {
                     point.targetObject = object;
-                    console.log(`成功綁定停車位: ${point.locationName} (name: ${object.name})`);
+                    console.log(`成功綁定泵浦物件: ${point.locationName} (name: ${object.name})`);
                     if (!point.element) {
                         createLabelForPoint(point);
-                    } else {
-                        // ★ 如果標籤已存在，確保外觀是最新的
-                        updateLabelAppearance(point);
                     }
                 }
             });
@@ -804,34 +698,61 @@
 
         function createLabelForPoint(point) {
             const label = document.createElement('div');
+            label.innerHTML = `
+                <div class="pump-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2Z" stroke="white" stroke-width="2" stroke-opacity="0.5"/><path d="M12 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M12 18V22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M5.63604 5.63603L8.46447 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M15.5355 15.5355L18.364 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M2 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18 12H22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18.364 5.63603L15.5355 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M8.46447 15.5355L5.63604 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+                </div>
+                <div class="pump-details">
+                    <span class="location-name">${point.locationName}</span>: <span class="status">${point.status}</span>
+                </div>
+            `;
             labelsContainer.appendChild(label);
             point.element = label;
             updateLabelAppearance(point);
+
+            label.addEventListener('click', (event) => {
+                event.stopPropagation();
+                toggleLabel(point);
+            });
         }
 
         function updateLabelAppearance(point) {
-            if (!point.element) return;    
+            if (!point.element) return;
+            
+            // 先更新狀態文字
+            const statusSpan = point.element.querySelector('.status');
+            if (statusSpan) {
+                statusSpan.textContent = point.status;
+            }
+            
+            const iconDiv = point.element.querySelector('.pump-icon');
+            
             switch (point.status) {
-                case '空位':
-                    point.element.className = 'status-label status-available';
-                    point.element.innerHTML = '';
-                    break;
-                case '有車':
-                    point.element.className = 'status-label status-occupied';
-                    point.element.innerHTML = '';
+                case '運轉中':
+                    point.element.className = 'status-label status-running';
+                    // 確保有 SVG 圖示
+                    if (!iconDiv.querySelector('svg')) {
+                        iconDiv.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2Z" stroke="white" stroke-width="2" stroke-opacity="0.5"/><path d="M12 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M12 18V22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M5.63604 5.63603L8.46447 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M15.5355 15.5355L18.364 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M2 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18 12H22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18.364 5.63603L15.5355 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M8.46447 15.5355L5.63604 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
+                    }
+                    iconDiv.classList.add('is-running');
                     break;
                 case '故障':
-                    // ★ 新增 pulsing class 來觸發閃爍動畫
                     point.element.className = 'status-label status-fault pulsing';
-                    point.element.innerHTML = `<div class="fault-icon">!</div>`;
+                    iconDiv.innerHTML = `<div class="fault-icon">!</div>`;
+                    iconDiv.classList.remove('is-running');
                     break;
+                case '停止':
                 default:
-                    // 預設情況，避免出錯
-                    point.element.className = 'status-label';
-                    point.element.innerHTML = '';
+                    point.element.className = 'status-label status-stopped';
+                    // 如果是從故障切換回來，需要還原 SVG
+                    if (!iconDiv.querySelector('svg')) {
+                        iconDiv.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2Z" stroke="white" stroke-width="2" stroke-opacity="0.5"/><path d="M12 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M12 18V22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M5.63604 5.63603L8.46447 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M15.5355 15.5355L18.364 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M2 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18 12H22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18.364 5.63603L15.5355 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M8.46447 15.5355L5.63604 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
+                    }
+                    iconDiv.classList.remove('is-running');
                     break;
             }
         }
+
         
         function toggleLabel(clickedPoint) {
             const wasExpanded = clickedPoint.element.classList.contains('expanded');
@@ -840,172 +761,6 @@
             });
             if (!wasExpanded) {
                 clickedPoint.element.classList.add('expanded');
-            }
-        }
-        // ★ 更新車道號誌UI的輔助函數
-        function updateLightUI(light, redUI, greenUI, statusTextUI) {
-            if (light.status === 'red') {
-                redUI.classList.add('active');
-                greenUI.classList.remove('active');
-                statusTextUI.textContent = "禁止通行";
-                statusTextUI.className = 'status-text red';
-            } else if (light.status === 'green') {
-                redUI.classList.remove('active');
-                greenUI.classList.add('active');
-                statusTextUI.textContent = "可以通行";
-                statusTextUI.className = 'status-text green';
-            }
-        }
-
-        // ★★★ 從後端獲取車道號誌狀態的函式 ★★★
-        async function updateTrafficLightStatus() {
-            try {
-                const response = await fetch('http://localhost:3000/api/traffic-light/b2f');
-                const data = await response.json();
-                
-                const lightsData = Object.values(data);
-
-                lightsData.forEach(newLightData => {
-                    let light = trafficLights.find(l => l.id === newLightData.id);
-                    if (light) {
-                        light.status = newLightData.status;
-                    } else {
-                        light = { ...newLightData, targetObject: null };
-                        trafficLights.push(light);
-                    }
-                    // ★ 根據 ID 更新對應的 UI
-                    if (light.id.includes('UP')) {
-                        updateLightUI(light, lightRedUpUI, lightGreenUpUI, lightStatusTextUpUI);
-                    } else if (light.id.includes('DOWN')) {
-                        updateLightUI(light, lightRedDownUI, lightGreenDownUI, lightStatusTextDownUI);
-                    }
-
-                    // 更新 3D 模型材質
-                    if (light.targetObject) {
-                        const redLightMesh = light.targetObject.getObjectByName('Red');
-                        const greenLightMesh = light.targetObject.getObjectByName('Green');
-                        if (redLightMesh && greenLightMesh) {
-                            redLightMesh.material = light.status === 'red' ? redLightMaterial : offLightMaterial;
-                            greenLightMesh.material = light.status === 'green' ? greenLightMaterial : offLightMaterial;
-                        }
-                    }
-                });
-
-                // ★ 修復：首先綁定 3D 物件，然後再更新狀態
-                if (model) {
-                    bindTrafficLights();
-                }
-
-                // 更新所有 3D 號誌燈
-                trafficLights.forEach(light => {
-                    // ★ 創建或更新 3D 標籤（類似停車位標籤）
-                    if (light.targetObject) {
-                        console.log(`正在更新 3D 號誌燈標籤: ${light.name}, 狀態: ${light.status}`);
-                        
-                        // 如果還沒有標籤元素，創建一個
-                        if (!light.element) {
-                            createTrafficLightLabel(light);
-                        }
-                        
-                        // 更新標籤外觀
-                        updateTrafficLightLabelAppearance(light);
-                    } else {
-                        console.log(`號誌燈 ${light.name} 尚未綁定到 3D 物件`);
-                    }
-                });
-
-            } catch (error) {
-                console.error("更新車道號誌狀態失敗:", error);
-            }
-        }
-
-        // ★ 將 3D 號誌燈模型綁定到數據點的函式
-        function bindTrafficLights() {
-            if (!model) return;
-            
-            model.traverse((object) => {
-                // ★ 修復：更靈活的物件名稱匹配
-                const light = trafficLights.find(l => {
-                    // 嘗試多種匹配方式
-                    return (l.name === object.name) || 
-                           (object.name && object.name.toLowerCase().includes('traffic')) ||
-                           (object.name && object.name.toLowerCase().includes('light')) ||
-                           (object.name && l.name && object.name.toLowerCase().includes(l.name.toLowerCase()));
-                });
-                
-                if (light && !light.targetObject) {
-                    light.targetObject = object;
-                    console.log(`成功綁定車道號誌: ${light.name} -> ${object.name}`);
-                    
-                    // ★ 立即創建標籤
-                    if (!light.element) {
-                        createTrafficLightLabel(light);
-                    }
-                }
-            });
-            
-            // ★ 如果找不到特定名稱的物件，列出所有可能的候選物件
-            if (trafficLights.some(l => !l.targetObject)) {
-                console.log('未綁定的號誌燈，以下是模型中所有可能的物件:');
-                model.traverse((object) => {
-                    if (object.name && (
-                        object.name.toLowerCase().includes('traffic') ||
-                        object.name.toLowerCase().includes('light') ||
-                        object.name.toLowerCase().includes('signal') ||
-                        object.name.toLowerCase().includes('lane')
-                    )) {
-                        console.log(`  候選物件: ${object.name}`);
-                    }
-                });
-            }
-        }
-
-        // ★ 創建車道號誌標籤的函式
-        function createTrafficLightLabel(light) {
-            const label = document.createElement('div');
-            label.className = 'traffic-light-label';
-            
-            // 創建紅燈指示器
-            const redLight = document.createElement('div');
-            redLight.className = 'light-indicator red-light';
-            
-            // 創建綠燈指示器
-            const greenLight = document.createElement('div');
-            greenLight.className = 'light-indicator green-light';
-            
-            label.appendChild(redLight);
-            label.appendChild(greenLight);
-            
-            labelsContainer.appendChild(label);
-            light.element = label;
-            light.element.style.visibility = 'visible';
-            
-            console.log(`創建車道號誌標籤: ${light.name}`);
-            
-            // 立即更新外觀
-            updateTrafficLightLabelAppearance(light);
-        }
-
-        // ★ 更新車道號誌標籤外觀的函式
-        function updateTrafficLightLabelAppearance(light) {
-            if (!light.element) return;
-            
-            const redLight = light.element.querySelector('.red-light');
-            const greenLight = light.element.querySelector('.green-light');
-            
-            if (redLight && greenLight) {
-                // 重置所有狀態
-                redLight.classList.remove('red-active');
-                greenLight.classList.remove('green-active');
-                
-                // 根據狀態設置對應的燈
-                if (light.status === 'red') {
-                    redLight.classList.add('red-active');
-                    console.log(`車道號誌標籤顯示紅燈: ${light.name}`);
-                } else if (light.status === 'green') {
-                    greenLight.classList.add('green-active');
-                    console.log(`車道號誌標籤顯示綠燈: ${light.name}`);
-                }
             }
         }
 
