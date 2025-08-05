@@ -843,7 +843,7 @@
         // --- 核心功能函式 ---
         async function updateACStatus() {
             try {
-                const response = await fetch('http://localhost:3000/api/ac/1f');
+                const response = await fetch('http://192.168.41.223:3000/api/ac/1f');
                 const latestData = await response.json();
 
                 latestData.forEach(newPoint => {
@@ -966,7 +966,7 @@
         // ★ 發送模式切換指令的函式
         async function sendModeCommand(acId, newMode) {
             try {
-                const response = await fetch(`http://localhost:3000/api/ac/1f/${acId}/mode`, {
+                const response = await fetch(`http://192.168.41.223:3000/api/ac/1f/${acId}/mode`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ mode: newMode })
@@ -1005,7 +1005,7 @@
         // 發送開關機指令的函式
         async function sendPowerCommand(acId, newStatus) {
             try {
-                const response = await fetch(`http://localhost:3000/api/ac/1f/${acId}/status`, {
+                const response = await fetch(`http://192.168.41.223:3000/api/ac/1f/${acId}/status`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: newStatus })
@@ -1035,7 +1035,7 @@
         // ★ 發送溫度調整指令的函式
         async function sendTemperatureCommand(acId, newTemp) {
             try {
-                const response = await fetch(`http://localhost:3000/api/ac/1f/${acId}/temperature`, {
+                const response = await fetch(`http://192.168.41.223:3000/api/ac/1f/${acId}/temperature`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ temperature: newTemp })
@@ -1068,7 +1068,7 @@
         // ★ 發送風速調整指令的函式
         async function sendFanSpeedCommand(acId, newSpeed) {
             try {
-                const response = await fetch(`http://localhost:3000/api/ac/1f/${acId}/fanspeed`, {
+                const response = await fetch(`http://192.168.41.223:3000/api/ac/1f/${acId}/fanspeed`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ fanSpeed: newSpeed })
@@ -1116,7 +1116,7 @@
         // ★ 發送風向調整指令的函式
         async function sendSwingCommand(acId, type, value) {
             try {
-                const response = await fetch(`http://localhost:3000/api/ac/1f/${acId}/swing`, {
+                const response = await fetch(`http://192.168.41.223:3000/api/ac/1f/${acId}/swing`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ type, value })
