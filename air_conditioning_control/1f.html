@@ -89,7 +89,23 @@
         }
         #sidebar-menu ul::-webkit-scrollbar-thumb:hover {
          background-color: #838b94;
-        }        
+        }
+        #back-to-home-btn {
+            margin-top: 20px; /* 與上方選單產生間距 */
+            padding-top: 20px !important; /* 增加頂部內邊距，並確保其優先級 */
+            border-top: 1px solid #465a70; /* 加上一條分隔線 */
+            font-weight: bold; /* 加粗字體 */
+            color: #1bdbed !important; /* 使用一個醒目的主題綠色 */
+        }
+
+        #back-to-home-btn:hover {
+            background-color: #34495e !important; /* 維持懸停效果 */
+            color: #1fecff !important; /* 懸停時顏色更亮 */
+        }
+        /* 為能源管理和電梯監控系統按鈕添加適當間距 */
+        #sidebar-menu li a[href*="energy"] {
+            margin-bottom: 18px; /* 能源管理按鈕下方間距 */
+        }      
         /* 樓層子選單的樣式 (預設隱藏) */
         .floor-submenu {
             list-style: none;
@@ -127,184 +143,6 @@
             background-color: rgba(0, 0, 0, 0.5); color: #cccccc; font-size: 16px;
             font-weight: bold; border-radius: 5px; z-index: 10; pointer-events: none;
         }
-        /* 1. 狀態標籤的基礎樣式 (現在是 Flexbox 容器) */
-        #labels-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
-
-        .status-label {
-            position: absolute;
-            display: flex;
-            align-items: center;
-            width: 36px;   /* 固定寬度 */   
-            height: 36px; /* 固定高度 */
-            padding: 0 ; 
-            color: white;
-            border-radius: 50%; /* 形成圓形 */
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            user-select: none;
-            pointer-events: auto; /* ★ 允許標籤接收點擊事件 */
-            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                padding 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                border-radius 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                background-color 0.3s;
-            cursor: pointer;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                padding 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                border-radius 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                background-color 0.3s;
-            overflow: hidden; /* 隱藏超出的文字內容 */
-        }
-        .status-running { background-color: rgba(46, 204, 113, 0.8); }
-        .status-stopped { background-color: rgba(63, 63, 63, 0.8); }
-
-        .pump-icon {
-            width: 36px; /* 圖示寬度等於標籤高度，形成正圓形 */
-            height: 36px;
-            flex-shrink: 0; /* 防止圖示被壓縮 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .pump-icon svg { width: 22px; height: 22px; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .pump-icon.is-running svg { animation: spin 2s linear infinite; }
-
-        /* 文字詳情區塊的樣式 */
-        .pump-details {
-            padding-left: 8px;
-            white-space: nowrap; /* 防止文字換行 */
-            opacity: 0; /* 預設透明 */
-            max-width: 0; /* ★ 預設最大寬度為 0，實現收合效果 */
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        /* 當標籤被展開時，讓標籤本身的寬度變寬 */
-        .status-label.expanded {
-            width: auto; /* 讓寬度由內容自動撐開 */
-            padding: 0 12px 0 0; /* 恢復右側的 padding */
-            border-radius: 18px;
-            z-index: 101;
-        }
-
-        /* ★ 當標籤被展開時，顯示文字詳情 */
-        .status-label.expanded .pump-details {
-            opacity: 1;
-            max-width: 200px; /* ★ 展開時的最大寬度 */
-        }
-
-        .pump-details .status { font-weight: normal; opacity: 0.9; }
-
-        /* 1. 故障狀態的樣式 (黃色) */
-        .status-fault {
-            background-color: #fffb07; /* 黃色 */
-            border-color: rgba(255, 255, 255, 0.7);            
-        }
-        
-
-        /* 2. 故障狀態的閃爍光暈動畫 */
-        .status-fault.pulsing {
-            animation: pulse-yellow 1.0s infinite;
-        }
-
-        @keyframes pulse-yellow {
-            0% {
-                box-shadow: 0 0 0 0 rgb(255, 0, 0);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(255, 234, 0, 0.561);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.266);
-            }
-        }
-        /* 3. 驚嘆號圖示的樣式 */
-        .fault-icon {
-            color: rgb(0, 0, 0);
-            font-size: 26px;
-            font-weight: 500;
-            line-height: 1;
-        }
-
-        /* --- ★★★ 全新的彈出式資訊面板樣式 ★★★ --- */
-        #info-panel {
-            position: fixed;
-            top: 60px; /* 避開頂部橫幅 */
-            bottom: 0;
-            right: -400px; /* 預設隱藏在右側 */
-            width: 380px;
-            background-color: rgba(60, 78, 101, 0.553);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border-left: 1px solid #30363d;
-            padding: 20px;
-            box-sizing: border-box;
-            overflow-y: auto;
-            transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            z-index: 500;
-        }
-        #info-panel.open {
-            right: 0; /* 彈入畫面 */
-        }
-        #info-panel h2 {
-            color: white; margin-top: 0; padding-bottom: 10px;
-            border-bottom: 1px solid #30363d;
-        }
-        .pump-card-list { display: flex; flex-direction: column; gap: 15px; }
-        .pump-card { background-color: #0d1117af; border: 1px solid #30363d; border-radius: 8px; padding: 20px; }
-        .pump-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 15px; }
-        .pump-card-title { font-size: 18px; font-weight: bold; }
-        .pump-card-status { padding: 4px 10px; border-radius: 12px; font-size: 14px; font-weight: bold; }
-        .pump-card-body { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .pump-data-item .label { font-size: 14px; color: #8b949e; }
-        .pump-data-item .value { font-size: 24px; font-weight: 600; color: #c9d1d9; }
-        .status-running { background-color: #2ea043; color: white; }
-        .status-stopped { background-color: #6e7681; color: white; }
-        .status-fault { background-color: #FFC107; color: black; }
-
-        /* 彈出面板的切換按鈕 */
-        #info-panel-toggle {
-            position: fixed;
-            top: 50%;
-            right: 0;
-            transform: translateY(-50%);
-            width: 30px;
-            height: 80px;
-            background-color: rgba(45, 71, 98, 0.873);
-            border: 2px solid #c2c6cb;
-            border-right: none;
-            border-top-left-radius: 8px;
-            border-bottom-left-radius: 8px;
-            color: #eaeaea;
-            cursor: pointer;
-            z-index: 501;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        #info-panel-toggle.open {
-            right: 380px; /* 跟隨面板移動 */
-        }
-
-        #back-to-home-btn {
-            margin-top: 20px; /* 與上方選單產生間距 */
-            padding-top: 20px !important; /* 增加頂部內邊距，並確保其優先級 */
-            border-top: 1px solid #465a70; /* 加上一條分隔線 */
-            font-weight: bold; /* 加粗字體 */
-            color: #1bdbed !important; /* 使用一個醒目的主題綠色 */
-        }
-
-        #back-to-home-btn:hover {
-            background-color: #34495e !important; /* 維持懸停效果 */
-            color: #1fecff !important; /* 懸停時顏色更亮 */
-        }
-        /* 為能源管理和電梯監控系統按鈕添加適當間距 */
-        #sidebar-menu li a[href*="energy"] {
-            margin-bottom: 18px; /* 能源管理按鈕下方間距 */
-        }
-
         /* 移除標題連結的預設樣式 */
         #home-link-title {
             color: inherit; /* 繼承父元素(header)的文字顏色，也就是白色 */
@@ -355,7 +193,269 @@
             /* 確保使用者無法選取文字 */
             user-select: none;
             -webkit-user-select: none;
+        }      
+
+        /* --- ★★★ 空調狀態標籤樣式 ★★★ --- */
+        #labels-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+        .status-label {
+            position: absolute; display: flex; align-items: center; justify-content: center;
+            width: 38px; height: 38px; border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3); user-select: none;
+            pointer-events: auto; cursor: pointer;
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            transition: background-color 0.3s;
         }
+        .ac-fan { width: 34px; height: 34px; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .ac-fan.is-running {
+            animation-name: spin;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+        .ac-fan.speed-auto { animation-duration: 1.2s; }
+        .ac-fan.speed-weak { animation-duration: 2s; }
+        .ac-fan.speed-medium { animation-duration: 1s; }
+        .ac-fan.speed-strong { animation-duration: 0.5s; }
+        
+        .status-cooling { background-color: rgba(36, 167, 255, 0.673); } /* 藍色 */
+        .status-heating { background-color: rgba(255, 170, 86, 0.8); } /* 橘色 */
+        .status-ventilating { background-color: rgba(12, 201, 24, 0.8); } /* 綠色 */
+        .status-dehumidifying { background-color: rgba(143, 86, 255, 0.8); } /* ★ 紫色 */
+        .status-stopped { background-color: rgba(128, 128, 128, 0.8); } /* 灰色 */
+        .status-fault { background-color: #FFC107; animation: pulse-yellow 1.5s infinite; }
+        @keyframes pulse-yellow {
+            0% {
+                box-shadow: 0 0 0 0 rgb(255, 0, 0);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 234, 0, 0.405);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.266);
+            }
+        }
+        .fault-icon { color: black; font-size: 26px; font-weight: 500; }
+
+        /* --- ★★★ 全新的彈出式資訊面板樣式 ★★★ --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7); display: flex;
+            align-items: center; justify-content: center; z-index: 2000;
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+        }
+        .modal-overlay.visible { opacity: 1; pointer-events: auto; }
+        .ac-modal-content {
+            background-color: #161b22; padding: 25px; border-radius: 8px;
+            border: 1px solid #30363d; width: 400px;
+            transform: scale(0.95); transition: transform 0.3s ease;
+            position: relative;
+        }
+        .modal-overlay.visible .ac-modal-content { transform: scale(1); }
+        .ac-modal-content h3 { margin-top: 0; }
+        .temp-display { display: flex; justify-content: space-around; text-align: center; margin: 20px 0; }
+        .temp-display .label { font-size: 14px; color: #bec7d2; }
+        .temp-display .value { font-size: 48px; font-weight: bold; }
+        .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .control-group {grid-column: span 1;}
+        .control-group.full-width {
+            grid-column: 1 / -1; /* 橫跨所有欄位 */
+        }
+        .control-group .label { display: block; text-align: center; margin-bottom: 10px; color: #bec7d2; }
+        .control-buttons { display: flex; justify-content: center; gap: 10px; }
+        .control-btn {
+            background-color: #21262d; border: 1px solid #30363d;
+            color: #c9d1d9; border-radius: 50%;
+            width: 50px; height: 50px; font-size: 24px;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+        .control-btn:hover { background-color: #30363d; }
+        /* ★模式按鈕的專屬樣式 */
+        .mode-btn, .fanspeed-btn  {
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16x;
+            flex: 1;
+        }
+        .mode-btn.active, .fanspeed-btn.active {
+            color: white;
+            font-weight: bold;
+        }
+        .mode-btn[data-mode="冷氣"].active { background-color: #36a2eb; border-color: #36a2eb; }
+        .mode-btn[data-mode="暖氣"].active { background-color: #ff9f40; border-color: #ff9f40; }
+        .mode-btn[data-mode="送風"].active { background-color: #4bc0c0; border-color: #4bc0c0; }
+        .mode-btn[data-mode="除濕"].active { background-color: #9966ff; border-color: #9966ff; }
+        /* ★ 風速按鈕的亮起樣式 */
+        .fanspeed-btn.active {
+            background-color: #58a6ff;
+            border-color: #58a6ff;
+        }
+        /* ★ 電源按鈕樣式 */
+        .power-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #6b7076;
+            background-color: #4b545f;
+            color: #fc1c1c83;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .power-btn:hover {
+            border-color: #bd3030c0;
+        }
+        .power-btn.active {
+            background-color: #2ea043;
+            border-color: #3fb950;
+            color: white;
+            box-shadow: 0 0 10px #2ea043;
+        }                
+        /* ★ 新增：溫度與風向顯示螢幕 */
+        .ac-screen {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        .temp-display {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+            flex: 1;
+        }
+        .temp-display > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .temp-display .label { font-size: 14px; color: #8b949e; }
+        .temp-display .value { font-size: 48px; font-weight: bold; }
+        
+        /* 風向圖示容器 */
+        .swing-display {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+        .swing-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .swing-label {
+            font-size: 12px;
+            color: #8b949e;
+            text-align: center;
+        }
+        .swing-indicator {
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .swing-indicator svg .blade {
+            stroke: #30363d; /* 預設的暗色 */
+            fill: none;
+            transition: stroke 0.3s ease;
+            pointer-events: none; /* 避免影響點擊事件 */
+            paint-order: stroke; /* 確保描邊在正確的層次 */
+        }
+        .swing-indicator svg .blade.active {
+            stroke: #58a6ff; /* 亮起的顏色 */
+            stroke-width: 4; /* 亮起時變粗 */
+            z-index: 10; /* 確保藍色扇葉在最上層 */
+            position: relative; /* 使z-index生效 */
+            paint-order: stroke; /* 確保描邊在最上層 */
+            stroke-linecap: round; /* 增強視覺效果 */
+        }
+        
+        /* 自動擺動動畫 */
+        
+        /* 左右風向自動擺動動畫 - 五片扇葉依序單一亮起 */
+        .swing-indicator.swing-auto#horizontal-swing-indicator .blade {
+            stroke: #30363d;
+            stroke-width: 3;
+            animation: horizontal-blade-sequence 2.5s infinite;
+        }
+        .swing-indicator.swing-auto#horizontal-swing-indicator .blade[data-blade="left"] {
+            animation-delay: 0s;
+        }
+        .swing-indicator.swing-auto#horizontal-swing-indicator .blade[data-blade="mid-left"] {
+            animation-delay: 0.5s;
+        }
+        .swing-indicator.swing-auto#horizontal-swing-indicator .blade[data-blade="mid"] {
+            animation-delay: 1s;
+        }
+        .swing-indicator.swing-auto#horizontal-swing-indicator .blade[data-blade="mid-right"] {
+            animation-delay: 1.5s;
+        }
+        .swing-indicator.swing-auto#horizontal-swing-indicator .blade[data-blade="right"] {
+            animation-delay: 2s;
+        }
+        
+        @keyframes horizontal-blade-sequence {
+            0%, 80%, 100% { 
+                stroke: #30363d; 
+                stroke-width: 3;
+            }
+            10%, 30% { 
+                stroke: #58a6ff; 
+                stroke-width: 4;
+            }
+        }
+        
+        /* 上下風向自動擺動動畫 - 四片扇葉依序單一亮起 */
+        .swing-indicator.swing-auto#vertical-swing-indicator .blade {
+            stroke: #30363d;
+            stroke-width: 3;
+            animation: vertical-blade-sequence 2s infinite;
+        }
+        .swing-indicator.swing-auto#vertical-swing-indicator .blade[data-blade="pos1"] {
+            animation-delay: 0s;
+        }
+        .swing-indicator.swing-auto#vertical-swing-indicator .blade[data-blade="pos2"] {
+            animation-delay: 0.5s;
+        }
+        .swing-indicator.swing-auto#vertical-swing-indicator .blade[data-blade="pos3"] {
+            animation-delay: 1s;
+        }
+        .swing-indicator.swing-auto#vertical-swing-indicator .blade[data-blade="pos4"] {
+            animation-delay: 1.5s;
+        }
+        
+        @keyframes vertical-blade-sequence {
+            0%, 75%, 100% { 
+                stroke: #30363d; 
+                stroke-width: 3;
+            }
+            12.5%, 37.5% { 
+                stroke: #58a6ff; 
+                stroke-width: 4;
+            }
+        }
+        
     </style>
 </head>
 <body>
@@ -464,14 +564,108 @@
     <div id="floor-indicator">當前樓層: 空調控制系統 - 1F</div>
     <div id="labels-container"></div>
 
-    <!-- 彈出式資訊面板和切換按鈕 -->
-    <button id="info-panel-toggle">‹</button>
-    <aside id="info-panel">
-        <h2>B3F 泵浦狀態</h2>
-        <div class="pump-card-list">
-            <!-- JavaScript 將會在這裡動態填入資訊卡 -->
+    <!-- ★ 空調控制彈出視窗 (HTML 結構已修改) -->
+    </main> <div id="ac-control-modal" class="modal-overlay">
+        <div class="ac-modal-content">
+            <button id="power-btn" class="power-btn" title="運轉開關">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <line x1="12" y1="2" x2="12" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <h3 id="ac-modal-title">--</h3>
+            <div class="ac-screen">
+                <div class="temp-display">
+                    <div>
+                        <div class="label">現在溫度</div>
+                        <div class="value"><span id="current-temp">--</span>°C</div>
+                    </div>
+                    <div>
+                        <div class="label">設定溫度</div>
+                        <div class="value"><span id="set-temp">--</span>°C</div>
+                    </div>
+                </div>
+                <div class="swing-display">
+                    <div class="swing-group">
+                        <div class="swing-label">左右風向</div>
+                        <div id="horizontal-swing-indicator" class="swing-indicator">
+                            <svg viewBox="0 0 60 60" width="60" height="60">
+                                <!-- 出風口底座 -->
+                                <rect x="28" y="43" width="4" height="6" fill="#58a6ff" opacity="0.8"/>
+                                
+                                <!-- 90度四分之一圓形扇形背景 -->
+                                <path d="M 30 45 L 5 45 A 25 25 0 0 1 30 20 Z" fill="#30363d" opacity="0.3"/>
+                                
+                                <!-- 五段風向指示條 - 從中心點發出，平均分配在90度中 -->
+                                <line class="blade" data-blade="left" x1="30" y1="45" x2="7.3" y2="37.3" stroke="#30363d" stroke-width="3" stroke-linecap="round"/>
+                                <line class="blade" data-blade="mid-left" x1="30" y1="45" x2="12.9" y2="27.9" stroke="#30363d" stroke-width="3" stroke-linecap="round"/>
+                                <line class="blade" data-blade="mid" x1="30" y1="45" x2="30" y2="20" stroke="#30363d" stroke-width="3" stroke-linecap="round"/>
+                                <line class="blade" data-blade="mid-right" x1="30" y1="45" x2="47.1" y2="27.9" stroke="#30363d" stroke-width="3" stroke-linecap="round"/>
+                                <line class="blade" data-blade="right" x1="30" y1="45" x2="52.7" y2="37.3" stroke="#30363d" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="swing-group">
+                        <div class="swing-label">上下風向</div>
+                        <div id="vertical-swing-indicator" class="swing-indicator">
+                            <svg viewBox="0 0 60 60" width="60" height="60">
+                                <!-- 出風口底座 -->
+                                <rect x="13" y="13" width="4" height="6" fill="#58a6ff" opacity="0.8"/>
+                                
+                                <!-- 90度四分之一圓形扇形背景（從水平往下90度） -->
+                                <path d="M 15 15 L 40 15 A 25 25 0 0 1 15 40 Z" fill="#30363d" opacity="0.3"/>
+                                
+                                <!-- 四段風向指示條 - 從中心點發出，從水平到垂直 -->
+                                <line class="blade" data-blade="pos1" x1="15" y1="15" x2="40" y2="15" stroke="#30363d" stroke-width="3" stroke-linecap="round"/>
+                                <line class="blade" data-blade="pos2" x1="15" y1="15" x2="32.68" y2="22.68" stroke="#30363d" stroke-width="3" stroke-linecap="round"/>
+                                <line class="blade" data-blade="pos3" x1="15" y1="15" x2="22.68" y2="32.68" stroke="#30363d" stroke-width="3" stroke-linecap="round"/>
+                                <line class="blade" data-blade="pos4" x1="15" y1="15" x2="15" y2="40" stroke="#30363d" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="controls-grid">
+                <div class="control-group">
+                    <span class="label">溫度</span>
+                    <div class="control-buttons">
+                        <button class="control-btn temp-down">-</button>
+                        <button class="control-btn temp-up">+</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <span class="label">左右風向</span>
+                    <div class="control-buttons">
+                        <button class="control-btn horizontal-swing-btn">↔</button>
+                    </div>
+                </div>                
+                <div class="control-group">
+                    <span class="label">上下風向</span>
+                    <div class="control-buttons">
+                        <button class="control-btn vertical-swing-btn">↕</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <span class="label">風速</span>
+                    <div class="control-buttons">
+                        <button class="fanspeed-btn" data-speed="自動">自動</button>
+                        <button class="fanspeed-btn" data-speed="弱">弱</button>
+                        <button class="fanspeed-btn" data-speed="中">中</button>
+                        <button class="fanspeed-btn" data-speed="強">強</button>
+                    </div>
+                </div>
+                <div class="control-group full-width">
+                    <span class="label">運轉模式</span>
+                    <div class="control-buttons">
+                        <button class="mode-btn" data-mode="冷氣">冷氣</button>
+                        <button class="mode-btn" data-mode="暖氣">暖氣</button>
+                        <button class="mode-btn" data-mode="送風">送風</button>
+                        <button class="mode-btn" data-mode="除濕">除濕</button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </aside>
+    </div>
 
     <script type="module">
         // --- 導入函式庫 ---
@@ -486,12 +680,10 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         const controls = new OrbitControls(camera, renderer.domElement);
         let model;                        
-        let monitoringPoints = [];        
+        let monitoringPoints = [];
+        let currentAcUnit = null;        
         
         const labelsContainer = document.getElementById('labels-container');
-        const infoPanel = document.getElementById('info-panel');
-        const infoPanelToggle = document.getElementById('info-panel-toggle');
-        const pumpCardList = infoPanel.querySelector('.pump-card-list');
         const datetimeContainer = document.getElementById('datetime-container');
         const menuToggleBtn = document.getElementById('menu-toggle-btn');
         const sidebarMenu = document.getElementById('sidebar-menu');
@@ -500,6 +692,15 @@
         const topViewBtn = document.getElementById('top-view-btn');
         const sideViewBtn = document.getElementById('side-view-btn');        
         const iconsContainer = document.getElementById('alarm-icons-container');
+        const acModal = document.getElementById('ac-control-modal');
+        const acModalTitle = document.getElementById('ac-modal-title');
+        const currentTempEl = document.getElementById('current-temp');
+        const setTempEl = document.getElementById('set-temp');
+        const powerBtn = document.getElementById('power-btn');
+        const tempUpBtn = acModal.querySelector('.temp-up');
+        const tempDownBtn = acModal.querySelector('.temp-down');
+        const horizontalSwingIndicator = document.getElementById('horizontal-swing-indicator');
+        const verticalSwingIndicator = document.getElementById('vertical-swing-indicator');
 
         const minDistance = 10, maxDistance = 80, minScale = 0.8, maxScale = 1.3;
 
@@ -540,19 +741,79 @@
                     scene.add(model);
                     console.log('模型載入成功！');
                     // 模型載入完成後立即執行一次狀態更新
-                    updatePlumbingStatus();
+                    updateACStatus(); 
                 },
                 undefined,
                 (error) => console.error(`模型載入失敗: ${modelPath}`, error)
             );
 
+            // 點擊 Modal 外部區域可關閉
+            acModal.addEventListener('click', (e) => {
+                if (e.target === acModal) {
+                    closeACControlModal();
+                }
+            });
+            // ★ 模式按鈕綁定事件
+            acModal.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (currentAcUnit) {
+                        sendModeCommand(currentAcUnit.id, btn.dataset.mode);
+                    }
+                });
+            });
+            // ★ 為電源按鈕綁定事件
+            powerBtn.addEventListener('click', () => {
+                if (currentAcUnit) {
+                    const newStatus = currentAcUnit.status === '運轉中' ? '停止' : '運轉中';
+                    sendPowerCommand(currentAcUnit.id, newStatus);
+                }
+            });
+            // ★ 為溫度控制按鈕綁定事件
+            tempUpBtn.addEventListener('click', () => {
+                if (currentAcUnit) {
+                    const newTemp = currentAcUnit.setTemperature + 1;
+                    sendTemperatureCommand(currentAcUnit.id, newTemp);
+                }
+            });
+            tempDownBtn.addEventListener('click', () => {
+                if (currentAcUnit) {
+                    const newTemp = currentAcUnit.setTemperature - 1;
+                    sendTemperatureCommand(currentAcUnit.id, newTemp);
+                }
+            });
+            // ★ 風速控制按鈕綁定事件
+            acModal.querySelectorAll('.fanspeed-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (currentAcUnit) {
+                        sendFanSpeedCommand(currentAcUnit.id, btn.dataset.speed);
+                    }
+                });
+            });
+            // ★ 風向控制按鈕綁定事件
+            acModal.querySelector('.horizontal-swing-btn').addEventListener('click', () => {
+                if (currentAcUnit) {
+                    const options = ['auto', 'left', 'mid-left', 'mid', 'mid-right', 'right'];
+                    const currentIndex = options.indexOf(currentAcUnit.horizontalSwing);
+                    const nextIndex = (currentIndex + 1) % options.length;
+                    sendSwingCommand(currentAcUnit.id, 'horizontal', options[nextIndex]);
+                }
+            });
+            acModal.querySelector('.vertical-swing-btn').addEventListener('click', () => {
+                if (currentAcUnit) {
+                    const options = ['auto', 'pos1', 'pos2', 'pos3', 'pos4'];
+                    const currentIndex = options.indexOf(currentAcUnit.verticalSwing);
+                    const nextIndex = (currentIndex + 1) % options.length;
+                    sendSwingCommand(currentAcUnit.id, 'vertical', options[nextIndex]);
+                }
+            });
+
+
             animate();
             setupEventListeners();
             updateDateTime();
             setInterval(updateDateTime, 1000);           
-            setInterval(updatePlumbingStatus, 4000);
-            // ★ 啟動彈出面板功能
-            setupInfoPanelToggle();
+            updateACStatus();
+            setInterval(updateACStatus, 3000);
         }
         
         // --- 動畫迴圈 ---
@@ -580,28 +841,15 @@
         }
 
         // --- 核心功能函式 ---
-        async function updatePlumbingStatus() {
+        async function updateACStatus() {
             try {
-                console.log('正在更新泵浦狀態...');
-                const response = await fetch('http://localhost:3000/api/plumbing/b3f');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
+                const response = await fetch('http://localhost:3000/api/ac/1f');
                 const latestData = await response.json();
-                console.log('收到 API 資料:', latestData);
 
-                // 處理資料更新
                 latestData.forEach(newPoint => {
                     const existingPoint = monitoringPoints.find(p => p.id === newPoint.id);
                     if (existingPoint) {
-                        // 更新所有屬性，不只是 status
-                        existingPoint.status = newPoint.status;
-                        existingPoint.powerConsumption = newPoint.powerConsumption;
-                        existingPoint.waterLevel = newPoint.waterLevel;
-                        existingPoint.locationName = newPoint.locationName;
-                        
+                        Object.assign(existingPoint, newPoint);
                         if (existingPoint.element) {
                             updateLabelAppearance(existingPoint);
                         }
@@ -609,77 +857,13 @@
                         monitoringPoints.push({ ...newPoint, name: newPoint.name, targetObject: null, element: null });
                     }
                 });
-                
-                // ★ 更新資訊卡視圖
-                updateInfoCards(monitoringPoints);
 
                 if (model) {
                     bindObjectsToPoints();
                 }
-                
-                console.log('泵浦狀態更新完成，當前監控點數量:', monitoringPoints.length);
-
             } catch (error) {
-                console.error("API 連接失敗:", error);
-                // 顯示連線錯誤
-                showConnectionError();
-                
-                if (error.message.includes('fetch')) {
-                    console.warn('API 伺服器可能未啟動，請檢查 localhost:3000 是否正常運行');
-                }
+                console.error("更新空調狀態失敗:", error);
             }
-        }
-
-        // 顯示連線錯誤的函數
-        function showConnectionError() {
-            pumpCardList.innerHTML = `
-                <div class="pump-card" style="text-align: center; padding: 40px;">
-                    <div style="color: #e74c3c; font-size: 18px; font-weight: bold; margin-bottom: 10px;">
-                        ❌ 連線錯誤
-                    </div>
-                    <div style="color: #8b949e; font-size: 14px;">
-                        無法連接到 API 伺服器<br>
-                        請檢查伺服器是否正常運行
-                    </div>
-                </div>
-            `;
-        }
-
-        // ★ 新增：更新資訊卡畫面的函式
-        function updateInfoCards(points) {
-            pumpCardList.innerHTML = ''; // 清空舊卡片
-            points.forEach(point => {
-                const card = document.createElement('div');
-                card.className = 'pump-card';
-                const statusClass = point.status === '運轉中' ? 'status-running' : (point.status === '故障' ? 'status-fault' : 'status-stopped');
-                const waterLevelColor = point.waterLevel === '高高' ? '#e74c3c' : (point.waterLevel === '高' ? '#f1c40f' : '#3498db');
-                card.innerHTML = `
-                    <div class="pump-card-header">
-                        <div class="pump-card-title">${point.locationName}</div>
-                        <div class="pump-card-status ${statusClass}">${point.status}</div>
-                    </div>
-                    <div class="pump-card-body">
-                        <div class="pump-data-item">
-                            <div class="label">即時耗電量</div>
-                            <div class="value">${Number(point.powerConsumption).toFixed(2)} kW</div>
-                        </div>
-                        <div class="pump-data-item">
-                            <div class="label">目前水位</div>
-                            <div class="value" style="color: ${waterLevelColor};">${point.waterLevel}</div>
-                        </div>
-                    </div>
-                `;
-                pumpCardList.appendChild(card);
-            });
-        }
-
-        // ★ 新增：設定彈出面板的事件
-        function setupInfoPanelToggle() {
-            infoPanelToggle.addEventListener('click', () => {
-                infoPanel.classList.toggle('open');
-                infoPanelToggle.classList.toggle('open');
-                infoPanelToggle.innerHTML = infoPanel.classList.contains('open') ? '›' : '‹';
-            });
         }
 
         function bindObjectsToPoints() {
@@ -688,7 +872,7 @@
                 const point = monitoringPoints.find(p => p.name === object.name && !p.targetObject);
                 if (point) {
                     point.targetObject = object;
-                    console.log(`成功綁定泵浦物件: ${point.locationName} (name: ${object.name})`);
+                    console.log(`成功綁定空調物件: ${point.locationName} (name: ${object.name})`);
                     if (!point.element) {
                         createLabelForPoint(point);
                     }
@@ -698,62 +882,268 @@
 
         function createLabelForPoint(point) {
             const label = document.createElement('div');
-            label.innerHTML = `
-                <div class="pump-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2Z" stroke="white" stroke-width="2" stroke-opacity="0.5"/><path d="M12 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M12 18V22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M5.63604 5.63603L8.46447 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M15.5355 15.5355L18.364 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M2 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18 12H22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18.364 5.63603L15.5355 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M8.46447 15.5355L5.63604 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
-                </div>
-                <div class="pump-details">
-                    <span class="location-name">${point.locationName}</span>: <span class="status">${point.status}</span>
-                </div>
-            `;
             labelsContainer.appendChild(label);
             point.element = label;
             updateLabelAppearance(point);
 
             label.addEventListener('click', (event) => {
                 event.stopPropagation();
-                toggleLabel(point);
+                openACControlModal(point);
             });
         }
 
         function updateLabelAppearance(point) {
             if (!point.element) return;
             
-            // 先更新狀態文字
-            const statusSpan = point.element.querySelector('.status');
-            if (statusSpan) {
-                statusSpan.textContent = point.status;
+            let content = '';
+            let className = 'status-label';            
+            const fanSVG = `<svg class="ac-fan" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                <g transform="translate(12,12)">
+                    <path d="M0,-8 Q2,-6 4,-4 Q2,-2 0,-2 Q-2,-4 -4,-6 Q-2,-8 0,-8 Z" fill="white" opacity="0.9" transform="rotate(0)"/>
+                    <path d="M0,-8 Q2,-6 4,-4 Q2,-2 0,-2 Q-2,-4 -4,-6 Q-2,-8 0,-8 Z" fill="white" opacity="0.9" transform="rotate(120)"/>
+                    <path d="M0,-8 Q2,-6 4,-4 Q2,-2 0,-2 Q-2,-4 -4,-6 Q-2,-8 0,-8 Z" fill="white" opacity="0.9" transform="rotate(240)"/>
+                    <circle cx="0" cy="0" r="1.5" fill="white"/>
+                </g>
+            </svg>`;
+
+            if (point.status === '故障') {
+                className += ' status-fault';
+                content = `<div class="fault-icon">!</div>`;
+            } else if (point.status === '停止') {
+                className += ' status-stopped';
+                content = fanSVG;
+            } else { // 運轉中
+                // 根據風速決定動畫速度
+                let speedClass = 'speed-auto'; // 預設為自動
+                if (point.fanSpeed === '弱') speedClass = 'speed-weak';
+                if (point.fanSpeed === '中') speedClass = 'speed-medium';
+                if (point.fanSpeed === '強') speedClass = 'speed-strong';
+
+                const fanRunningSVG = fanSVG.replace('<svg class="ac-fan"', `<svg class="ac-fan is-running ${speedClass}"`);
+                content = fanRunningSVG;
+                switch (point.mode) {
+                    case '冷氣': className += ' status-cooling'; break;
+                    case '暖氣': className += ' status-heating'; break;
+                    case '送風': className += ' status-ventilating'; break;
+                    case '除濕': className += ' status-dehumidifying'; break;
+                    default: className += ' status-ventilating'; break;
+                }
             }
+            point.element.className = className;
+            point.element.innerHTML = content;
+        }
+
+        // ★ 彈出視窗相關函式
+        function openACControlModal(unitData) {
+            currentAcUnit = unitData; // ★ 儲存當前空調的數據
+            acModalTitle.textContent = unitData.locationName;
+            currentTempEl.textContent = unitData.currentTemperature.toFixed(1);
+            setTempEl.textContent = unitData.setTemperature;
             
-            const iconDiv = point.element.querySelector('.pump-icon');
-            
-            switch (point.status) {
-                case '運轉中':
-                    point.element.className = 'status-label status-running';
-                    // 確保有 SVG 圖示
-                    if (!iconDiv.querySelector('svg')) {
-                        iconDiv.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2Z" stroke="white" stroke-width="2" stroke-opacity="0.5"/><path d="M12 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M12 18V22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M5.63604 5.63603L8.46447 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M15.5355 15.5355L18.364 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M2 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18 12H22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18.364 5.63603L15.5355 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M8.46447 15.5355L5.63604 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
-                    }
-                    iconDiv.classList.add('is-running');
-                    break;
-                case '故障':
-                    point.element.className = 'status-label status-fault pulsing';
-                    iconDiv.innerHTML = `<div class="fault-icon">!</div>`;
-                    iconDiv.classList.remove('is-running');
-                    break;
-                case '停止':
-                default:
-                    point.element.className = 'status-label status-stopped';
-                    // 如果是從故障切換回來，需要還原 SVG
-                    if (!iconDiv.querySelector('svg')) {
-                        iconDiv.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2Z" stroke="white" stroke-width="2" stroke-opacity="0.5"/><path d="M12 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M12 18V22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M5.63604 5.63603L8.46447 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M15.5355 15.5355L18.364 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M2 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18 12H22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18.364 5.63603L15.5355 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M8.46447 15.5355L5.63604 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
-                    }
-                    iconDiv.classList.remove('is-running');
-                    break;
+            // 更新模式按鈕的亮起狀態
+            acModal.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === unitData.mode);
+            });
+            // ★ 更新風速按鈕的亮起狀態
+            acModal.querySelectorAll('.fanspeed-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.speed === unitData.fanSpeed);
+            });
+
+            powerBtn.classList.toggle('active', unitData.status === '運轉中');
+
+            // 更新風向圖示
+            updateSwingIndicatorUI(horizontalSwingIndicator, unitData.horizontalSwing);
+            updateSwingIndicatorUI(verticalSwingIndicator, unitData.verticalSwing);
+
+            acModal.classList.add('visible');
+        }
+
+        function closeACControlModal() {
+            acModal.classList.remove('visible');
+            currentAcUnit = null; // ★ 清除當前空調
+        }
+
+        // ★ 發送模式切換指令的函式
+        async function sendModeCommand(acId, newMode) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/ac/1f/${acId}/mode`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: newMode })
+                });
+                if (!response.ok) {
+                    throw new Error('模式切換失敗');
+                }
+                
+                // ★ 關鍵修正：直接使用後端返回的最新數據來更新 UI
+                const updatedUnitData = await response.json();
+                
+                // 1. 更新本地數據陣列中的資料
+                const pointToUpdate = monitoringPoints.find(p => p.id === acId);
+                if (pointToUpdate) {
+                    Object.assign(pointToUpdate, updatedUnitData);
+                }
+
+                // 2. 更新 3D 標籤的外觀
+                updateLabelAppearance(pointToUpdate);
+                
+                // 3. 更新彈出視窗的內容 (包括按鈕高亮)
+                if (currentAcUnit && currentAcUnit.id === acId) {
+                    currentAcUnit = pointToUpdate;
+                    // 直接更新模式按鈕的亮起狀態
+                    acModal.querySelectorAll('.mode-btn').forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.mode === currentAcUnit.mode);
+                    });
+                }
+
+            } catch (error) {
+                console.error("發送模式指令失敗:", error);                
+                updateACStatus();
             }
         }
 
-        
+        // 發送開關機指令的函式
+        async function sendPowerCommand(acId, newStatus) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/ac/1f/${acId}/status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (!response.ok) {
+                    throw new Error('開關機失敗');
+                }
+                
+                const updatedUnitData = await response.json();
+                
+                // 更新本地數據和 UI
+                const pointToUpdate = monitoringPoints.find(p => p.id === acId);
+                if (pointToUpdate) {
+                    Object.assign(pointToUpdate, updatedUnitData);
+                }
+                updateLabelAppearance(pointToUpdate);
+                if (currentAcUnit && currentAcUnit.id === acId) {
+                    currentAcUnit = pointToUpdate;
+                    powerBtn.classList.toggle('active', currentAcUnit.status === '運轉中');
+                }
+
+            } catch (error) {
+                console.error("發送開關機指令失敗:", error);
+                updateACStatus(); // 如果失敗，觸發一次完整更新來同步
+            }
+        }
+        // ★ 發送溫度調整指令的函式
+        async function sendTemperatureCommand(acId, newTemp) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/ac/1f/${acId}/temperature`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ temperature: newTemp })
+                });
+                if (!response.ok) {
+                    throw new Error('溫度設定失敗');
+                }
+                
+                const updatedUnitData = await response.json();
+                
+                // 更新本地數據陣列中的資料
+                const pointToUpdate = monitoringPoints.find(p => p.id === acId);
+                if (pointToUpdate) {
+                    Object.assign(pointToUpdate, updatedUnitData);
+                }
+                
+                // 更新彈出視窗的內容
+                if (currentAcUnit && currentAcUnit.id === acId) {
+                    currentAcUnit = pointToUpdate;
+                    // 只更新設定溫度的顯示，提供即時反饋
+                    setTempEl.textContent = currentAcUnit.setTemperature;
+                }
+
+            } catch (error) {
+                console.error("發送溫度指令失敗:", error);
+                // 如果失敗，觸發一次完整更新來同步狀態
+                updateACStatus();
+            }
+        }     
+        // ★ 發送風速調整指令的函式
+        async function sendFanSpeedCommand(acId, newSpeed) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/ac/1f/${acId}/fanspeed`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fanSpeed: newSpeed })
+                });
+                if (!response.ok) {
+                    throw new Error('風速設定失敗');
+                }
+                
+                const updatedUnitData = await response.json();
+                
+                const pointToUpdate = monitoringPoints.find(p => p.id === acId);
+                if (pointToUpdate) {
+                    Object.assign(pointToUpdate, updatedUnitData);
+                }
+                
+                if (currentAcUnit && currentAcUnit.id === acId) {
+                    currentAcUnit = pointToUpdate;
+                    acModal.querySelectorAll('.fanspeed-btn').forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.speed === currentAcUnit.fanSpeed);
+                    });
+                }
+
+            } catch (error) {
+                console.error("發送風速指令失敗:", error);
+                updateACStatus();
+            }
+        }
+        // ★ 單個風向圖示的輔助函式
+        function updateSwingIndicatorUI(indicatorElement, position) {
+            indicatorElement.classList.remove('swing-auto');
+            // 修正：針對line元素而非path元素
+            indicatorElement.querySelectorAll('line.blade').forEach(blade => {
+                blade.classList.remove('active');
+            });
+
+            if (position === 'auto') {
+                indicatorElement.classList.add('swing-auto');
+            } else {
+                const activeBlade = indicatorElement.querySelector(`line[data-blade="${position}"]`);
+                if (activeBlade) {
+                    activeBlade.classList.add('active');
+                }
+            }
+        }
+        // ★ 發送風向調整指令的函式
+        async function sendSwingCommand(acId, type, value) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/ac/1f/${acId}/swing`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, value })
+                });
+                if (!response.ok) {
+                    throw new Error('風向設定失敗');
+                }
+                
+                const updatedUnitData = await response.json();
+                
+                const pointToUpdate = monitoringPoints.find(p => p.id === acId);
+                if (pointToUpdate) {
+                    Object.assign(pointToUpdate, updatedUnitData);
+                }
+                
+                if (currentAcUnit && currentAcUnit.id === acId) {
+                    currentAcUnit = pointToUpdate;
+                    updateSwingIndicatorUI(horizontalSwingIndicator, currentAcUnit.horizontalSwing);
+                    updateSwingIndicatorUI(verticalSwingIndicator, currentAcUnit.verticalSwing);
+                }
+
+            } catch (error) {
+                console.error("發送風向指令失敗:", error);
+                updateACStatus();
+            }
+        }
+       
         function toggleLabel(clickedPoint) {
             const wasExpanded = clickedPoint.element.classList.contains('expanded');
             monitoringPoints.forEach(p => {
