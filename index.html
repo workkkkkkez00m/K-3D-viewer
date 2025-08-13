@@ -452,7 +452,7 @@
         async function updateInfoPanel() {
             try {
                 // 使用 HTTPS 協議連接 Render 靜態出站 IP
-                const response = await fetch('https://100.20.92.101');
+                const response = await fetch('https://bms-backend-server1.onrender.com');
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
