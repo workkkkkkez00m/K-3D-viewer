@@ -31,8 +31,21 @@
         #sidebar-menu li a { display: block; color: #ecf0f1; text-decoration: none; padding: 15px 10px; border-radius: 4px; transition: background-color 0.2s; }
         #sidebar-menu li a:hover { background-color: #34495e; }
         #close-menu-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: white; font-size: 30px; font-weight: bold; line-height: 1; cursor: pointer; }
-        #sidebar-menu .system-category > a { font-weight: bold; background-color: #1bdbed; color: white; }
-        #sidebar-menu .system-category > a::after { content: '▼'; float: right; transition: transform 0.3s; }
+        #sidebar-menu .system-category > a { 
+            font-weight: bold; 
+            background-color: #1bdbed; 
+            color: white; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding-right: 15px; /* 給箭頭留出空間 */
+        }
+        #sidebar-menu .system-category > a::after { 
+            content: '▼'; 
+            transition: transform 0.3s; 
+            flex-shrink: 0; /* 防止箭頭被壓縮 */
+            margin-left: 8px; /* 與文字保持間距 */
+        }
         #sidebar-menu .system-category.active > a::after { transform: rotate(180deg); }
         #sidebar-menu ul::-webkit-scrollbar {
             width: 8px;
@@ -982,7 +995,7 @@
                 </ul>
             </li>   
             <li class="system-category">
-                <a href="#">空調控制系統</a>
+                <a href="#" data-i18n="systemAirConditioning">空調控制系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../air_conditioning_control/1f.html">1F</a></li>
                 </ul>
@@ -1041,6 +1054,7 @@
                     systemFire: '消防火警系統',
                     systemPlumbing: '給排水系統',
                     systemParking: '停車管理系統',
+                    systemAirConditioning: '空調控制系統',
                     backToHome: '‹ 回首頁',
                     emergencyCall: '緊急呼叫',
                     runStatus: '運轉狀態',
@@ -1098,6 +1112,7 @@
                     systemFire: 'Fire Alarm System',
                     systemPlumbing: 'Plumbing System',
                     systemParking: 'Parking System',
+                    systemAirConditioning: 'Air Conditioning Control',
                     backToHome: '‹ Back to Home',
                     emergencyCall: 'Emergency Call',
                     runStatus: 'Run Status',
@@ -1154,6 +1169,7 @@
                     systemFire: '火災警報',
                     systemPlumbing: '給排水システム',
                     systemParking: '駐車場管理',
+                    systemAirConditioning: '空調制御システム',
                     backToHome: '‹ ホームに戻る',
                     emergencyCall: '緊急呼び出し',
                     runStatus: '運転状態',
@@ -1210,6 +1226,7 @@
                     systemFire: '消防火警系统',
                     systemPlumbing: '给排水系统',
                     systemParking: '停车管理系统',
+                    systemAirConditioning: '空调控制系统',
                     backToHome: '‹ 返回首页',
                     emergencyCall: '紧急呼叫',
                     runStatus: '运转状态',
@@ -1944,7 +1961,7 @@
         });
     </script>
     <footer id="page-footer">
-        <span>v1.3.0</span> | <span>Copyright © 2025 KL </span>
+        <span>v1.3.1</span> | <span>Copyright © 2025 KL </span>
     </footer>
 </body>
 </html>

@@ -62,16 +62,20 @@
             color: white; font-size: 30px; font-weight: bold; line-height: 1; cursor: pointer;
         }
         /* 系統分類的樣式 */
-        #sidebar-menu .system-category > a {
-            font-weight: bold;
-            background-color: #1bdbed; /* 系統分類底色 */
-            color: white;
+        #sidebar-menu .system-category > a { 
+            font-weight: bold; 
+            background-color: #1bdbed; 
+            color: white; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding-right: 15px; /* 給箭頭留出空間 */
         }
-        /* 在分類後方加上一個箭頭圖示 */
-        #sidebar-menu .system-category > a::after {
-            content: '▼';
-            float: right;
-            transition: transform 0.3s;
+        #sidebar-menu .system-category > a::after { 
+            content: '▼'; 
+            transition: transform 0.3s; 
+            flex-shrink: 0; /* 防止箭頭被壓縮 */
+            margin-left: 8px; /* 與文字保持間距 */
         }
         /* 當分類被展開時，讓箭頭朝上 */
         #sidebar-menu .system-category.active > a::after {
@@ -619,7 +623,7 @@
 
     </script>
     <footer id="page-footer">
-        <span>v1.3.0</span> | <span>Copyright © 2025 KL </span>
+        <span>v1.3.1</span> | <span>Copyright © 2025 KL </span>
     </footer>
 </body>
 </html>

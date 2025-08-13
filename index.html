@@ -43,6 +43,18 @@
             padding-bottom: 15px;
             margin-top: 0;
             flex-shrink: 0;
+            transition: font-size 0.3s ease; /* 平滑的字體大小變化 */
+        }
+
+        /* 英語和日語的字體縮小設定 */
+        html[lang="en"] #ui-panel h1,
+        html[lang="ja"] #ui-panel h1 {
+            font-size: 28px; /* 縮小字體以適應較長的文字 */
+        }
+
+        /* 簡體中文稍微縮小 */
+        html[lang="zh-Hans"] #ui-panel h1 {
+            font-size: 32px;
         }
 
         #ui-panel p {
@@ -51,6 +63,19 @@
             line-height: 1.6;
             flex-shrink: 0;
             margin-bottom: 30px;
+            transition: font-size 0.3s ease; /* 平滑的字體大小變化 */
+        }
+
+        /* 英語的說明文字稍微縮小 */
+        html[lang="en"] #ui-panel p {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* 日語的說明文字稍微縮小 */
+        html[lang="ja"] #ui-panel p {
+            font-size: 15px;
+            line-height: 1.5;
         }
 
         /* --- ★★★ 系統按鈕與選單容器 ★★★ --- */
@@ -78,6 +103,20 @@
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
+            white-space: nowrap; /* 防止文字換行 */
+            overflow: hidden; /* 隱藏溢出文字 */
+            text-overflow: ellipsis; /* 顯示省略號 */
+        }
+
+        /* 英語按鈕文字縮小 */
+        html[lang="en"] .system-btn {
+            font-size: 16px;
+            padding: 12px 15px; /* 稍微減少內邊距 */
+        }
+
+        /* 日語按鈕文字稍微縮小 */
+        html[lang="ja"] .system-btn {
+            font-size: 17px;
         }
 
         .system-btn:hover {
@@ -201,26 +240,66 @@
             -webkit-user-select: none;
         }
 
+        /* --- 語言選擇器樣式 --- */
+        #language-selector-container {
+            position: fixed;
+            top: 30px;
+            right: 20px;
+            z-index: 100;
+            background-color: rgba(32, 45, 62, 0);
+            border: 1px solid #9fa6b200;
+            border-radius: 8px;
+            padding: 8px;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        #language-selector {
+            background-color: #47637e;
+            color: #ecf0f1;
+            border: 1px solid #465a70;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            min-width: 60px; /* 最小寬度 */
+            max-width: 100px; /* 最大寬度 */
+            width: auto; /* 根據內容自動調整 */
+        }
+
+        #language-selector:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+
     </style>
 </head>
 <body>
 
     <div id="scene-container">
+        <div id="language-selector-container">
+            <select id="language-selector">
+                <option value="zh-TW">繁體中文</option>
+                <option value="en">English</option>
+                <option value="ja">日本語</option>
+                <option value="zh-CN">简体中文</option>
+            </select>
+        </div>
         <div id="info-panel">
             <div class="info-card">
-                <div class="info-title">環境溫溼度</div>
+                <div class="info-title" data-i18n="envTempHumidity">環境溫溼度</div>
                 <div class="info-value">
                     <span id="info-temp">--</span>°C / <span id="info-humidity">--</span>%
                 </div>
             </div>
             <div class="info-card">
-                <div class="info-title">目前用電量</div>
+                <div class="info-title" data-i18n="currentPowerUsage">目前用電量</div>
                 <div class="info-value">
                     <span id="info-power">--</span> kW
                 </div>
             </div>
             <div class="info-card">
-                <div class="info-title">本日碳排放量</div>
+                <div class="info-title" data-i18n="todayCarbonEmission">本日碳排放量</div>
                 <div class="info-value">
                     <span id="info-carbon">--</span> kg CO₂e
                 </div>
@@ -231,21 +310,21 @@
 
 
     <div id="ui-panel">    
-        <h1>智慧中央監控系統</h1>
-        <p>請選擇您要檢視的子系統，以進入對應樓層的 3D 監控畫面。</p>
+        <h1 data-i18n="mainTitle">智慧中央監控系統</h1>
+        <p data-i18n="mainDescription">請選擇您要檢視的子系統，以進入對應樓層的 3D 監控畫面。</p>
         
         <div id="system-buttons">
 
             <div class="system-menu-container">
-                <button class="system-btn" data-link="./energy/index.html">能源管理儀表板</button>
+                <button class="system-btn" data-link="./energy/index.html" data-i18n="dashboardEnergy">能源管理儀表板</button>
             </div>
 
             <div class="system-menu-container">
-                <button class="system-btn" data-link="./elevator_management/index.html">電梯監控系統</button>
+                <button class="system-btn" data-link="./elevator_management/index.html" data-i18n="dashboardElevator">電梯監控系統</button>
             </div>
 
             <div class="system-menu-container">
-                <button class="system-btn" data-menu="theft-menu">防盜及求救系統</button>
+                <button class="system-btn" data-menu="theft-menu" data-i18n="systemTheft">防盜及求救系統</button>
                 <ul id="theft-menu" class="floor-dropdown-menu">
                     <li><a href="./theft_prevention/1f.html">1F</a></li>
                     <li><a href="./theft_prevention/2f.html">2F</a></li>
@@ -255,7 +334,7 @@
                 </ul>
             </div>
             <div class="system-menu-container">
-                <button class="system-btn" data-menu="cctv-menu">攝影監視系統</button>
+                <button class="system-btn" data-menu="cctv-menu" data-i18n="systemCCTV">攝影監視系統</button>
                 <ul id="cctv-menu" class="floor-dropdown-menu">
                     <li><a href="./cctv/1f.html">1F</a></li>
                     <li><a href="./cctv/2f.html">2F</a></li>
@@ -265,7 +344,7 @@
                     </ul>
             </div>
             <div class="system-menu-container">
-                <button class="system-btn" data-menu="access-menu">門禁保全系統</button>
+                <button class="system-btn" data-menu="access-menu" data-i18n="systemAccess">門禁保全系統</button>
                 <ul id="access-menu" class="floor-dropdown-menu">
                     <li><a href="./access_control/1f.html">1F</a></li>
                     <li><a href="./access_control/2f.html">2F</a></li>
@@ -275,7 +354,7 @@
                 </ul>
             </div>
             <div class="system-menu-container">
-                <button class="system-btn" data-menu="intercom-menu">影像對講系統</button>
+                <button class="system-btn" data-menu="intercom-menu" data-i18n="systemIntercom">影像對講系統</button>
                 <ul id="intercom-menu" class="floor-dropdown-menu">
                     <li><a href="./video_intercom/1f.html">1F</a></li>
                     <li><a href="./video_intercom/2f.html">2F</a></li>
@@ -285,7 +364,7 @@
                 </ul>                      
             </div>
             <div class="system-menu-container">
-                <button class="system-btn" data-menu="fire-alarm-menu">消防火警系統</button>
+                <button class="system-btn" data-menu="fire-alarm-menu" data-i18n="systemFire">消防火警系統</button>
                 <ul id="fire-alarm-menu" class="floor-dropdown-menu">
                     <li><a href="./fire_alarm/1f.html">1F</a></li>
                     <li><a href="./fire_alarm/2f.html">2F</a></li>
@@ -295,13 +374,13 @@
                 </ul>
             </div>
             <div class="system-menu-container">
-                <button class="system-btn" data-menu="plumbing_drainage-menu">給排水系統</button>
+                <button class="system-btn" data-menu="plumbing_drainage-menu" data-i18n="systemPlumbing">給排水系統</button>
                 <ul id="plumbing_drainage-menu" class="floor-dropdown-menu">
                     <li><a href="./plumbing_drainage/b3f.html">B3F</a></li>                    
                 </ul>
             </div>
             <div class="system-menu-container">
-                <button class="system-btn" data-menu="parking-management-menu">停車管理系統</button>
+                <button class="system-btn" data-menu="parking-management-menu" data-i18n="systemParking">停車管理系統</button>
                 <ul id="parking-management-menu" class="floor-dropdown-menu">
                     <li><a href="./parking_management/b1f.html">B1F</a></li> 
                     <li><a href="./parking_management/b2f.html">B2F</a></li> 
@@ -309,7 +388,7 @@
                 </ul>
             </div>
             <div class="system-menu-container">
-                <button class="system-btn" data-menu="ac-menu">空調控制系統</button>
+                <button class="system-btn" data-menu="ac-menu" data-i18n="systemAirConditioning">空調控制系統</button>
                 <ul id="ac-menu" class="floor-dropdown-menu">
                     <li><a href="./air_conditioning_control/1f.html">1F</a></li>
                 </ul>
@@ -435,10 +514,137 @@
         });
 
         setInterval(updateInfoPanel, 5000);
+        updateInfoPanel(); // 立即執行一次
+
+        // --- 多國語言功能 ---
+        const translations = {
+            'zh-TW': {
+                pageTitle: '智慧住宅 - 系統總覽',
+                mainTitle: '智慧中央監控系統',
+                mainDescription: '請選擇您要檢視的子系統，以進入對應樓層的 3D 監控畫面。',
+                envTempHumidity: '環境溫溼度',
+                currentPowerUsage: '目前用電量',
+                todayCarbonEmission: '本日碳排放量',
+                dashboardEnergy: '能源管理儀表板',
+                dashboardElevator: '電梯監控系統',
+                systemTheft: '防盜及求救系統',
+                systemCCTV: '攝影監視系統',
+                systemAccess: '門禁保全系統',
+                systemIntercom: '影像對講系統',
+                systemFire: '消防火警系統',
+                systemPlumbing: '給排水系統',
+                systemParking: '停車管理系統',
+                systemAirConditioning: '空調控制系統'
+            },
+            'en': {
+                pageTitle: 'Smart Housing - System Overview',
+                mainTitle: 'Smart Central Monitoring System',
+                mainDescription: 'Please select the subsystem you want to view to enter the corresponding floor\'s 3D monitoring interface.',
+                envTempHumidity: 'Environment Temp/Humidity',
+                currentPowerUsage: 'Current Power Usage',
+                todayCarbonEmission: 'Today\'s Carbon Emission',
+                dashboardEnergy: 'Energy Management Dashboard',
+                dashboardElevator: 'Elevator Monitoring System',
+                systemTheft: 'Security & Emergency System',
+                systemCCTV: 'CCTV Surveillance System',
+                systemAccess: 'Access Control System',
+                systemIntercom: 'Video Intercom System',
+                systemFire: 'Fire Alarm System',
+                systemPlumbing: 'Plumbing & Drainage System',
+                systemParking: 'Parking Management System',
+                systemAirConditioning: 'Air Conditioning Control System'
+            },
+            'ja': {
+                pageTitle: 'スマート住宅 - システム概要',
+                mainTitle: 'スマート中央監視システム',
+                mainDescription: '確認したいサブシステムを選択して、対応するフロアの3D監視画面に入ってください。',
+                envTempHumidity: '環境温湿度',
+                currentPowerUsage: '現在の電力使用量',
+                todayCarbonEmission: '本日の炭素排出量',
+                dashboardEnergy: 'エネルギー管理ダッシュボード',
+                dashboardElevator: 'エレベーター監視システム',
+                systemTheft: '防犯・緊急システム',
+                systemCCTV: '監視カメラシステム',
+                systemAccess: 'アクセス制御システム',
+                systemIntercom: 'ビデオインターホンシステム',
+                systemFire: '火災警報システム',
+                systemPlumbing: '給排水システム',
+                systemParking: '駐車場管理システム',
+                systemAirConditioning: '空調制御システム'
+            },
+            'zh-CN': {
+                pageTitle: '智慧住宅 - 系统总览',
+                mainTitle: '智慧中央监控系统',
+                mainDescription: '请选择您要查看的子系统，以进入对应楼层的3D监控界面。',
+                envTempHumidity: '环境温湿度',
+                currentPowerUsage: '目前用电量',
+                todayCarbonEmission: '本日碳排放量',
+                dashboardEnergy: '能源管理仪表板',
+                dashboardElevator: '电梯监控系统',
+                systemTheft: '防盗及求救系统',
+                systemCCTV: '摄影监控系统',
+                systemAccess: '门禁保全系统',
+                systemIntercom: '影像对讲系统',
+                systemFire: '消防火警系统',
+                systemPlumbing: '给排水系统',
+                systemParking: '停车管理系统',
+                systemAirConditioning: '空调控制系统'
+            }
+        };
+
+        let currentLanguage = 'zh-TW';
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('preferredLanguage', lang);
+            
+            // 設置適當的HTML語言屬性對應
+            const langMap = {
+                'zh-TW': 'zh-Hant',
+                'zh-CN': 'zh-Hans', 
+                'en': 'en',
+                'ja': 'ja'
+            };
+            
+            // 更新HTML的lang屬性
+            document.documentElement.setAttribute('lang', langMap[lang] || 'zh-Hant');
+            
+            // 更新頁面標題
+            if (translations[lang] && translations[lang].pageTitle) {
+                document.title = translations[lang].pageTitle;
+            }
+            
+            // 翻譯所有帶有data-i18n的元素
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+        }
+
+        function initI18n() {
+            const languageSelector = document.getElementById('language-selector');
+            const savedLang = localStorage.getItem('preferredLanguage');
+            
+            if (savedLang && translations[savedLang]) {
+                languageSelector.value = savedLang;
+                setLanguage(savedLang);
+            } else {
+                setLanguage('zh-TW');
+            }
+            
+            languageSelector.addEventListener('change', (e) => {
+                setLanguage(e.target.value);
+            });
+        }
+
+        // 初始化多國語言功能
+        initI18n();
 
     </script>
     <footer id="page-footer">
-        <span>v1.3.0</span> | <span>Copyright © 2025 KL </span>
+        <span>v1.3.1</span> | <span>Copyright © 2025 KL </span>
     </footer>
 </body>
 </html>

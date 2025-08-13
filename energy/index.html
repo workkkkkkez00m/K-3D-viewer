@@ -13,6 +13,7 @@
     <style>
         /* --- 基礎樣式 --- */
         body { margin: 0; font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif; overflow: hidden; background-color: #0d1117; color: #c9d1d9; }
+        canvas { display: block; }
 
         /* --- 框架 UI 樣式  --- */
         #top-banner {
@@ -48,21 +49,28 @@
         #sidebar-menu .system-category {
             margin-bottom: 20px;
         }
+        #sidebar-menu .system-category:first-child {
+            margin-top: 20px; /* 只有第一個按鈕上方有 20px 間距 */
+        }
         #close-menu-btn {
             position: absolute; top: 15px; right: 15px; background: none; border: none;
             color: white; font-size: 30px; font-weight: bold; line-height: 1; cursor: pointer;
         }
         /* 系統分類的樣式 */
-        #sidebar-menu .system-category > a {
-            font-weight: bold;
-            background-color: #1bdbed; /* 系統分類底色 */
-            color: white;
+        #sidebar-menu .system-category > a { 
+            font-weight: bold; 
+            background-color: #1bdbed; 
+            color: white; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding-right: 15px; /* 給箭頭留出空間 */
         }
-        /* 在分類後方加上一個箭頭圖示 */
-        #sidebar-menu .system-category > a::after {
-            content: '▼';
-            float: right;
-            transition: transform 0.3s;
+        #sidebar-menu .system-category > a::after { 
+            content: '▼'; 
+            transition: transform 0.3s; 
+            flex-shrink: 0; /* 防止箭頭被壓縮 */
+            margin-left: 8px; /* 與文字保持間距 */
         }
         /* 當分類被展開時，讓箭頭朝上 */
         #sidebar-menu .system-category.active > a::after {
@@ -80,7 +88,7 @@
         }
         #sidebar-menu ul::-webkit-scrollbar-thumb:hover {
          background-color: #838b94;
-        }        
+        }                
         /* 回首頁按鈕的樣式 - 與 cctv/1f.html 保持一致 */
         #back-to-home-btn {
             margin-top: 20px; /* 與上方選單產生間距 */
@@ -512,13 +520,55 @@
         #sidebar-menu li a[href*="energy"] {
             margin-bottom: 20px;
         }
+        /* ★★★ 語言選擇器樣式 ★★★ */      
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 50px;
+            border-bottom: 1px solid #728aa2;
+            padding-bottom: 10px;
+        }
+        #sidebar-menu h2 {
+            color: white;
+            margin: 0; /* 移除舊的邊距和邊框 */
+            padding: 0;
+            border: none;
+            font-size: 18px; /* 預設字體大小 */
+            white-space: nowrap; /* 防止換行 */
+            overflow: hidden; /* 隱藏溢出內容 */
+            text-overflow: ellipsis; /* 如果必要時顯示省略號 */
+            transition: font-size 0.3s ease; /* 平滑的字體大小變化 */
+        }
+        
+        /* 英語和日語的字體縮小設定 */
+        html[lang="en"] #sidebar-menu h2,
+        html[lang="ja"] #sidebar-menu h2 {
+            font-size: 14px; /* 縮小字體以適應較長的文字 */
+        }
+        
+        /* 額外的安全設定，針對特別長的文字 */
+        #sidebar-menu h2[data-i18n="systemMenu"] {
+            max-width: 150px; /* 限制最大寬度 */
+            min-height: 20px; /* 確保有足夠的高度 */
+        }
+        
+        #language-selector {
+            width: auto; /* 讓寬度自適應內容 */
+            background-color: #47637e;
+            color: #ecf0f1;
+            border: 1px solid #465a70;
+            padding: 4px 8px; /* 縮小內邊距 */
+            border-radius: 4px;
+            font-size: 12px; /* 縮小字體 */
+        }
     </style>
 </head>
 <body>
     <header id="top-banner">
         <button id="menu-toggle-btn" title="展開選單">☰</button>
         <a href="https://workkkkkkez00m.github.io/K-3D-viewer/index.html" id="home-link-title">
-            <h1 id="project-title">智慧住宅中央監控系統 </h1>
+            <h1 id="project-title" data-i18n="projectTitle">智慧住宅中央監控系統 </h1>
         </a>
         <div class="header-right-items">
             <div id="datetime-container"></div>
@@ -528,10 +578,20 @@
 
     <nav id="sidebar-menu">
         <button id="close-menu-btn">&times;</button>
-        <h2>系統選單</h2>
+        <div class="sidebar-header">
+            <h2 data-i18n="systemMenu">系統選單</h2>
+            <div class="language-selector-container">
+                <select id="language-selector">
+                    <option value="zh-TW">繁體中文</option>
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                    <option value="zh-CN">简体中文</option>
+                </select>
+            </div>
+        </div> 
         <ul>
             <li class="system-category">
-                <a href="#">防盜及求救系統</a>
+                <a href="#" data-i18n="systemTheft">防盜及求救系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../theft_prevention/1f.html">1F</a></li>
                     <li><a href="../theft_prevention/2f.html">2F</a></li>
@@ -541,7 +601,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">攝影監視系統</a>
+                <a href="#" data-i18n="systemCCTV">攝影監視系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../cctv/1f.html">1F</a></li>
                     <li><a href="../cctv/2f.html">2F</a></li>
@@ -551,7 +611,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">門禁保全系統</a>
+                <a href="#" data-i18n="systemAccess">門禁保全系統</a>
                 <ul class="floor-submenu">
                      <li><a href="../access_control/1f.html">1F</a></li>
                     <li><a href="../access_control/2f.html">2F</a></li>
@@ -561,7 +621,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">影像對講系統</a>
+                <a href="#" data-i18n="systemIntercom">影像對講系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../video_intercom/1f.html">1F</a></li>
                     <li><a href="../video_intercom/2f.html">2F</a></li>
@@ -571,7 +631,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">消防火警系統</a>
+                <a href="#" data-i18n="systemFire">消防火警系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../fire_alarm/1f.html">1F</a></li>
                     <li><a href="../fire_alarm/2f.html">2F</a></li>
@@ -581,13 +641,13 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">給排水系統</a>
+                <a href="#" data-i18n="systemPlumbing">給排水系統</a>
                 <ul class="floor-submenu">
                    <li><a href="../plumbing_drainage/b3f.html">B3F</a></li>                   
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">停車管理系統</a>
+                <a href="#" data-i18n="systemParking">停車管理系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../parking_management/b1f.html">B1F</a></li>
                     <li><a href="../parking_management/b2f.html">B2F</a></li>
@@ -595,54 +655,54 @@
                 </ul>
             </li>   
             <li class="system-category">
-                <a href="#">空調控制系統</a>
+                <a href="#" data-i18n="systemAirConditioning">空調控制系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../air_conditioning_control/1f.html">1F</a></li>
                 </ul>
             </li>   
-            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;">能源管理儀表板</a></li>
-            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;">電梯監控系統</a></li>
-            <li><a id="back-to-home-btn" href="../index.html">‹ 回首頁</a></li>
+            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;" data-i18n="dashboardEnergy">能源管理儀表板</a></li>
+            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;" data-i18n="dashboardElevator">電梯監控系統</a></li>
+            <li><a id="back-to-home-btn" href="../index.html" data-i18n="backToHome">‹ 回首頁</a></li>
         </ul>
     </nav>
 
     <main id="content-wrapper">
         <section class="data-section">
-            <h2 class="section-title">電力監控</h2>
+            <h2 class="section-title" data-i18n="dashboardPower">電力監控</h2>
 
             <nav class="tab-nav">
-                <a href="#realtime-monitoring" class="tab-link active">即時監控</a>
-                <a href="#energy-analysis" class="tab-link">耗能分析</a>
-                <a href="#historical-records" class="tab-link">歷史紀錄</a>
+                <a href="#realtime-monitoring" class="tab-link active" data-i18n="tabRealtime">即時監控</a>
+                <a href="#energy-analysis" class="tab-link" data-i18n="tabEnergy">耗能分析</a>
+                <a href="#historical-records" class="tab-link" data-i18n="tabHistorical">歷史紀錄</a>
             </nav>
 
             <div class="tab-content-container">        
                 <div id="realtime-monitoring" class="tab-content active">
                     <div class="section-header">                          
                         <div class="chart-toggle data-toggle-group">
-                            <button id="total-data-btn" class="toggle-btn active" data-zone="total">全區</button>
-                            <button id="res-data-btn" class="toggle-btn" data-zone="residential">住宅區</button>
-                            <button id="off-data-btn" class="toggle-btn" data-zone="office">辦公區</button>
+                            <button id="total-data-btn" class="toggle-btn active" data-zone="total" data-i18n="totalData">全區</button>
+                            <button id="res-data-btn" class="toggle-btn" data-zone="residential" data-i18n="residentialData">住宅區</button>
+                            <button id="off-data-btn" class="toggle-btn" data-zone="office" data-i18n="officeData">辦公區</button>
                         </div>
                     </div>
                     <div class="summary-grid">
                         <div class="data-card">
-                            <div class="title">即時用電量</div>
+                            <div class="title" data-i18n="realtimePower">即時用電量</div>
                             <div><span id="realtime-power" class="value">--</span><span class="unit">kW</span></div>
                         </div>
                         <div class="data-card">
-                            <div class="title">本日用電總量</div>
+                            <div class="title" data-i18n="todayPower">本日用電總量</div>
                             <div><span id="today-kwh" class="value">--</span><span class="unit">kWh</span></div>
                         </div>
                         <div class="data-card">
-                            <div class="title">本月用電總量</div>
+                            <div class="title" data-i18n="monthPower">本月用電總量</div>
                             <div><span id="month-kwh" class="value">--</span><span class="unit">kWh</span></div>
                         </div>
                     </div>
                     <div class="chart-container">
                         <div class="chart-toggle data-toggle-group">
-                            <button id="line-chart-btn" class="toggle-btn">總量趨勢</button>
-                            <button id="bar-chart-btn" class="toggle-btn active">用量分佈</button>
+                            <button id="line-chart-btn" class="toggle-btn" data-i18n="chartTotalTrend">總量趨勢</button>
+                            <button id="bar-chart-btn" class="toggle-btn active" data-i18n="chartUsageDistribution">用量分佈</button>
                         </div>
                         <div class="chart-wrapper">
                             <canvas id="hourly-chart"></canvas>
@@ -654,11 +714,11 @@
                 <div id="energy-analysis" class="tab-content">
                     <div class="analysis-grid">
                         <div class="analysis-cards-container">
-                            <div class="data-card small"><div class="title">電力耗能</div><div><span id="analysis-power" class="value">--</span><span class="unit">kWh</span></div></div>
-                            <div class="data-card small"><div class="title">空調耗能</div><div><span id="analysis-ac" class="value">--</span><span class="unit">kWh</span></div></div>
-                            <div class="data-card small"><div class="title">照明耗能</div><div><span id="analysis-lighting" class="value">--</span><span class="unit">kWh</span></div></div>
-                            <div class="data-card small"><div class="title">機房耗能</div><div><span id="analysis-server" class="value">--</span><span class="unit">kWh</span></div></div>
-                            <div class="data-card small"><div class="title">其他耗能</div><div><span id="analysis-other" class="value">--</span><span class="unit">kWh</span></div></div>
+                            <div class="data-card small"><div class="title" data-i18n="analysisPower">電力耗能</div><div><span id="analysis-power" class="value">--</span><span class="unit">kWh</span></div></div>
+                            <div class="data-card small"><div class="title" data-i18n="analysisAC">空調耗能</div><div><span id="analysis-ac" class="value">--</span><span class="unit">kWh</span></div></div>
+                            <div class="data-card small"><div class="title" data-i18n="analysisLighting">照明耗能</div><div><span id="analysis-lighting" class="value">--</span><span class="unit">kWh</span></div></div>
+                            <div class="data-card small"><div class="title" data-i18n="analysisServer">機房耗能</div><div><span id="analysis-server" class="value">--</span><span class="unit">kWh</span></div></div>
+                            <div class="data-card small"><div class="title" data-i18n="analysisOther">其他耗能</div><div><span id="analysis-other" class="value">--</span><span class="unit">kWh</span></div></div>
                         </div>
                         <div class="chart-container pie-chart-container">
                             <div class="chart-wrapper">
@@ -671,13 +731,13 @@
                 <!-- 「歷史紀錄」的內容面板  -->
                 <div id="historical-records" class="tab-content">
                     <div class="record-block">
-                        <h3 class="block-title">單日紀錄查詢</h3>
+                        <h3 class="block-title" data-i18n="dailyRecordQuery">單日紀錄查詢</h3>
                             <div class="query-bar">
                             <input type="date" id="date-picker">
-                            <button id="search-btn">搜尋</button>
+                            <button id="search-btn" data-i18n="search">搜尋</button>
                         </div>
                         <div id="historical-results" class="results-container">
-                            <p class="placeholder-text">請選擇日期並點擊搜尋以載入數據</p>
+                            <p class="placeholder-text" data-i18n="selectDate">請選擇日期並點擊搜尋以載入數據</p>
                             <table id="results-table" class="hidden">
                                 <thead><tr><th>項目</th><th>用電量 (kWh)</th></tr></thead>
                                 <tbody></tbody>
@@ -687,10 +747,10 @@
                     </div>
 
                     <div class="record-block">
-                        <h3 class="block-title">用電紀錄匯出</h3>
+                        <h3 class="block-title" data-i18n="exportElectricityRecords">用電紀錄匯出</h3>
                         <div class="query-bar">
                             <input type="month" id="month-picker">
-                            <button id="export-btn">匯出 Excel</button>
+                            <button id="export-btn" data-i18n="exportExcel">匯出 Excel</button>
                         </div>
                     </div>
                 </div>
@@ -698,39 +758,39 @@
         </section>
 
         <section class="data-section">
-            <h2 class="section-title">水錶監控</h2>
+            <h2 class="section-title" data-i18n="waterMeterMonitoring">水錶監控</h2>
             <div class="water-grid">
                 <div class="water-summary">
                     <div class="data-card">
-                        <div class="title">本日總用水度數</div>
+                        <div class="title" data-i18n="todayTotalWaterUsage">本日總用水度數</div>
                         <div class="card-main-content">
                             <div>
-                                <span id="today-water" class="value">--</span><span class="unit">度</span>
+                                <span id="today-water" class="value">--</span><span class="unit" data-i18n="degree">度</span>
                             </div>
                             <div class="sub-data-container">
                                 <div class="sub-data-item">
-                                    <span>住宅區:</span>
+                                    <span data-i18n="residentialArea">住宅區:</span>
                                     <span id="today-water-res" class="sub-value">-- 度</span>
                                 </div>
                                 <div class="sub-data-item">
-                                    <span>辦公區:</span>
+                                    <span data-i18n="officeArea">辦公區:</span>
                                     <span id="today-water-off" class="sub-value">-- 度</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="data-card">
-                        <div class="title">本月總用水度數</div>
+                        <div class="title" data-i18n="monthTotalWaterUsage">本月總用水度數</div>
                         <div class="card-main-content">
                             <div>
-                                <span id="month-water" class="value">--</span><span class="unit">度</span></div>
+                                <span id="month-water" class="value">--</span><span class="unit" data-i18n="degree">度</span></div>
                             <div class="sub-data-container">
                                 <div class="sub-data-item">
-                                    <span>住宅區:</span>
+                                    <span data-i18n="residentialArea">住宅區:</span>
                                     <span id="month-water-res" class="sub-value">-- 度</span>
                                 </div>
                                 <div class="sub-data-item">
-                                    <span>辦公區:</span>
+                                    <span data-i18n="officeArea">辦公區:</span>
                                     <span id="month-water-off" class="sub-value">-- 度</span>
                                 </div>
                             </div>
@@ -748,6 +808,362 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+
+        const translations = {
+                'zh-TW': {
+                    pageTitleElevator: '電梯監控系統',
+                    projectTitle: '智慧住宅中央監控系統',
+                    systemMenu: '系統選單',
+                    dashboardEnergy: '能源管理儀表板',
+                    dashboardElevator: '電梯監控系統',
+                    systemTheft: '防盜及求救系統',
+                    systemCCTV: '攝影監視系統',
+                    systemAccess: '門禁保全系統',
+                    systemIntercom: '影像對講系統',
+                    systemFire: '消防火警系統',
+                    systemPlumbing: '給排水系統',
+                    systemParking: '停車管理系統',
+                    systemAirConditioning: '空調控制系統',
+                    backToHome: '‹ 回首頁',
+                    tabRealtime: '即時監控',
+                    tabEnergy: '耗能分析',
+                    tabHistorical: '歷史紀錄',
+                    totalData: '全區',
+                    residentialData: '住宅區',
+                    officeData: '辦公區',
+                    realtimePower: '即時用電量',
+                    todayPower: '本日用電總量',
+                    monthPower: '本月用電總量',      
+                    chartTotalTrend: '總量趨勢',
+                    chartUsageDistribution: '用量分佈',    
+                    analysisPower: '電力耗能',
+                    analysisAC: '空調耗能',
+                    analysisLighting: '照明耗能',
+                    analysisServer: '機房耗能',
+                    analysisOther: '其他耗能',
+                    dailyRecordQuery: '單日紀錄查詢',
+                    electDate: '選擇日期',
+                    searchBtn: '搜尋',
+                    exportBtn: '匯出 Excel',
+                    waterMeterMonitoring: '水錶監控',
+                    todayTotalWaterUsage: '本日總用水度數',
+                    monthTotalWaterUsage: '本月總用水度數',
+                    degree: '度',
+                    projectTitle: '智慧住宅中央監控系統',
+                    exportElectricityRecords: '用電紀錄匯出',
+                    exportExcel: '匯出 Excel',
+                    search: '搜尋',
+                    selectDate: '請選擇日期並點擊搜尋以載入數據',
+                    residentialArea: '住宅區:',
+                    officeArea: '辦公區:',
+                    dashboardPower: '電力監控',
+                    // 圖表翻譯
+                    chartHourlyPowerTotal: '每小時用電總量 (kWh)',
+                    chartResidentialPower: '住宅區用電量',
+                    chartOfficePower: '辦公區用電量',
+                    chartResidentialLabel: '住宅區',
+                    chartOfficeLabel: '辦公區',
+                    chartWaterDistribution: '當日各區用水量分佈',
+                    chartWaterUsageUnit: '本日用水量 (度)',
+                    chartConsumptionTitle: '本日各項設備耗能佔比',
+                    chartConsumptionUnit: '耗能佔比 (kWh)',
+                    chartPowerLabel: '電力',
+                    chartACLabel: '空調',
+                    chartLightingLabel: '照明',
+                    chartServerLabel: '機房',
+                    chartOtherLabel: '其他'
+                },
+                'en': {
+                    pageTitleElevator: 'Elevator Monitoring System',
+                    projectTitle: 'Smart Housing Central Monitoring System',
+                    systemMenu: 'System Menu',
+                    dashboardEnergy: 'Energy Dashboard',
+                    dashboardElevator: 'Elevator Monitoring',
+                    systemTheft: 'Security System',
+                    systemCCTV: 'CCTV System',
+                    systemAccess: 'Access Control',
+                    systemIntercom: 'Video Intercom',
+                    systemFire: 'Fire Alarm System',
+                    systemPlumbing: 'Plumbing System',
+                    systemParking: 'Parking System',
+                    systemAirConditioning: 'Air Conditioning Control',
+                    backToHome: '‹ Back to Home',
+                    tabRealtime: 'Real-time Monitoring',
+                    tabEnergy: 'Energy Analysis',
+                    tabHistorical: 'Historical Records',
+                    totalData: 'Total Area',
+                    residentialData: 'Residential Area',
+                    officeData: 'Office Area',
+                    realtimePower: 'Real-time Power Consumption',
+                    todayPower: 'Today\'s Total Power Consumption',
+                    monthPower: 'This Month\'s Total Power Consumption',
+                    chartTotalTrend: 'Total Trend',
+                    chartUsageDistribution: 'Usage Distribution',
+                    analysisPower: 'Power Consumption',
+                    analysisAC: 'Air Conditioning Consumption',
+                    analysisLighting: 'Lighting Consumption',
+                    analysisServer: 'Server Room Consumption',
+                    analysisOther: 'Other Consumption',
+                    dailyRecordQuery: 'Daily Record Query',
+                    electDate: 'Select Date',
+                    searchBtn: 'Search',
+                    exportBtn: 'Export to Excel',
+                    waterMeterMonitoring: 'Water Meter Monitoring',
+                    todayTotalWaterUsage: 'Total Water Usage Today',
+                    monthTotalWaterUsage: 'Total Water Usage This Month',
+                    degree: 'Degree',
+                    projectTitle: 'Smart Housing Central Monitoring System',
+                    exportElectricityRecords: 'Export Electricity Records',
+                    exportExcel: 'Export to Excel',
+                    search: 'Search',
+                    selectDate: 'Please select a date and click search to load data',
+                    residentialArea: 'Residential Area:',
+                    officeArea: 'Office Area:',
+                    dashboardPower: 'Power Monitoring',
+                    // 圖表翻譯
+                    chartHourlyPowerTotal: 'Hourly Total Power Consumption (kWh)',
+                    chartResidentialPower: 'Residential Power Consumption',
+                    chartOfficePower: 'Office Power Consumption',
+                    chartResidentialLabel: 'Residential',
+                    chartOfficeLabel: 'Office',
+                    chartWaterDistribution: 'Daily Water Usage Distribution by Area',
+                    chartWaterUsageUnit: 'Daily Water Usage (Degree)',
+                    chartConsumptionTitle: 'Daily Equipment Energy Consumption Distribution',
+                    chartConsumptionUnit: 'Energy Consumption (kWh)',
+                    chartPowerLabel: 'Power',
+                    chartACLabel: 'Air Conditioning',
+                    chartLightingLabel: 'Lighting',
+                    chartServerLabel: 'Server Room',
+                    chartOtherLabel: 'Other'
+                },
+                'ja': {
+                    pageTitleElevator: 'エレベーター監視システム',
+                    projectTitle: 'スマート住宅中央監視システム',
+                    systemMenu: 'システムメニュー',
+                    dashboardEnergy: 'エネルギー管理',
+                    dashboardElevator: 'エレベーター監視',
+                    systemTheft: '防犯システム',
+                    systemCCTV: '監視カメラ',
+                    systemAccess: 'アクセス制御',
+                    systemIntercom: 'ビデオインターホン',
+                    systemFire: '火災警報',
+                    systemPlumbing: '給排水システム',
+                    systemParking: '駐車場管理',
+                    systemAirConditioning: '空調制御システム',
+                    backToHome: '‹ ホームに戻る',
+                    tabRealtime: 'リアルタイム監視',
+                    tabEnergy: 'エネルギー分析',
+                    tabHistorical: '履歴記録',
+                    totalData: '全体エリア',
+                    residentialData: '住宅エリア',
+                    officeData: 'オフィスエリア',
+                    realtimePower: 'リアルタイム電力消費',
+                    todayPower: '今日の総電力消費',
+                    monthPower: '今月の総電力消費',
+                    chartTotalTrend: '総量トレンド',
+                    chartUsageDistribution: '使用量分布',
+                    analysisPower: '電力消費',
+                    analysisAC: '空調消費',
+                    analysisLighting: '照明消費',
+                    analysisServer: 'サーバールーム消費',
+                    analysisOther: 'その他消費',
+                    searchBtn: '検索',
+                    exportBtn: 'Excelにエクスポート',
+                    dailyRecordQuery: '日次記録クエリ',
+                    electDate: '日付を選択',
+                    waterMeterMonitoring: '水道メーター監視',
+                    todayTotalWaterUsage: '今日の総水使用量',
+                    monthTotalWaterUsage: '今月の総水使用量',
+                    degree: '度',
+                    projectTitle: 'スマート住宅中央監視システム',
+                    exportElectricityRecords: '電力記録をエクスポート',
+                    exportExcel: 'Excelにエクスポート',
+                    search: '検索',
+                    selectDate: '日付を選択して検索をクリックしてデータを読み込んでください',
+                    residentialArea: '住宅区:',
+                    officeArea: '办公区:',
+                    dashboardPower: '电力监控',
+                    // 圖表翻譯
+                    chartHourlyPowerTotal: '時間別総電力消費量 (kWh)',
+                    chartResidentialPower: '住宅地区電力消費',
+                    chartOfficePower: 'オフィス地区電力消費',
+                    chartResidentialLabel: '住宅地区',
+                    chartOfficeLabel: 'オフィス地区',
+                    chartWaterDistribution: '当日地区別水使用量分布',
+                    chartWaterUsageUnit: '当日水使用量 (度)',
+                    chartConsumptionTitle: '当日各設備エネルギー消費分布',
+                    chartConsumptionUnit: 'エネルギー消費 (kWh)',
+                    chartPowerLabel: '電力',
+                    chartACLabel: '空調',
+                    chartLightingLabel: '照明',
+                    chartServerLabel: 'サーバールーム',
+                    chartOtherLabel: 'その他'
+                },
+                'zh-CN': {
+                    pageTitleElevator: '电梯监控系统',
+                    projectTitle: '智慧住宅中央监控系统',
+                    systemMenu: '系统菜单',
+                    dashboardEnergy: '能源管理仪表板',
+                    dashboardElevator: '电梯监控系统',
+                    systemTheft: '防盗及求救系统',
+                    systemCCTV: '摄影监控系统',
+                    systemAccess: '门禁保全系统',
+                    systemIntercom: '影像对讲系统',
+                    systemFire: '消防火警系统',
+                    systemPlumbing: '给排水系统',
+                    systemParking: '停车管理系统',
+                    systemAirConditioning: '空调控制系统',
+                    backToHome: '‹ 返回首页',
+                    tabRealtime: '实时监控',
+                    tabEnergy: '能耗分析',
+                    tabHistorical: '历史记录',
+                    totalData: '全区',
+                    residentialData: '住宅区',
+                    officeData: '办公区',
+                    realtimePower: '实时用电量',
+                    todayPower: '今日用电总量',
+                    monthPower: '本月用电总量',
+                    chartTotalTrend: '总量趋势',
+                    chartUsageDistribution: '用量分布',
+                    analysisPower: '电力耗能',
+                    analysisAC: '空调耗能',
+                    analysisLighting: '照明耗能',
+                    analysisServer: '服务器耗能',
+                    analysisOther: '其他耗能',
+                    dailyRecordQuery: '单日记录查询',
+                    electDate: '选择日期',
+                    searchBtn: '搜索',
+                    exportBtn: '导出 Excel',
+                    waterMeterMonitoring: '水表监控',
+                    todayTotalWaterUsage: '今日总用水度数',
+                    monthTotalWaterUsage: '本月总用水度数',
+                    degree: '度',
+                    projectTitle: '智慧住宅中央监控系统',
+                    exportElectricityRecords: '导出电力记录',
+                    exportExcel: '导出 Excel',
+                    search: '搜索',
+                    selectDate: '请选择日期并点击搜索以加载数据',
+                    residentialArea: '住宅区:',
+                    officeArea: '办公区:',
+                    dashboardPower: '电力监控',
+                    // 圖表翻譯
+                    chartHourlyPowerTotal: '每小时用电总量 (kWh)',
+                    chartResidentialPower: '住宅区用电量',
+                    chartOfficePower: '办公区用电量',
+                    chartResidentialLabel: '住宅区',
+                    chartOfficeLabel: '办公区',
+                    chartWaterDistribution: '当日各区用水量分布',
+                    chartWaterUsageUnit: '当日用水量 (度)',
+                    chartConsumptionTitle: '当日各项设备耗能占比',
+                    chartConsumptionUnit: '耗能占比 (kWh)',
+                    chartPowerLabel: '电力',
+                    chartACLabel: '空调',
+                    chartLightingLabel: '照明',
+                    chartServerLabel: '服务器',
+                    chartOtherLabel: '其他'
+                }
+            };
+            
+            let currentLanguage = 'zh-TW';
+
+            function setLanguage(lang) {
+                currentLanguage = lang;
+                localStorage.setItem('preferredLanguage', lang);
+                
+                // 0. 更新HTML的lang屬性，以便CSS語言選擇器能正常工作
+                document.documentElement.setAttribute('lang', lang);
+                
+                // 1. 翻譯所有靜態標籤
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations[lang] && translations[lang][key]) {
+                        // 特殊處理：如果是包含動態數值的元素，只更新固定文字部分
+                        if (key === 'degree' && el.classList.contains('sub-value')) {
+                            // 對於 "-- 度" 這樣的格式，保留數值部分，只替換單位
+                            const currentText = el.textContent;
+                            const match = currentText.match(/^(.+?)\s*[度Degree]+$/);
+                            if (match) {
+                                el.textContent = `${match[1]} ${translations[lang][key]}`;
+                            } else {
+                                el.textContent = translations[lang][key];
+                            }
+                        } else {
+                            el.textContent = translations[lang][key];
+                        }
+                    }
+                });
+                
+                // 2. 動態調整側邊欄標題字體大小
+                adjustSidebarTitleFontSize();
+                
+                // 3. 更新圖表翻譯
+                updateChartTranslations();
+                
+                // 4. 觸發一次數據更新，來翻譯所有動態內容
+                updateDashboard();
+            }
+            
+            function updateChartTranslations() {
+                const t = translations[currentLanguage] || translations['zh-TW'];
+                
+                // 更新水力圓餅圖
+                if (waterPieChart) {
+                    waterPieChart.data.labels = [t.chartResidentialLabel || '住宅區', t.chartOfficeLabel || '辦公區'];
+                    waterPieChart.data.datasets[0].label = t.chartWaterUsageUnit || '本日用水量 (度)';
+                    waterPieChart.options.plugins.title.text = t.chartWaterDistribution || '當日各區用水量分佈';
+                    waterPieChart.update('none');
+                }
+                
+                // 更新耗能分析圓餅圖
+                if (consumptionPieChart) {
+                    consumptionPieChart.data.labels = [
+                        t.chartPowerLabel || '電力',
+                        t.chartACLabel || '空調', 
+                        t.chartLightingLabel || '照明', 
+                        t.chartServerLabel || '機房', 
+                        t.chartOtherLabel || '其他'
+                    ];
+                    consumptionPieChart.data.datasets[0].label = t.chartConsumptionUnit || '耗能佔比 (kWh)';
+                    consumptionPieChart.options.plugins.title.text = t.chartConsumptionTitle || '本日各項設備耗能佔比';
+                    consumptionPieChart.update('none');
+                }
+            }
+
+            function adjustSidebarTitleFontSize() {
+                const sidebarTitle = document.querySelector('#sidebar-menu h2');
+                if (!sidebarTitle) return;
+                
+                // 重置字體大小為預設值
+                sidebarTitle.style.fontSize = '';
+                
+                // 檢查文字是否溢出
+                const containerWidth = sidebarTitle.parentElement.offsetWidth - 120; // 減去語言選擇器的空間
+                const textWidth = sidebarTitle.scrollWidth;
+                
+                if (textWidth > containerWidth) {
+                    // 如果文字溢出，縮小字體
+                    sidebarTitle.style.fontSize = '14px';
+                    
+                    // 如果還是溢出，進一步縮小
+                    if (sidebarTitle.scrollWidth > containerWidth) {
+                        sidebarTitle.style.fontSize = '12px';
+                    }
+                }
+            }
+
+            function initI18n() {
+                const languageSelector = document.getElementById('language-selector');
+                const savedLang = localStorage.getItem('preferredLanguage');
+                if (savedLang && translations[savedLang]) {
+                    languageSelector.value = savedLang;
+                    setLanguage(savedLang);
+                } else {
+                    setLanguage('zh-TW');
+                }
+                languageSelector.addEventListener('change', (e) => {
+                    setLanguage(e.target.value);
+                });
+            }
         // --- 獲取 DOM 元素 ---
         const realtimePowerEl = document.getElementById('realtime-power');
         const todayKwhEl = document.getElementById('today-kwh');
@@ -793,50 +1209,59 @@
             plugins: { legend: { labels: { color: '#c9d1d9' } } }
         };
         // --- 初始化水力圓餅圖 ---
-        const waterPieChart = new Chart(ctxPie, {
-            type: 'pie',
-            data: {
-                labels: ['住宅區', '辦公區'],
-                datasets: [{
-                    label: '本日用水量 (度)',
-                    data: [0, 0],
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.8)', // 藍色
-                        'rgba(255, 206, 86, 0.8)'  // 黃色
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)'
-                    ],
-                    borderWidth: 1,                    
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: '當日各區用水量分佈',
-                        color: '#c9d1d9',
-                        font: { size: 16 }
-                    },
-                    legend: {
-                        labels: { color: '#c9d1d9' }
+        function initWaterPieChart() {
+            const t = translations[currentLanguage] || translations['zh-TW'];
+            
+            return new Chart(ctxPie, {
+                type: 'pie',
+                data: {
+                    labels: [t.chartResidentialLabel || '住宅區', t.chartOfficeLabel || '辦公區'],
+                    datasets: [{
+                        label: t.chartWaterUsageUnit || '本日用水量 (度)',
+                        data: [0, 0],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.8)', // 藍色
+                            'rgba(255, 206, 86, 0.8)'  // 黃色
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)'
+                        ],
+                        borderWidth: 1,                    
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: t.chartWaterDistribution || '當日各區用水量分佈',
+                            color: '#c9d1d9',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            labels: { color: '#c9d1d9' }
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
+        
+        let waterPieChart = initWaterPieChart();
 
         // 建立「折線圖」的函式
         function createLineChart(data) {
             if (hourlyChart) hourlyChart.destroy(); // 如果已有圖表，先銷毀它
+            
+            const t = translations[currentLanguage] || translations['zh-TW'];
+            
             hourlyChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: chartLabels,
                     datasets: [{
-                        label: '每小時用電總量 (kWh)',
+                        label: t.chartHourlyPowerTotal || '每小時用電總量 (kWh)',
                         data: data.total,
                         borderColor: 'rgba(0, 128, 255, 1)',
                         backgroundColor: 'rgba(88, 166, 255, 0.2)',
@@ -856,18 +1281,20 @@
             stackedOptions.scales.y.stacked = true; // 開啟 Y 軸堆疊
             stackedOptions.scales.x.offset = true;
 
+            const t = translations[currentLanguage] || translations['zh-TW'];
+
             hourlyChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: chartLabels,
                     datasets: [
                         {
-                            label: '住宅區用電量',
+                            label: t.chartResidentialPower || '住宅區用電量',
                             data: data.residential,
                             backgroundColor: 'rgba(54, 162, 235, 0.8)'
                         },
                         {
-                            label: '辦公區用電量',
+                            label: t.chartOfficePower || '辦公區用電量',
                             data: data.office,
                             backgroundColor: 'rgba(255, 206, 86, 0.8)'
                         }
@@ -899,14 +1326,17 @@
                     if (data.water.todayTotal !== undefined) todayWaterEl.textContent = data.water.todayTotal.toFixed(1);
                     if (data.water.monthTotal !== undefined) monthWaterEl.textContent = data.water.monthTotal.toLocaleString('en-US', { maximumFractionDigits: 1 });
             
+                    // 取得當前語言的單位翻譯
+                    const degreeUnit = translations[currentLanguage] && translations[currentLanguage]['degree'] ? translations[currentLanguage]['degree'] : '度';
+                    
                     if (data.water.todayBreakdown) {
-                        if (data.water.todayBreakdown.residential !== undefined) todayWaterResEl.textContent = `${data.water.todayBreakdown.residential.toFixed(1)} 度`;
-                        if (data.water.todayBreakdown.office !== undefined) todayWaterOffEl.textContent = `${data.water.todayBreakdown.office.toFixed(1)} 度`;
+                        if (data.water.todayBreakdown.residential !== undefined) todayWaterResEl.textContent = `${data.water.todayBreakdown.residential.toFixed(1)} ${degreeUnit}`;
+                        if (data.water.todayBreakdown.office !== undefined) todayWaterOffEl.textContent = `${data.water.todayBreakdown.office.toFixed(1)} ${degreeUnit}`;
                     }
             
                     if (data.water.monthBreakdown) {
-                        if (data.water.monthBreakdown.residential !== undefined) monthWaterResEl.textContent = `${data.water.monthBreakdown.residential.toLocaleString('en-US', { maximumFractionDigits: 1 })} 度`;
-                        if (data.water.monthBreakdown.office !== undefined) monthWaterOffEl.textContent = `${data.water.monthBreakdown.office.toLocaleString('en-US', { maximumFractionDigits: 1 })} 度`;
+                        if (data.water.monthBreakdown.residential !== undefined) monthWaterResEl.textContent = `${data.water.monthBreakdown.residential.toLocaleString('en-US', { maximumFractionDigits: 1 })} ${degreeUnit}`;
+                        if (data.water.monthBreakdown.office !== undefined) monthWaterOffEl.textContent = `${data.water.monthBreakdown.office.toLocaleString('en-US', { maximumFractionDigits: 1 })} ${degreeUnit}`;
                     }
                 }
 
@@ -946,12 +1376,20 @@
                         
                         if (!consumptionPieChart) {
                             // ★★★ 初始化一個帶有傳統圖例的標準圓餅圖 ★★★
+                            const t = translations[currentLanguage] || translations['zh-TW'];
+                            
                             consumptionPieChart = new Chart(ctxConsumptionPie, {
                                 type: 'pie',
                                 data: {
-                                    labels: ['電力', '空調', '照明', '機房', '其他'],
+                                    labels: [
+                                        t.chartPowerLabel || '電力',
+                                        t.chartACLabel || '空調', 
+                                        t.chartLightingLabel || '照明', 
+                                        t.chartServerLabel || '機房', 
+                                        t.chartOtherLabel || '其他'
+                                    ],
                                     datasets: [{
-                                        label: '耗能佔比 (kWh)',
+                                        label: t.chartConsumptionUnit || '耗能佔比 (kWh)',
                                         data: analysisChartData,
                                         backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
                                         borderWidth: 1
@@ -963,7 +1401,7 @@
                                     plugins: {
                                         title: {
                                             display: true,
-                                            text: '本日各項設備耗能佔比',
+                                            text: t.chartConsumptionTitle || '本日各項設備耗能佔比',
                                             color: '#c9d1d9',
                                             font: { size: 22 }, // ★ 稍微加大標題字體
                                             padding: {
@@ -984,7 +1422,19 @@
                                 }
                             });
                         } else {
+                            // 更新現有圖表的標籤和標題
+                            const t = translations[currentLanguage] || translations['zh-TW'];
+                            
+                            consumptionPieChart.data.labels = [
+                                t.chartPowerLabel || '電力',
+                                t.chartACLabel || '空調', 
+                                t.chartLightingLabel || '照明', 
+                                t.chartServerLabel || '機房', 
+                                t.chartOtherLabel || '其他'
+                            ];
+                            consumptionPieChart.data.datasets[0].label = t.chartConsumptionUnit || '耗能佔比 (kWh)';
                             consumptionPieChart.data.datasets[0].data = analysisChartData;
+                            consumptionPieChart.options.plugins.title.text = t.chartConsumptionTitle || '本日各項設備耗能佔比';
                             consumptionPieChart.update('none');
                         }
                     }                                
@@ -1199,39 +1649,8 @@
             });
         }
 
-        // 設定圖表切換按鈕的事件
-        function setupChartToggle() {
-            const lineBtn = document.getElementById('line-chart-btn');
-            const barBtn = document.getElementById('bar-chart-btn');
-
-            // 為「總量趨勢」按鈕新增點擊事件
-            lineBtn.addEventListener('click', async () => {
-                // 從後端獲取最新數據
-                const response = await fetch('http://localhost:3000/api/energy');
-                const data = await response.json();
-                // 呼叫函式來建立「折線圖」
-                createLineChart(data.hourlyData);
-
-                // 更新按鈕的選中樣式
-                lineBtn.classList.add('active');
-                barBtn.classList.remove('active');
-            });
-
-            // 為「用量分佈」按鈕新增點擊事件
-            barBtn.addEventListener('click', async () => {
-                // 從後端獲取最新數據
-                const response = await fetch('http://localhost:3000/api/energy');
-                const data = await response.json();
-                // 呼叫函式來建立「堆疊長條圖」
-                createStackedBarChart(data.hourlyData);
-
-                // 更新按鈕的選中樣式
-                barBtn.classList.add('active');
-                lineBtn.classList.remove('active');
-            });
-        }
-
         // --- 啟動所有功能 ---
+        initI18n();
         updateDashboard();
         setInterval(updateDashboard, 5000);
         updateDateTime();
@@ -1245,7 +1664,7 @@
         });
     </script>
     <footer id="page-footer">
-        <span>v1.3.0</span> | <span>Copyright © 2025 KL </span>
+        <span>v1.3.1</span> | <span>Copyright © 2025 KL </span>
     </footer>
     
 </body>
