@@ -729,7 +729,7 @@
         // --- 核心功能函式 ---
         async function updateParkingStatus() {
             try {
-                const response = await fetch('http://localhost:3000/api/parking/b2f');
+                const response = await fetch('https://bms-backend-server1.onrender.com/api/parking/b2f');
                 const latestData = await response.json();
 
                 // 更新數據
@@ -864,7 +864,7 @@
         // ★★★ 從後端獲取車道號誌狀態的函式 ★★★
         async function updateTrafficLightStatus() {
             try {
-                const response = await fetch('http://localhost:3000/api/traffic-light/b2f');
+                const response = await fetch('https://bms-backend-server1.onrender.com/api/traffic-light/b2f');
                 const data = await response.json();
                 
                 const lightsData = Object.values(data);

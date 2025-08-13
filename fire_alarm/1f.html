@@ -469,7 +469,7 @@
             // ★★★ 從後端獲取火警狀態的函式 ★★★
             async function updateFireAlarmStatus() {
             try {
-                const response = await fetch('http://localhost:3000/api/fire-alarm/1f');
+                const response = await fetch('https://bms-backend-server1.onrender.com/api/fire-alarm/1f');
                 const latestData = await response.json();
 
                 // 更新或新增偵測點數據

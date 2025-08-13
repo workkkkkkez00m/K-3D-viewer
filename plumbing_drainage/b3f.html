@@ -587,7 +587,7 @@
         async function updatePlumbingStatus() {
             try {
                 console.log('正在更新泵浦狀態...');
-                const response = await fetch('http://localhost:3000/api/plumbing/b3f');
+                const response = await fetch('https://bms-backend-server1.onrender.com/api/plumbing/b3f');
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
