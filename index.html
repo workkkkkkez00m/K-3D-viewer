@@ -451,9 +451,13 @@
 
         async function updateInfoPanel() {
             try {
-                // 使用儀表板 API
-                const response = await fetch('http://localhost:3000/api/energy');
-                if (!response.ok) return; // 如果請求失敗，就直接跳出
+                // 使用 Render 靜態出站 IP
+                const response = await fetch('http://100.20.92.101');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
 
                 // 模擬溫溼度數據
@@ -470,7 +474,13 @@
                 carbonEl.textContent = carbonEmission.toLocaleString('en-US', { maximumFractionDigits: 1 });
 
             } catch (error) {
-                console.error("更新即時資訊失敗:", error);
+                console.error("API 連接失敗:", error.message);
+                
+                // 顯示連接失敗狀態
+                tempEl.textContent = "連接失敗";
+                humidityEl.textContent = "連接失敗";
+                powerEl.textContent = "連接失敗";
+                carbonEl.textContent = "連接失敗";
             }
         }
 
