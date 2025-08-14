@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>電梯監控系統</title>
+    <title data-i18n="pageTitleElevator">電梯監控系統</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
@@ -640,7 +640,7 @@
             /* --- ★ 修改大小 --- */
             width: 30px;
             height: 30px;
-            font-size: 20px; /* 齒輪圖示的大小 */
+            font-size: 30px; /* 齒輪圖示的大小 */
 
             /* --- ★修改顏色 --- */
             background-color: #52586068; /* 按鈕背景色 */
@@ -652,6 +652,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
         }
 
         .settings-btn:hover {
@@ -879,16 +880,20 @@
             transition: font-size 0.3s ease; /* 平滑的字體大小變化 */
         }
         
-        /* 英語和日語的字體縮小設定 */
-        html[lang="en"] #sidebar-menu h2,
+        /* 英語的字體縮小設定 */
+        html[lang="en"] #sidebar-menu h2 {
+            font-size: 18px; /* 縮小字體以適應較長的文字 */
+        }
+        
+        /* 日語的字體放大設定 */
         html[lang="ja"] #sidebar-menu h2 {
-            font-size: 14px; /* 縮小字體以適應較長的文字 */
+            font-size: 22px; /* 進一步放大字體以增加可讀性 */
         }
         
         /* 額外的安全設定，針對特別長的文字 */
         #sidebar-menu h2[data-i18n="systemMenu"] {
-            max-width: 150px; /* 限制最大寬度 */
-            min-height: 20px; /* 確保有足夠的高度 */
+            max-width: 220px; /* 稍微放寬最大寬度限制 */
+            min-height: 26px; /* 確保有足夠的高度 */
         }
         
         #language-selector {
@@ -900,8 +905,6 @@
             border-radius: 4px;
             font-size: 12px; /* 縮小字體 */
         }
-
-
     </style>
 </head>
 <body>
@@ -1162,11 +1165,11 @@
                     systemMenu: 'システムメニュー',
                     dashboardEnergy: 'エネルギー管理',
                     dashboardElevator: 'エレベーター監視',
-                    systemTheft: '防犯システム',
-                    systemCCTV: '監視カメラ',
+                    systemTheft: '防犯及び救助システム',
+                    systemCCTV: '映像監視システム',
                     systemAccess: 'アクセス制御',
                     systemIntercom: 'ビデオインターホン',
-                    systemFire: '火災警報',
+                    systemFire: '火災報知システム',
                     systemPlumbing: '給排水システム',
                     systemParking: '駐車場管理',
                     systemAirConditioning: '空調制御システム',
@@ -1294,13 +1297,15 @@
                 
                 // 3. 觸發一次數據更新，來翻譯所有動態內容
                 updateElevatorStatus();
+
+                updateDateTime();
             }
 
             function adjustSidebarTitleFontSize() {
                 const sidebarTitle = document.querySelector('#sidebar-menu h2');
                 if (!sidebarTitle) return;
                 
-                // 重置字體大小為預設值
+                // 重置字體大小為預設值（讓CSS決定）
                 sidebarTitle.style.fontSize = '';
                 
                 // 檢查文字是否溢出
@@ -1308,12 +1313,22 @@
                 const textWidth = sidebarTitle.scrollWidth;
                 
                 if (textWidth > containerWidth) {
-                    // 如果文字溢出，縮小字體
-                    sidebarTitle.style.fontSize = '14px';
-                    
-                    // 如果還是溢出，進一步縮小
-                    if (sidebarTitle.scrollWidth > containerWidth) {
-                        sidebarTitle.style.fontSize = '12px';
+                    // 如果文字溢出，根據語言調整字體
+                    if (currentLanguage === 'ja') {
+                        sidebarTitle.style.fontSize = '18px'; // 日語溢出時稍微縮小
+                        
+                        // 如果還是溢出，進一步縮小
+                        if (sidebarTitle.scrollWidth > containerWidth) {
+                            sidebarTitle.style.fontSize = '16px';
+                        }
+                    } else {
+                        // 其他語言的處理
+                        sidebarTitle.style.fontSize = '14px';
+                        
+                        // 如果還是溢出，進一步縮小
+                        if (sidebarTitle.scrollWidth > containerWidth) {
+                            sidebarTitle.style.fontSize = '12px';
+                        }
                     }
                 }
             }
@@ -1354,11 +1369,33 @@
 
             // --- UI 框架功能函式 ---
             function updateDateTime() {
-                const now = new Date();
-                const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' };
-                const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-                datetimeContainer.textContent = `${now.toLocaleDateString('zh-TW', dateOptions)} ${now.toLocaleTimeString('zh-TW', timeOptions)}`;
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            
+            // 根據當前語言設定對應的locale
+            let locale;
+            switch (currentLanguage) {
+                case 'zh-TW':
+                    locale = 'zh-TW';
+                    break;
+                case 'zh-CN':
+                    locale = 'zh-CN';
+                    break;
+                case 'en':
+                    locale = 'en-US';
+                    break;
+                case 'ja':
+                    locale = 'ja-JP';
+                    break;
+                default:
+                    locale = 'zh-TW';
             }
+            
+            const dateString = now.toLocaleDateString(locale, dateOptions);
+            const timeString = now.toLocaleTimeString(locale, timeOptions);
+            datetimeContainer.textContent = `${dateString} ${timeString}`;
+        }
 
             function setupSidebarMenu() {
                 menuToggleBtn.addEventListener('click', () => sidebarMenu.classList.toggle('open'));
@@ -1630,7 +1667,9 @@
                             </div>
                         </div>
                     </div>
-                    <button class="adv-btn settings-btn">⚙️</button>
+                    <button class="adv-btn settings-btn">
+                        <img src="../assets/settings-icon.png" alt="⚙️" style="width: 32px; height: 32px;">
+                    </button>
                 `;
                 
                 // ★ 為緊急呼叫按鈕新增事件
@@ -1643,7 +1682,10 @@
                 });
 
                 // 為設定按鈕新增翻轉事件
-                elevatorUnit.querySelector('.settings-btn').addEventListener('click', () => {
+                const settingsBtn = elevatorUnit.querySelector('.settings-btn');
+                
+                // 點擊事件
+                settingsBtn.addEventListener('click', () => {
                     elevatorUnit.classList.toggle('flipped');
                 });
                 
@@ -1961,7 +2003,7 @@
         });
     </script>
     <footer id="page-footer">
-        <span>v1.3.1</span> | <span>Copyright © 2025 KL </span>
+        <span>v1.3.2</span> | <span>Copyright © 2025 KL</a></span>
     </footer>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智慧住宅中央監控系統 - 4F</title>
+    <title data-i18n="systemTheft">防盜及求救系統</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
@@ -93,6 +93,12 @@
         }
         #sidebar-menu ul::-webkit-scrollbar-thumb:hover {
          background-color: #838b94;
+        }    
+        #sidebar-menu .system-category {
+            margin-bottom: 20px;
+        }
+        #sidebar-menu .system-category:first-child {
+            margin-top: 20px;
         }        
         /* 樓層子選單的樣式 (預設隱藏) */
         .floor-submenu {
@@ -213,6 +219,52 @@
             user-select: none;
             -webkit-user-select: none;
         }
+        /* ★★★ 語言選擇器樣式 ★★★ */      
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 50px;
+            border-bottom: 1px solid #728aa2;
+            padding-bottom: 10px;
+        }
+        #sidebar-menu h2 {
+            color: white;
+            margin: 0; /* 移除舊的邊距和邊框 */
+            padding: 0;
+            border: none;
+            font-size: 18px; /* 預設字體大小 */
+            white-space: nowrap; /* 防止換行 */
+            overflow: hidden; /* 隱藏溢出內容 */
+            text-overflow: ellipsis; /* 如果必要時顯示省略號 */
+            transition: font-size 0.3s ease; /* 平滑的字體大小變化 */
+        }
+        
+        /* 英語的字體縮小設定 */
+        html[lang="en"] #sidebar-menu h2 {
+            font-size: 18px; /* 縮小字體以適應較長的文字 */
+        }
+        
+        /* 日語的字體放大設定 */
+        html[lang="ja"] #sidebar-menu h2 {
+            font-size: 22px; /* 進一步放大字體以增加可讀性 */
+        }
+        
+        /* 額外的安全設定，針對特別長的文字 */
+        #sidebar-menu h2[data-i18n="systemMenu"] {
+            max-width: 220px; /* 稍微放寬最大寬度限制 */
+            min-height: 26px; /* 確保有足夠的高度 */
+        }
+        
+        #language-selector {
+            width: auto; /* 讓寬度自適應內容 */
+            background-color: #47637e;
+            color: #ecf0f1;
+            border: 1px solid #465a70;
+            padding: 4px 8px; /* 縮小內邊距 */
+            border-radius: 4px;
+            font-size: 12px; /* 縮小字體 */
+        }
     </style>
 </head>
 <body>
@@ -220,7 +272,7 @@
     <header id="top-banner">
         <button id="menu-toggle-btn" title="展開選單">☰</button>
         <a href="https://workkkkkkez00m.github.io/K-3D-viewer/index.html" id="home-link-title">
-            <h1 id="project-title">智慧住宅中央監控系統</h1>
+            <h1 id="project-title" data-i18n="projectTitle">智慧住宅中央監控系統</h1>
         </a>
         <div class="header-right-items">
             <div id="datetime-container"></div>
@@ -229,10 +281,20 @@
     </header>
     <nav id="sidebar-menu">
         <button id="close-menu-btn">&times;</button>
-        <h2>系統選單</h2>
+        <div class="sidebar-header">
+            <h2 data-i18n="systemMenu">系統選單</h2>
+            <div class="language-selector-container">
+                <select id="language-selector">
+                    <option value="zh-TW">繁體中文</option>
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                    <option value="zh-CN">简体中文</option>
+                </select>
+            </div>
+        </div>
         <ul>
             <li class="system-category">
-                <a href="#">防盜及求救系統</a>
+                <a href="#" data-i18n="systemTheft">防盜及求救系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../theft_prevention/1f.html">1F</a></li>
                     <li><a href="../theft_prevention/2f.html">2F</a></li>
@@ -242,7 +304,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">攝影監視系統</a>
+                <a href="#" data-i18n="systemCCTV">攝影監視系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../cctv/1f.html">1F</a></li>
                     <li><a href="../cctv/2f.html">2F</a></li>
@@ -252,7 +314,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">門禁保全系統</a>
+                <a href="#" data-i18n="systemAccess">門禁保全系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../access_control/1f.html">1F</a></li>
                     <li><a href="../access_control/2f.html">2F</a></li>
@@ -262,7 +324,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">影像對講系統</a>
+                <a href="#" data-i18n="systemIntercom">影像對講系統</a>
                 <ul class="floor-submenu">
                    <li><a href="../video_intercom/1f.html">1F</a></li>
                    <li><a href="../video_intercom/2f.html">2F</a></li>
@@ -272,7 +334,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">消防火警系統</a>
+                <a href="#" data-i18n="systemFire">消防火警系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../fire_alarm/1f.html">1F</a></li>
                     <li><a href="../fire_alarm/2f.html">2F</a></li>
@@ -282,29 +344,29 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">給排水系統</a>
+                <a href="#" data-i18n="systemPlumbing">給排水系統</a>
                 <ul class="floor-submenu">
                    <li><a href="../plumbing_drainage/b3f.html">B3F</a></li>                   
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">停車管理系統</a>
+                <a href="#" data-i18n="systemParking">停車管理系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../parking_management/b1f.html">B1F</a></li>
                     <li><a href="../parking_management/b2f.html">B2F</a></li>
                     <li><a href="../parking_management/b3f.html">B3F</a></li>                   
                 </ul>
-            </li>   
+            </li> 
             <li class="system-category">
-                <a href="#">空調控制系統</a>
+                <a href="#" data-i18n="systemAirConditioning">空調控制系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../air_conditioning_control/1f.html">1F</a></li>
                 </ul>
             </li>   
-            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;">能源管理儀表板</a></li>
-            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;">電梯監控系統</a></li>
+            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;" data-i18n="dashboardEnergy">能源管理儀表板</a></li>
+            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;" data-i18n="dashboardElevator">電梯監控系統</a></li>
             <li>
-                <a id="back-to-home-btn" href="../index.html">‹ 回首頁</a>
+                <a id="back-to-home-btn" href="../index.html" data-i18n="backToHome">‹ 回首頁</a>
                 </li>
                 </ul>
             </li>
@@ -312,12 +374,12 @@
 </ul>
     </nav>
     <div id="ui-container">
-        <button id="front-view-btn">正視圖</button>
-        <button id="top-view-btn">俯視圖</button>
-        <button id="side-view-btn">側視圖</button>
+        <button id="front-view-btn" data-i18n="viewFront">正視圖</button>
+        <button id="top-view-btn" data-i18n="viewTop">俯視圖</button>
+        <button id="side-view-btn" data-i18n="viewSide">側視圖</button>
     </div>
-    <div id="controls-helper">左鍵: 旋轉 | 右鍵: 平移 | 滾輪: 縮放</div>
-    <div id="floor-indicator">當前樓層: 防盜及求救系統 - 4F</div>
+    <div id="controls-helper" data-i18n="controlsHelper">左鍵: 旋轉 | 右鍵: 平移 | 滾輪: 縮放</div>
+    <div id="floor-indicator" data-i18n="floorIndicator">當前樓層: 防盜及求救系統 - 4F</div>
     <div id="labels-container"></div>
 
     <script type="module">
@@ -420,6 +482,173 @@
             updateDateTime();
             setInterval(updateDateTime, 1000);
         }
+
+        const translations = {
+            'zh-TW': {
+                projectTitle: '智慧住宅中央監控系統',
+                systemMenu: '系統選單',
+                dashboardEnergy: '能源管理儀表板',
+                dashboardElevator: '電梯監控系統',
+                systemTheft: '防盜及求救系統',
+                systemCCTV: '攝影監視系統',
+                systemAccess: '門禁保全系統',
+                systemIntercom: '影像對講系統',
+                systemFire: '消防火警系統',
+                systemPlumbing: '給排水系統',
+                systemParking: '停車管理系統',
+                systemAirConditioning: '空調控制系統',
+                backToHome: '‹ 回首頁',
+                controlsHelper: '左鍵: 選轉 | 右鍵: 平移 | 滾輪: 縮放',
+                floorIndicator: '當前樓層: 防盜及求救系統 - 4F',
+                viewFront: '正視圖',
+                viewTop: '俯視圖',
+                viewSide: '側視圖'
+            },
+            'en': {
+                projectTitle: 'Smart Residential Central Monitoring System',
+                systemMenu: 'System Menu',
+                dashboardEnergy: 'Energy Dashboard',
+                dashboardElevator: 'Elevator Monitoring',
+                systemTheft: 'Security System',
+                systemCCTV: 'CCTV System',
+                systemAccess: 'Access Control',
+                systemIntercom: 'Video Intercom',
+                systemFire: 'Fire Alarm System',
+                systemPlumbing: 'Plumbing System',
+                systemParking: 'Parking System',
+                systemAirConditioning: 'Air Conditioning Control',
+                backToHome: '‹ Back to Home',
+                controlsHelper: 'Left Click: Rotate | Right Click: Pan | Scroll: Zoom',
+                floorIndicator: 'Current Floor: Security System - 4F',
+                viewFront: 'Front View',
+                viewTop: 'Top View',
+                viewSide: 'Side View'
+            },
+            'ja': {
+                projectTitle: 'スマート住宅中央監視システム',
+                systemMenu: 'システムメニュー',
+                dashboardEnergy: 'エネルギー管理',
+                dashboardElevator: 'エレベーター監視',
+                systemTheft: '防犯及び救助システム',
+                systemCCTV: '映像監視システム',
+                systemAccess: 'アクセス制御',
+                systemIntercom: 'ビデオインターホン',
+                systemFire: '火災報知システム',
+                systemPlumbing: '給排水システム',
+                systemParking: '駐車場管理',
+                systemAirConditioning: '空調制御システム',
+                backToHome: '‹ ホームに戻る',
+                controlsHelper: '左クリック: 回転 | 右クリック: パン | スクロール: ズーム',
+                floorIndicator: '現在の階: 防犯及び救助システム - 4F',
+                viewFront: '正視図',
+                viewTop: '俯視図',
+                viewSide: '側視図'
+            },
+            'zh-CN': {
+                projectTitle: '智慧住宅中央监控系统',
+                systemMenu: '系统菜单',
+                dashboardEnergy: '能源管理仪表板',
+                dashboardElevator: '电梯监控系统',
+                systemTheft: '防盗系统',
+                systemTheft: '防盗及求救系统',
+                systemCCTV: '摄影监控系统',
+                systemAccess: '门禁保全系统',
+                systemIntercom: '影像对讲系统',
+                systemFire: '消防火警系统',
+                systemPlumbing: '给排水系统',
+                systemParking: '停车管理系统',
+                systemAirConditioning: '空调控制系统',
+                backToHome: '‹ 返回首页',
+                controlsHelper: '左键: 旋转 | 右键: 平移 | 滚轮: 缩放',
+                floorIndicator: '当前楼层: 防盗及求救系统 - 4F',
+                viewFront: '正视图',
+                viewTop: '俯视图',
+                viewSide: '侧视图'
+            }
+        };
+
+        let currentLanguage = 'zh-TW';
+
+            function setLanguage(lang) {
+                currentLanguage = lang;
+                localStorage.setItem('preferredLanguage', lang);
+                
+                // 0. 更新HTML的lang屬性，以便CSS語言選擇器能正常工作
+                document.documentElement.setAttribute('lang', lang);
+                
+                // 1. 翻譯所有靜態標籤
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations[lang] && translations[lang][key]) {
+                        el.textContent = translations[lang][key];
+                    }
+                });
+                
+                // 2. 動態調整側邊欄標題字體大小
+                adjustSidebarTitleFontSize();
+                
+                // 3. 立即更新時間日期顯示格式
+                updateDateTime();
+                
+                // 4. 更新動態生成的內容（如果有監控點數據）
+                if (monitoringPoints.length > 0) {
+                    updateInfoCards(monitoringPoints);
+                    // 更新所有標籤的狀態顯示
+                    monitoringPoints.forEach(point => {
+                        updateLabelAppearance(point);
+                    });
+                }
+                
+            }
+
+            function adjustSidebarTitleFontSize() {
+                const sidebarTitle = document.querySelector('#sidebar-menu h2');
+                if (!sidebarTitle) return;
+                
+                // 重置字體大小為預設值（讓CSS決定）
+                sidebarTitle.style.fontSize = '';
+                
+                // 檢查文字是否溢出
+                const containerWidth = sidebarTitle.parentElement.offsetWidth - 120; // 減去語言選擇器的空間
+                const textWidth = sidebarTitle.scrollWidth;
+                
+                if (textWidth > containerWidth) {
+                    // 如果文字溢出，根據語言調整字體
+                    if (currentLanguage === 'ja') {
+                        sidebarTitle.style.fontSize = '18px'; // 日語溢出時稍微縮小
+                        
+                        // 如果還是溢出，進一步縮小
+                        if (sidebarTitle.scrollWidth > containerWidth) {
+                            sidebarTitle.style.fontSize = '16px';
+                        }
+                    } else {
+                        // 其他語言的處理
+                        sidebarTitle.style.fontSize = '14px';
+                        
+                        // 如果還是溢出，進一步縮小
+                        if (sidebarTitle.scrollWidth > containerWidth) {
+                            sidebarTitle.style.fontSize = '12px';
+                        }
+                    }
+                }
+            }
+
+            function initI18n() {
+                const languageSelector = document.getElementById('language-selector');
+                const savedLang = localStorage.getItem('preferredLanguage');
+                if (savedLang && translations[savedLang]) {
+                    languageSelector.value = savedLang;
+                    setLanguage(savedLang);
+                } else {
+                    setLanguage('zh-TW');
+                }
+                languageSelector.addEventListener('change', (e) => {
+                    setLanguage(e.target.value);
+                });
+            }
+
+        // 初始化多國語言功能
+        initI18n();
 
         // --- 動畫迴圈 ---
         function animate() {
@@ -529,8 +758,28 @@
             const now = new Date();
             const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' };
             const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-            const dateString = now.toLocaleDateString('zh-TW', dateOptions);
-            const timeString = now.toLocaleTimeString('zh-TW', timeOptions);
+            
+            // 根據當前語言設定對應的locale
+            let locale;
+            switch (currentLanguage) {
+                case 'zh-TW':
+                    locale = 'zh-TW';
+                    break;
+                case 'zh-CN':
+                    locale = 'zh-CN';
+                    break;
+                case 'en':
+                    locale = 'en-US';
+                    break;
+                case 'ja':
+                    locale = 'ja-JP';
+                    break;
+                default:
+                    locale = 'zh-TW';
+            }
+            
+            const dateString = now.toLocaleDateString(locale, dateOptions);
+            const timeString = now.toLocaleTimeString(locale, timeOptions);
             datetimeContainer.textContent = `${dateString} ${timeString}`;
         }
 
@@ -539,7 +788,7 @@
 
     </script>
     <footer id="page-footer">
-        <span>v1.3.1</span> | <span>Copyright © 2025 KL </span>
+        <span>v1.3.2</span> | <span>Copyright © 2025 KL </span>
     </footer>
 </body>
 </html>

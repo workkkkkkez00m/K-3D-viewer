@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智慧住宅中央監控系統 - B3F</title>
+    <title data-i18n="systemPlumbing">給排水系統</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
@@ -94,6 +94,12 @@
         #sidebar-menu ul::-webkit-scrollbar-thumb:hover {
          background-color: #838b94;
         }        
+        #sidebar-menu .system-category {
+            margin-bottom: 20px;
+        }
+        #sidebar-menu .system-category:first-child {
+            margin-top: 20px;
+        }
         /* 樓層子選單的樣式 (預設隱藏) */
         .floor-submenu {
             list-style: none;
@@ -360,6 +366,52 @@
             user-select: none;
             -webkit-user-select: none;
         }
+        /* ★★★ 語言選擇器樣式 ★★★ */      
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 50px;
+            border-bottom: 1px solid #728aa2;
+            padding-bottom: 10px;
+        }
+        #sidebar-menu h2 {
+            color: white;
+            margin: 0; /* 移除舊的邊距和邊框 */
+            padding: 0;
+            border: none;
+            font-size: 18px; /* 預設字體大小 */
+            white-space: nowrap; /* 防止換行 */
+            overflow: hidden; /* 隱藏溢出內容 */
+            text-overflow: ellipsis; /* 如果必要時顯示省略號 */
+            transition: font-size 0.3s ease; /* 平滑的字體大小變化 */
+        }
+        
+        /* 英語的字體縮小設定 */
+        html[lang="en"] #sidebar-menu h2 {
+            font-size: 18px; /* 縮小字體以適應較長的文字 */
+        }
+        
+        /* 日語的字體放大設定 */
+        html[lang="ja"] #sidebar-menu h2 {
+            font-size: 22px; /* 進一步放大字體以增加可讀性 */
+        }
+        
+        /* 額外的安全設定，針對特別長的文字 */
+        #sidebar-menu h2[data-i18n="systemMenu"] {
+            max-width: 220px; /* 稍微放寬最大寬度限制 */
+            min-height: 26px; /* 確保有足夠的高度 */
+        }
+        
+        #language-selector {
+            width: auto; /* 讓寬度自適應內容 */
+            background-color: #47637e;
+            color: #ecf0f1;
+            border: 1px solid #465a70;
+            padding: 4px 8px; /* 縮小內邊距 */
+            border-radius: 4px;
+            font-size: 12px; /* 縮小字體 */
+        }
     </style>
 </head>
 <body>
@@ -367,7 +419,7 @@
     <header id="top-banner">
         <button id="menu-toggle-btn" title="展開選單">☰</button>
         <a href="https://workkkkkkez00m.github.io/K-3D-viewer/index.html" id="home-link-title">
-            <h1 id="project-title">智慧住宅中央監控系統</h1>
+            <h1 id="project-title" data-i18n="projectTitle">智慧住宅中央監控系統</h1>
         </a>
         <div class="header-right-items">
             <div id="datetime-container"></div>
@@ -378,10 +430,20 @@
     </header>
     <nav id="sidebar-menu">
         <button id="close-menu-btn">&times;</button>
-        <h2>系統選單</h2>
+        <div class="sidebar-header">
+            <h2 data-i18n="systemMenu">系統選單</h2>
+            <div class="language-selector-container">
+                <select id="language-selector">
+                    <option value="zh-TW">繁體中文</option>
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                    <option value="zh-CN">简体中文</option>
+                </select>
+            </div>
+        </div>
         <ul>
             <li class="system-category">
-                <a href="#">防盜及求救系統</a>
+                <a href="#" data-i18n="systemTheft">防盜及求救系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../theft_prevention/1f.html">1F</a></li>
                     <li><a href="../theft_prevention/2f.html">2F</a></li>
@@ -391,7 +453,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">攝影監視系統</a>
+                <a href="#" data-i18n="systemCCTV">攝影監視系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../cctv/1f.html">1F</a></li>
                     <li><a href="../cctv/2f.html">2F</a></li>
@@ -401,7 +463,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">門禁保全系統</a>
+                <a href="#" data-i18n="systemAccess">門禁保全系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../access_control/1f.html">1F</a></li>
                     <li><a href="../access_control/2f.html">2F</a></li>
@@ -411,7 +473,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">影像對講系統</a>
+                <a href="#" data-i18n="systemIntercom">影像對講系統</a>
                 <ul class="floor-submenu">
                    <li><a href="../video_intercom/1f.html">1F</a></li>
                    <li><a href="../video_intercom/2f.html">2F</a></li>
@@ -421,7 +483,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">消防火警系統</a>
+                <a href="#" data-i18n="systemFire">消防火警系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../fire_alarm/1f.html">1F</a></li>
                     <li><a href="../fire_alarm/2f.html">2F</a></li>
@@ -431,13 +493,13 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">給排水系統</a>
+                <a href="#" data-i18n="systemPlumbing">給排水系統</a>
                 <ul class="floor-submenu">
                    <li><a href="../plumbing_drainage/b3f.html">B3F</a></li>                   
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">停車管理系統</a>
+                <a href="#" data-i18n="systemParking">停車管理系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../parking_management/b1f.html">B1F</a></li>
                     <li><a href="../parking_management/b2f.html">B2F</a></li>
@@ -445,33 +507,33 @@
                 </ul>
             </li>   
             <li class="system-category">
-                <a href="#">空調控制系統</a>
+                <a href="#" data-i18n="systemAirConditioning">空調控制系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../air_conditioning_control/1f.html">1F</a></li>
                 </ul>
             </li>   
-            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;">能源管理儀表板</a></li>
-            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;">電梯監控系統</a></li>
+            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;" data-i18n="dashboardEnergy">能源管理儀表板</a></li>
+            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;" data-i18n="dashboardElevator">電梯監控系統</a></li>
             <li>
-                <a id="back-to-home-btn" href="../index.html">‹ 回首頁</a>
+                <a id="back-to-home-btn" href="../index.html" data-i18n="backToHome">‹ 回首頁</a>
                 </li>
                 </ul>
             </li>
-</ul>
+    </ul>
     </nav>
     <div id="ui-container">
         <button id="front-view-btn">正視圖</button>
         <button id="top-view-btn">俯視圖</button>
         <button id="side-view-btn">側視圖</button>
     </div>
-    <div id="controls-helper">左鍵: 選轉 | 右鍵: 平移 | 滾輪: 縮放</div>
-    <div id="floor-indicator">當前樓層: 給排水系統 - B3F</div>
+    <div id="controls-helper" data-i18n="controlsHelper">左鍵: 選轉 | 右鍵: 平移 | 滾輪: 縮放</div>
+    <div id="floor-indicator" data-i18n="floorIndicator">當前樓層: 給排水系統 - B3F</div>
     <div id="labels-container"></div>
 
     <!-- 彈出式資訊面板和切換按鈕 -->
     <button id="info-panel-toggle">‹</button>
     <aside id="info-panel">
-        <h2>B3F 泵浦狀態</h2>
+        <h2 data-i18n="pumpStatus">B3F 泵浦狀態</h2>
         <div class="pump-card-list">
             <!-- JavaScript 將會在這裡動態填入資訊卡 -->
         </div>
@@ -559,6 +621,221 @@
             setupInfoPanelToggle();
         }
         
+        const translations = {
+            'zh-TW': {
+                projectTitle: '智慧住宅中央監控系統',
+                systemMenu: '系統選單',
+                dashboardEnergy: '能源管理儀表板',
+                dashboardElevator: '電梯監控系統',
+                systemTheft: '防盜及求救系統',
+                systemCCTV: '攝影監視系統',
+                systemAccess: '門禁保全系統',
+                systemIntercom: '影像對講系統',
+                systemFire: '消防火警系統',
+                systemPlumbing: '給排水系統',
+                systemParking: '停車管理系統',
+                systemAirConditioning: '空調控制系統',
+                backToHome: '‹ 回首頁',
+                controlsHelper: '左鍵: 選轉 | 右鍵: 平移 | 滾輪: 縮放',
+                floorIndicator: '當前樓層: 給排水系統  - B3F',
+                pumpStatus: 'B3F 泵浦狀態',
+                powerConsumption: '即時功耗',
+                waterLevel: '目前水位',
+                connectionError: '連線錯誤',
+                serverCheckMessage: '無法連接到 API 伺服器<br>請檢查伺服器是否正常運行',
+                pumpRunning: '運轉中',
+                pumpFault: '故障',
+                pumpStopped: '停止',
+                waterLevelHigh: '高',
+                waterLevelVeryHigh: '高高',
+                waterLevelMedium: '中',
+                waterLevelLow: '低',
+                sewagePump: '污水泵浦',
+                wastewaterPump: '廢水泵浦',
+                rainwaterPump: '雨水泵浦'
+            },
+            'en': {
+                projectTitle: 'Smart Residential Central Monitoring System',
+                systemMenu: 'System Menu',
+                dashboardEnergy: 'Energy Dashboard',
+                dashboardElevator: 'Elevator Monitoring',
+                systemTheft: 'Security System',
+                systemCCTV: 'CCTV System',
+                systemAccess: 'Access Control',
+                systemIntercom: 'Video Intercom',
+                systemFire: 'Fire Alarm System',
+                systemPlumbing: 'Plumbing System',
+                systemParking: 'Parking System',
+                systemAirConditioning: 'Air Conditioning Control',
+                backToHome: '‹ Back to Home',
+                controlsHelper: 'Left Click: Rotate | Right Click: Pan | Scroll: Zoom',
+                floorIndicator: 'Current Floor: Plumbing Drainage - B3F',
+                pumpStatus: 'B3F Pump Status',
+                powerConsumption: 'Instant Power Consumption',
+                waterLevel: 'Current Water Level',
+                connectionError: 'Connection Error',
+                serverCheckMessage: 'Unable to connect to API server<br>Please check if server is running',
+                pumpRunning: 'Running',
+                pumpFault: 'Fault',
+                pumpStopped: 'Stopped',
+                waterLevelHigh: 'High',
+                waterLevelVeryHigh: 'Very High',
+                waterLevelMedium: 'Medium',
+                waterLevelLow: 'Low',
+                sewagePump: 'Sewage Pump',
+                wastewaterPump: 'Wastewater Pump',
+                rainwaterPump: 'Rainwater Pump'
+            },
+            'ja': {
+                projectTitle: 'スマート住宅中央監視システム',
+                systemMenu: 'システムメニュー',
+                dashboardEnergy: 'エネルギー管理',
+                dashboardElevator: 'エレベーター監視',
+                systemTheft: '防犯及び救助システム',
+                systemCCTV: '映像監視システム',
+                systemAccess: 'アクセス制御',
+                systemIntercom: 'ビデオインターホン',
+                systemFire: '火災報知システム',
+                systemPlumbing: '給排水システム',
+                systemParking: '駐車場管理',
+                systemAirConditioning: '空調制御システム',
+                backToHome: '‹ ホームに戻る',
+                controlsHelper: '左クリック: 回転 | 右クリック: パン | スクロール: ズーム',
+                floorIndicator: '現在の階: 給排水システム - B3F',
+                pumpStatus: 'B3F ポンプ状態',
+                powerConsumption: '即時電力消費',
+                waterLevel: '現在の水位',
+                connectionError: '接続エラー',
+                serverCheckMessage: 'APIサーバーに接続できません<br>サーバーが正常に動作しているか確認してください',
+                pumpRunning: '運転中',
+                pumpFault: '故障',
+                pumpStopped: '停止',
+                waterLevelHigh: '高',
+                waterLevelVeryHigh: '非常に高い',
+                waterLevelMedium: '中',
+                waterLevelLow: '低',
+                sewagePump: '汚水ポンプ',
+                wastewaterPump: '排水ポンプ',
+                rainwaterPump: '雨水ポンプ'
+            },
+            'zh-CN': {
+                projectTitle: '智慧住宅中央监控系统',
+                systemMenu: '系统菜单',
+                dashboardEnergy: '能源管理仪表板',
+                dashboardElevator: '电梯监控系统',
+                systemTheft: '防盗系统',
+                systemTheft: '防盗及求救系统',
+                systemCCTV: '摄影监控系统',
+                systemAccess: '门禁保全系统',
+                systemIntercom: '影像对讲系统',
+                systemFire: '消防火警系统',
+                systemPlumbing: '给排水系统',
+                systemParking: '停车管理系统',
+                systemAirConditioning: '空调控制系统',
+                backToHome: '‹ 返回首页',
+                controlsHelper: '左键: 旋转 | 右键: 平移 | 滚轮: 缩放',
+                floorIndicator: '当前楼层: 给排水系统 - B3F',
+                pumpStatus: 'B3F 泵浦状态',
+                powerConsumption: '当前功耗',
+                waterLevel: '当前水位',
+                connectionError: '连接错误',
+                serverCheckMessage: '无法连接到 API 服务器<br>请检查服务器是否正常运行',
+                pumpRunning: '运转中',
+                pumpFault: '故障',
+                pumpStopped: '停止',
+                waterLevelHigh: '高',
+                waterLevelVeryHigh: '很高',
+                waterLevelMedium: '中',
+                waterLevelLow: '低',
+                sewagePump: '污水泵',
+                wastewaterPump: '废水泵',
+                rainwaterPump: '雨水泵'
+            }
+        };
+
+        let currentLanguage = 'zh-TW';
+
+            function setLanguage(lang) {
+                currentLanguage = lang;
+                localStorage.setItem('preferredLanguage', lang);
+                
+                // 0. 更新HTML的lang屬性，以便CSS語言選擇器能正常工作
+                document.documentElement.setAttribute('lang', lang);
+                
+                // 1. 翻譯所有靜態標籤
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations[lang] && translations[lang][key]) {
+                        el.textContent = translations[lang][key];
+                    }
+                });
+                
+                // 2. 動態調整側邊欄標題字體大小
+                adjustSidebarTitleFontSize();
+
+                // 3. 立即更新時間日期顯示格式
+                updateDateTime();
+
+                // 4. 更新動態生成的內容（如果有監控點數據）
+                if (monitoringPoints.length > 0) {
+                    updateInfoCards(monitoringPoints);
+                    // 更新所有標籤的狀態顯示
+                    monitoringPoints.forEach(point => {
+                        updateLabelAppearance(point);
+                    });
+                }
+                
+            }
+
+            function adjustSidebarTitleFontSize() {
+                const sidebarTitle = document.querySelector('#sidebar-menu h2');
+                if (!sidebarTitle) return;
+                
+                // 重置字體大小為預設值（讓CSS決定）
+                sidebarTitle.style.fontSize = '';
+                
+                // 檢查文字是否溢出
+                const containerWidth = sidebarTitle.parentElement.offsetWidth - 120; // 減去語言選擇器的空間
+                const textWidth = sidebarTitle.scrollWidth;
+                
+                if (textWidth > containerWidth) {
+                    // 如果文字溢出，根據語言調整字體
+                    if (currentLanguage === 'ja') {
+                        sidebarTitle.style.fontSize = '18px'; // 日語溢出時稍微縮小
+                        
+                        // 如果還是溢出，進一步縮小
+                        if (sidebarTitle.scrollWidth > containerWidth) {
+                            sidebarTitle.style.fontSize = '16px';
+                        }
+                    } else {
+                        // 其他語言的處理
+                        sidebarTitle.style.fontSize = '14px';
+                        
+                        // 如果還是溢出，進一步縮小
+                        if (sidebarTitle.scrollWidth > containerWidth) {
+                            sidebarTitle.style.fontSize = '12px';
+                        }
+                    }
+                }
+            }
+
+            function initI18n() {
+                const languageSelector = document.getElementById('language-selector');
+                const savedLang = localStorage.getItem('preferredLanguage');
+                if (savedLang && translations[savedLang]) {
+                    languageSelector.value = savedLang;
+                    setLanguage(savedLang);
+                } else {
+                    setLanguage('zh-TW');
+                }
+                languageSelector.addEventListener('change', (e) => {
+                    setLanguage(e.target.value);
+                });
+            }
+
+        // 初始化多國語言功能
+        initI18n();
+
         // --- 動畫迴圈 ---
         function animate() {
             requestAnimationFrame(animate);
@@ -639,11 +916,10 @@
             pumpCardList.innerHTML = `
                 <div class="pump-card" style="text-align: center; padding: 40px;">
                     <div style="color: #e74c3c; font-size: 18px; font-weight: bold; margin-bottom: 10px;">
-                        ❌ 連線錯誤
+                        ❌ ${translations[currentLanguage].connectionError}
                     </div>
                     <div style="color: #8b949e; font-size: 14px;">
-                        無法連接到 API 伺服器<br>
-                        請檢查伺服器是否正常運行
+                        ${translations[currentLanguage].serverCheckMessage}
                     </div>
                 </div>
             `;
@@ -655,21 +931,59 @@
             points.forEach(point => {
                 const card = document.createElement('div');
                 card.className = 'pump-card';
-                const statusClass = point.status === '運轉中' ? 'status-running' : (point.status === '故障' ? 'status-fault' : 'status-stopped');
+                
+                // 根據狀態確定樣式類別
+                let statusClass, translatedStatus;
+                if (point.status === '運轉中') {
+                    statusClass = 'status-running';
+                    translatedStatus = translations[currentLanguage].pumpRunning;
+                } else if (point.status === '故障') {
+                    statusClass = 'status-fault';
+                    translatedStatus = translations[currentLanguage].pumpFault;
+                } else {
+                    statusClass = 'status-stopped';
+                    translatedStatus = translations[currentLanguage].pumpStopped;
+                }
+                
+                // 翻譯水位值
+                let translatedWaterLevel;
+                if (point.waterLevel === '高高') {
+                    translatedWaterLevel = translations[currentLanguage].waterLevelVeryHigh;
+                } else if (point.waterLevel === '高') {
+                    translatedWaterLevel = translations[currentLanguage].waterLevelHigh;
+                } else if (point.waterLevel === '中') {
+                    translatedWaterLevel = translations[currentLanguage].waterLevelMedium;
+                } else if (point.waterLevel === '低') {
+                    translatedWaterLevel = translations[currentLanguage].waterLevelLow;
+                } else {
+                    translatedWaterLevel = point.waterLevel; // 如果不匹配，使用原值
+                }
+
+                let translatedLocationName;
+                if (point.locationName === '污水泵浦') {
+                    translatedLocationName = translations[currentLanguage].sewagePump;
+                } else if (point.locationName === '廢水泵浦') {
+                    translatedLocationName = translations[currentLanguage].wastewaterPump;
+                } else if (point.locationName === '雨水泵浦') {
+                    translatedLocationName = translations[currentLanguage].rainwaterPump;
+                } else {
+                    translatedLocationName = point.locationName; // 如果不匹配，使用原值
+                }
+
                 const waterLevelColor = point.waterLevel === '高高' ? '#e74c3c' : (point.waterLevel === '高' ? '#f1c40f' : '#3498db');
                 card.innerHTML = `
                     <div class="pump-card-header">
-                        <div class="pump-card-title">${point.locationName}</div>
-                        <div class="pump-card-status ${statusClass}">${point.status}</div>
+                        <div class="pump-card-title">${translatedLocationName}</div>
+                        <div class="pump-card-status ${statusClass}">${translatedStatus}</div>
                     </div>
                     <div class="pump-card-body">
                         <div class="pump-data-item">
-                            <div class="label">即時耗電量</div>
+                            <div class="label">${translations[currentLanguage].powerConsumption}</div>
                             <div class="value">${Number(point.powerConsumption).toFixed(2)} kW</div>
                         </div>
                         <div class="pump-data-item">
-                            <div class="label">目前水位</div>
-                            <div class="value" style="color: ${waterLevelColor};">${point.waterLevel}</div>
+                            <div class="label">${translations[currentLanguage].waterLevel}</div>
+                            <div class="value" style="color: ${waterLevelColor};">${translatedWaterLevel}</div>
                         </div>
                     </div>
                 `;
@@ -701,13 +1015,25 @@
         }
 
         function createLabelForPoint(point) {
+            // 翻譯位置名稱
+            let translatedLocationName;
+            if (point.locationName === '污水泵浦') {
+                translatedLocationName = translations[currentLanguage].sewagePump;
+            } else if (point.locationName === '廢水泵浦') {
+                translatedLocationName = translations[currentLanguage].wastewaterPump;
+            } else if (point.locationName === '雨水泵浦') {
+                translatedLocationName = translations[currentLanguage].rainwaterPump;
+            } else {
+                translatedLocationName = point.locationName; // 如果不匹配，使用原值
+            }
+
             const label = document.createElement('div');
             label.innerHTML = `
                 <div class="pump-icon">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2Z" stroke="white" stroke-width="2" stroke-opacity="0.5"/><path d="M12 2V6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M12 18V22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M5.63604 5.63603L8.46447 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M15.5355 15.5355L18.364 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M2 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18 12H22" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M18.364 5.63603L15.5355 8.46446" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M8.46447 15.5355L5.63604 18.364" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
                 </div>
                 <div class="pump-details">
-                    <span class="location-name">${point.locationName}</span>: <span class="status">${point.status}</span>
+                    <span class="location-name">${translatedLocationName}</span>: <span class="status">${point.status}</span>
                 </div>
             `;
             labelsContainer.appendChild(label);
@@ -723,10 +1049,34 @@
         function updateLabelAppearance(point) {
             if (!point.element) return;
             
-            // 先更新狀態文字
+            // 更新位置名稱（使用翻譯）
+            const locationNameSpan = point.element.querySelector('.location-name');
+            if (locationNameSpan) {
+                let translatedLocationName;
+                if (point.locationName === '污水泵浦') {
+                    translatedLocationName = translations[currentLanguage].sewagePump;
+                } else if (point.locationName === '廢水泵浦') {
+                    translatedLocationName = translations[currentLanguage].wastewaterPump;
+                } else if (point.locationName === '雨水泵浦') {
+                    translatedLocationName = translations[currentLanguage].rainwaterPump;
+                } else {
+                    translatedLocationName = point.locationName; // 如果不匹配，使用原值
+                }
+                locationNameSpan.textContent = translatedLocationName;
+            }
+            
+            // 先更新狀態文字（使用翻譯）
             const statusSpan = point.element.querySelector('.status');
             if (statusSpan) {
-                statusSpan.textContent = point.status;
+                let translatedStatus;
+                if (point.status === '運轉中') {
+                    translatedStatus = translations[currentLanguage].pumpRunning;
+                } else if (point.status === '故障') {
+                    translatedStatus = translations[currentLanguage].pumpFault;
+                } else {
+                    translatedStatus = translations[currentLanguage].pumpStopped;
+                }
+                statusSpan.textContent = translatedStatus;
             }
             
             const iconDiv = point.element.querySelector('.pump-icon');
@@ -825,8 +1175,28 @@
             const now = new Date();
             const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' };
             const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-            const dateString = now.toLocaleDateString('zh-TW', dateOptions);
-            const timeString = now.toLocaleTimeString('zh-TW', timeOptions);
+            
+            // 根據當前語言設定對應的locale
+            let locale;
+            switch (currentLanguage) {
+                case 'zh-TW':
+                    locale = 'zh-TW';
+                    break;
+                case 'zh-CN':
+                    locale = 'zh-CN';
+                    break;
+                case 'en':
+                    locale = 'en-US';
+                    break;
+                case 'ja':
+                    locale = 'ja-JP';
+                    break;
+                default:
+                    locale = 'zh-TW';
+            }
+            
+            const dateString = now.toLocaleDateString(locale, dateOptions);
+            const timeString = now.toLocaleTimeString(locale, timeOptions);
             datetimeContainer.textContent = `${dateString} ${timeString}`;
         }
 
@@ -864,7 +1234,7 @@
 
     </script>
     <footer id="page-footer">
-        <span>v1.3.1</span> | <span>Copyright © 2025 KL </span>
+        <span>v1.3.2</span> | <span>Copyright © 2025 KL </span>
     </footer>
 </body>
 </html>

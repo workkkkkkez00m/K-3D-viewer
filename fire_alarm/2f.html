@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智慧住宅中央監控系統 - 2F</title>
+    <title data-i18n="systemFire">消防火警系統</title>
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
@@ -93,7 +93,13 @@
         }
         #sidebar-menu ul::-webkit-scrollbar-thumb:hover {
          background-color: #838b94;
-        }        
+        }      
+        #sidebar-menu .system-category {
+            margin-bottom: 20px;
+        }
+        #sidebar-menu .system-category:first-child {
+            margin-top: 20px;
+        }      
         /* 樓層子選單的樣式 (預設隱藏) */
         .floor-submenu {
             list-style: none;
@@ -131,6 +137,8 @@
             background-color: rgba(0, 0, 0, 0.5); color: #cccccc; font-size: 16px;
             font-weight: bold; border-radius: 5px; z-index: 10; pointer-events: none;
         }
+        /* 1. 狀態標籤的基礎樣式 (現在是 Flexbox 容器) */
+        #labels-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
         .status-label {
             position: absolute;
             padding: 8px 12px;
@@ -183,6 +191,76 @@
             width: 60%; /* 設定一個寬度，防止標題在小螢幕上與兩側元素重疊 */
             text-align: center;
         }
+
+        /* ★★★ 火警相關樣式 ★★★ */
+        /* 總體狀態提示 */
+        #master-alarm-status {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            z-index: 50;
+            transition: background-color 0.5s;
+        }
+        .status-ok { background-color: rgba(46, 204, 113, 0.8); } /* 綠色 */
+        .status-alarm { background-color: rgba(231, 76, 60, 0.9); } /* 紅色 */
+
+        /* 3D 場景中的火警圖示容器 */
+        #alarm-icons-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; /* 讓滑鼠可以穿透此容器 */
+        }
+
+        /* 單個火警圖示的樣式 */
+        .alarm-icon {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background-color: #e74c3c; /* 使用一個更柔和的紅色 */
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 8px rgb(255, 0, 0); /* 為圖示本身增加紅色光暈 */
+
+            /* --- 確保置中的設定 --- */
+            display: none; /* visible class 會把它改成 flex */
+            justify-content: center; /* 水平置中 */
+            align-items: center;     /* 垂直置中 */
+            line-height: 1;          /* ★ 確保行高不會干擾垂直置中 */
+
+            /* --- 讓驚嘆號更明顯的設定 --- */
+            color: rgb(255, 255, 255);
+            font-size: 20px;    /* ★ 加大字體 */
+            font-weight: 500;   /* ★ 使用更粗的字重 */
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.9); /* ★ 新增文字陰影 */
+        }
+
+        .alarm-icon.visible { display: flex; } /* 作用中時顯示 */
+        .alarm-icon::before, .alarm-icon::after {
+            content: '';
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%; height: 100%;
+            background-color: red;
+            border-radius: 50%;
+            animation: pulse 2s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .alarm-icon::after {
+            animation-delay: 1s; /* 第二個光圈延遲 1 秒播放 */
+        }
+        
+        /* 脈衝動畫的定義 */
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+        }
         /*icon*/
         .header-right-items {
             display: flex;
@@ -213,6 +291,52 @@
             user-select: none;
             -webkit-user-select: none;
         }
+        /* ★★★ 語言選擇器樣式 ★★★ */      
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 50px;
+            border-bottom: 1px solid #728aa2;
+            padding-bottom: 10px;
+        }
+        #sidebar-menu h2 {
+            color: white;
+            margin: 0; /* 移除舊的邊距和邊框 */
+            padding: 0;
+            border: none;
+            font-size: 18px; /* 預設字體大小 */
+            white-space: nowrap; /* 防止換行 */
+            overflow: hidden; /* 隱藏溢出內容 */
+            text-overflow: ellipsis; /* 如果必要時顯示省略號 */
+            transition: font-size 0.3s ease; /* 平滑的字體大小變化 */
+        }
+        
+        /* 英語的字體縮小設定 */
+        html[lang="en"] #sidebar-menu h2 {
+            font-size: 18px; /* 縮小字體以適應較長的文字 */
+        }
+        
+        /* 日語的字體放大設定 */
+        html[lang="ja"] #sidebar-menu h2 {
+            font-size: 22px; /* 進一步放大字體以增加可讀性 */
+        }
+        
+        /* 額外的安全設定，針對特別長的文字 */
+        #sidebar-menu h2[data-i18n="systemMenu"] {
+            max-width: 220px; /* 稍微放寬最大寬度限制 */
+            min-height: 26px; /* 確保有足夠的高度 */
+        }
+        
+        #language-selector {
+            width: auto; /* 讓寬度自適應內容 */
+            background-color: #47637e;
+            color: #ecf0f1;
+            border: 1px solid #465a70;
+            padding: 4px 8px; /* 縮小內邊距 */
+            border-radius: 4px;
+            font-size: 12px; /* 縮小字體 */
+        }
     </style>
 </head>
 <body>
@@ -220,8 +344,9 @@
     <header id="top-banner">
         <button id="menu-toggle-btn" title="展開選單">☰</button>
         <a href="https://workkkkkkez00m.github.io/K-3D-viewer/index.html" id="home-link-title">
-            <h1 id="project-title">智慧住宅中央監控系統</h1>
+            <h1 id="project-title" data-i18n="projectTitle">智慧住宅中央監控系統</h1>
         </a>
+        <div id="master-alarm-status" class="status-ok">系統正常</div>
         <div class="header-right-items">
             <div id="datetime-container"></div>
             <img src="../assets/favicon-32x32.png" id="logo-icon-right" alt="系統圖示">
@@ -229,10 +354,20 @@
     </header>
     <nav id="sidebar-menu">
         <button id="close-menu-btn">&times;</button>
-        <h2>系統選單</h2>
+        <div class="sidebar-header">
+            <h2 data-i18n="systemMenu">系統選單</h2>
+            <div class="language-selector-container">
+                <select id="language-selector">
+                    <option value="zh-TW">繁體中文</option>
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                    <option value="zh-CN">简体中文</option>
+                </select>
+            </div>
+        </div>
         <ul>
             <li class="system-category">
-                <a href="#">防盜及求救系統</a>
+                <a href="#" data-i18n="systemTheft">防盜及求救系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../theft_prevention/1f.html">1F</a></li>
                     <li><a href="../theft_prevention/2f.html">2F</a></li>
@@ -242,7 +377,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">攝影監視系統</a>
+                <a href="#" data-i18n="systemCCTV">攝影監視系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../cctv/1f.html">1F</a></li>
                     <li><a href="../cctv/2f.html">2F</a></li>
@@ -252,7 +387,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">門禁保全系統</a>
+                <a href="#" data-i18n="systemAccess">門禁保全系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../access_control/1f.html">1F</a></li>
                     <li><a href="../access_control/2f.html">2F</a></li>
@@ -262,7 +397,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">影像對講系統</a>
+                <a href="#" data-i18n="systemIntercom">影像對講系統</a>
                 <ul class="floor-submenu">
                    <li><a href="../video_intercom/1f.html">1F</a></li>
                    <li><a href="../video_intercom/2f.html">2F</a></li>
@@ -272,7 +407,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">消防火警系統</a>
+                <a href="#" data-i18n="systemFire">消防火警系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../fire_alarm/1f.html">1F</a></li>
                     <li><a href="../fire_alarm/2f.html">2F</a></li>
@@ -282,29 +417,29 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">給排水系統</a>
+                <a href="#" data-i18n="systemPlumbing">給排水系統</a>
                 <ul class="floor-submenu">
                    <li><a href="../plumbing_drainage/b3f.html">B3F</a></li>                   
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#">停車管理系統</a>
+                <a href="#" data-i18n="systemParking">停車管理系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../parking_management/b1f.html">B1F</a></li>
                     <li><a href="../parking_management/b2f.html">B2F</a></li>
                     <li><a href="../parking_management/b3f.html">B3F</a></li>                   
                 </ul>
-            </li>   
+            </li> 
             <li class="system-category">
-                <a href="#">空調控制系統</a>
+                <a href="#" data-i18n="systemAirConditioning">空調控制系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../air_conditioning_control/1f.html">1F</a></li>
                 </ul>
             </li>   
-            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;">能源管理儀表板</a></li>
-            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;">電梯監控系統</a></li>
+            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;" data-i18n="dashboardEnergy">能源管理儀表板</a></li>
+            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;" data-i18n="dashboardElevator">電梯監控系統</a></li>
             <li>
-                <a id="back-to-home-btn" href="../index.html">‹ 回首頁</a>
+                <a id="back-to-home-btn" href="../index.html" data-i18n="backToHome">‹ 回首頁</a>
                 </li>
                 </ul>
             </li>
@@ -312,13 +447,14 @@
 </ul>
     </nav>
     <div id="ui-container">
-        <button id="front-view-btn">正視圖</button>
-        <button id="top-view-btn">俯視圖</button>
-        <button id="side-view-btn">側視圖</button>
+        <button id="front-view-btn" data-i18n="viewFront">正視圖</button>
+        <button id="top-view-btn" data-i18n="viewTop">俯視圖</button>
+        <button id="side-view-btn" data-i18n="viewSide">側視圖</button>
     </div>
-    <div id="controls-helper">左鍵: 平移 | 右鍵: 平移 | 滾輪: 縮放</div>
-    <div id="floor-indicator">當前樓層: 消防火警系統 - 2F</div>
+    <div id="controls-helper" data-i18n="controlsHelper">左鍵: 平移 | 右鍵: 平移 | 滾輪: 縮放</div>
+    <div id="floor-indicator" data-i18n="floorIndicator">當前樓層: 消防火警系統 - 2F</div>
     <div id="labels-container"></div>
+    <div id="alarm-icons-container"></div>
 
     <script type="module">
         // --- 導入函式庫 ---
@@ -326,13 +462,14 @@
         import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
         import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
         import { DRACOLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/DRACOLoader.js';
-
+        
         // --- 變數宣告區 ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         const controls = new OrbitControls(camera, renderer.domElement);
         let model;
+        let fireAlarmPoints = [];
         
         const monitoringPoints = [];
         
@@ -344,6 +481,8 @@
         const frontViewBtn = document.getElementById('front-view-btn');
         const topViewBtn = document.getElementById('top-view-btn');
         const sideViewBtn = document.getElementById('side-view-btn');
+        const masterStatusEl = document.getElementById('master-alarm-status');
+        const iconsContainer = document.getElementById('alarm-icons-container');
 
         const minDistance = 10, maxDistance = 50, minScale = 0.3, maxScale = 1.0;
 
@@ -353,8 +492,9 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
-
-            camera.position.set(0, 10, 25);
+                        
+            // ▼▼▼ 相機位置，從正上方往下看 ▼▼▼
+            camera.position.set(0, 30, 0);
             
             scene.add(new THREE.AmbientLight(0xffffff, 0.6));
             const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -365,9 +505,7 @@
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
             controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: null, RIGHT: THREE.MOUSE.PAN };
-            // ★ 限制攝影機最低只能到高於水平線 20 度的視角 (70度角)
-            controls.maxPolarAngle = 70 * (Math.PI / 180);
-            
+
             // --- ★★★ 消防系統專屬操控設定 ★★★ ---
 
             // 1. 鎖定垂直角度，永遠從正上方往下看
@@ -384,12 +522,59 @@
             controls.enablePan = true;
             controls.enableZoom = true;
 
-            // 4. 為了方便俯視角操作，滑鼠左鍵也改為平移
+            // 4. 為了方便俯視角操作，將滑鼠左鍵也改為平移
             controls.mouseButtons = {
                 LEFT: THREE.MOUSE.PAN,
                 MIDDLE: THREE.MOUSE.DOLLY, // 中鍵滾輪點擊 = 縮放 (可選)
                 RIGHT: THREE.MOUSE.PAN
             };
+
+            // ★★★ 從後端獲取火警狀態的函式 ★★★
+            /*async function updateFireAlarmStatus() {
+            try {
+                const response = await fetch('https://bms-backend-server1.onrender.com/api/fire-alarm/1f');
+                const latestData = await response.json();
+
+                // 更新或新增偵測點數據
+                latestData.forEach(newPoint => {
+                    const existingPoint = fireAlarmPoints.find(p => p.id === newPoint.id);
+                    if (existingPoint) {
+                        existingPoint.active = newPoint.active; // 只更新狀態
+                    } else {
+                        fireAlarmPoints.push({ ...newPoint, targetObject: null, element: null });
+                    }
+                });
+
+                // 檢查是否有任何警報正在作用中
+                const isAlarmActive = fireAlarmPoints.some(p => p.active);
+                if (isAlarmActive) {
+                    masterStatusEl.textContent = translations[currentLanguage].fireAlarmActive;
+                    masterStatusEl.className = 'status-alarm';
+                } else {
+                    masterStatusEl.textContent = translations[currentLanguage].systemNormal;
+                    masterStatusEl.className = 'status-ok';
+                }
+
+                // 在模型載入後，確保所有點都被綁定
+                if (model) {
+                    bindObjectsToPoints();
+                }
+
+            } catch (error) {
+                console.error("更新火警狀態失敗:", error);
+            }
+        }*/
+
+        // ★★★ 將 3D 物件綁定到數據點的函式 ★★★
+        function bindObjectsToPoints() {
+            model.traverse((object) => {
+                const point = fireAlarmPoints.find(p => p.name === object.name && !p.targetObject);
+                if (point) {
+                    point.targetObject = object;
+                    console.log(`成功綁定火警物件: ${point.name}`);
+                }
+            });
+        }
 
             const loader = new GLTFLoader();
             const dracoLoader = new DRACOLoader();
@@ -418,67 +603,239 @@
             );
 
             // --- 點擊模型以查詢物件名稱 ---
-            //const raycasterForClick = new THREE.Raycaster();
-            //const mouseForClick = new THREE.Vector2();
+            /*const raycasterForClick = new THREE.Raycaster();
+            const mouseForClick = new THREE.Vector2();
 
-            //window.addEventListener('click', (event) => {
-            // 只在側邊欄關閉時才觸發點擊查詢
-                //if (!sidebarMenu.classList.contains('open')) {
-                    //mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
-                    //mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
+            window.addEventListener('click', (event) => {
+                // 只在側邊欄關閉時才觸發點擊查詢
+                if (!sidebarMenu.classList.contains('open')) {
+                    mouseForClick.x = (event.clientX / window.innerWidth) * 2 - 1;
+                    mouseForClick.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-                    //raycasterForClick.setFromCamera(mouseForClick, camera);
-                    //const intersects = raycasterForClick.intersectObjects(scene.children, true);
+                    raycasterForClick.setFromCamera(mouseForClick, camera);
+                    const intersects = raycasterForClick.intersectObjects(scene.children, true);
 
-                //if (intersects.length > 0) {
+                if (intersects.length > 0) {
                     //const clickedObject = intersects[0].object;
-                //console.log('您點擊了:', clickedObject);
-                //console.log('物件名稱:', clickedObject.name);
-                //console.log('物件位置:', clickedObject.position);
-                    //}
-                //}
-            //});
+                console.log('您點擊了:', clickedObject);
+                console.log('物件名稱:', clickedObject.name);
+                console.log('物件位置:', clickedObject.position);
+                    }
+                }
+            });*/
 
             animate();
             setupEventListeners();
             updateDateTime();
             setInterval(updateDateTime, 1000);
+            // ★★★ 啟動火警狀態的定時更新 ★★★
+            // updateFireAlarmStatus(); // 註解：後端API尚未提供二樓數據
+            // setInterval(updateFireAlarmStatus, 5000); // 註解：後端API尚未提供二樓數據
         }
 
+        const translations = {
+            'zh-TW': {
+                projectTitle: '智慧住宅中央監控系統',
+                systemMenu: '系統選單',
+                dashboardEnergy: '能源管理儀表板',
+                dashboardElevator: '電梯監控系統',
+                systemTheft: '防盜及求救系統',
+                systemCCTV: '攝影監視系統',
+                systemAccess: '門禁保全系統',
+                systemIntercom: '影像對講系統',
+                systemFire: '消防火警系統',
+                systemPlumbing: '給排水系統',
+                systemParking: '停車管理系統',
+                systemAirConditioning: '空調控制系統',
+                backToHome: '‹ 回首頁',
+                controlsHelper: '左鍵: 選轉 | 右鍵: 平移 | 滾輪: 縮放',
+                floorIndicator: '當前樓層: 消防火警系統 - 2F',
+                viewFront: '正視圖',
+                viewTop: '俯視圖',
+                viewSide: '側視圖',
+                systemNormal: '系統正常',
+                fireAlarmActive: '火警警報作用中！'
+            },
+            'en': {
+                projectTitle: 'Smart Residential Central Monitoring System',
+                systemMenu: 'System Menu',
+                dashboardEnergy: 'Energy Dashboard',
+                dashboardElevator: 'Elevator Monitoring',
+                systemTheft: 'Security System',
+                systemCCTV: 'CCTV System',
+                systemAccess: 'Access Control',
+                systemIntercom: 'Video Intercom',
+                systemFire: 'Fire Alarm System',
+                systemPlumbing: 'Plumbing System',
+                systemParking: 'Parking System',
+                systemAirConditioning: 'Air Conditioning Control',
+                backToHome: '‹ Back to Home',
+                controlsHelper: 'Left Click: Rotate | Right Click: Pan | Scroll: Zoom',
+                floorIndicator: 'Current Floor: Fire Alarm System - 2F',
+                viewFront: 'Front View',
+                viewTop: 'Top View',
+                viewSide: 'Side View',
+                systemNormal: 'System Normal',
+                fireAlarmActive: 'Fire Alarm Active!'
+            },
+            'ja': {
+                projectTitle: 'スマート住宅中央監視システム',
+                systemMenu: 'システムメニュー',
+                dashboardEnergy: 'エネルギー管理',
+                dashboardElevator: 'エレベーター監視',
+                systemTheft: '防犯及び救助システム',
+                systemCCTV: '映像監視システム',
+                systemAccess: 'アクセス制御',
+                systemIntercom: 'ビデオインターホン',
+                systemFire: '火災報知システム',
+                systemPlumbing: '給排水システム',
+                systemParking: '駐車場管理',
+                systemAirConditioning: '空調制御システム',
+                backToHome: '‹ ホームに戻る',
+                controlsHelper: '左クリック: 回転 | 右クリック: パン | スクロール: ズーム',
+                floorIndicator: '現在の階: 火災報知システム - 2F',
+                viewFront: '正視図',
+                viewTop: '俯視図',
+                viewSide: '側視図',
+                systemNormal: 'システム正常',
+                fireAlarmActive: '火災警報作動中！'
+            },
+            'zh-CN': {
+                projectTitle: '智慧住宅中央监控系统',
+                systemMenu: '系统菜单',
+                dashboardEnergy: '能源管理仪表板',
+                dashboardElevator: '电梯监控系统',
+                systemTheft: '防盗系统',
+                systemTheft: '防盗及求救系统',
+                systemCCTV: '摄影监控系统',
+                systemAccess: '门禁保全系统',
+                systemIntercom: '影像对讲系统',
+                systemFire: '消防火警系统',
+                systemPlumbing: '给排水系统',
+                systemParking: '停车管理系统',
+                systemAirConditioning: '空调控制系统',
+                backToHome: '‹ 返回首页',
+                controlsHelper: '左键: 旋转 | 右键: 平移 | 滚轮: 缩放',
+                floorIndicator: '当前楼层: 消防火警系统 - 2F',
+                viewFront: '正视图',
+                viewTop: '俯视图',
+                viewSide: '侧视图',
+                systemNormal: '系统正常',
+                fireAlarmActive: '火警报警作用中！'
+            }
+        };
+
+        let currentLanguage = 'zh-TW';
+
+            function setLanguage(lang) {
+                currentLanguage = lang;
+                localStorage.setItem('preferredLanguage', lang);
+                
+                // 0. 更新HTML的lang屬性，以便CSS語言選擇器能正常工作
+                document.documentElement.setAttribute('lang', lang);
+                
+                // 1. 翻譯所有靜態標籤
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations[lang] && translations[lang][key]) {
+                        el.textContent = translations[lang][key];
+                    }
+                });
+                
+                // 2. 動態調整側邊欄標題字體大小
+                adjustSidebarTitleFontSize();
+                
+                // 3. 立即更新時間日期顯示格式
+                updateDateTime();
+                
+                // 4. 更新主警報狀態文字
+                const isAlarmActive = fireAlarmPoints.some(p => p.active);
+                if (isAlarmActive) {
+                    masterStatusEl.textContent = translations[currentLanguage].fireAlarmActive;
+                } else {
+                    masterStatusEl.textContent = translations[currentLanguage].systemNormal;
+                }
+                
+            }
+
+            function adjustSidebarTitleFontSize() {
+                const sidebarTitle = document.querySelector('#sidebar-menu h2');
+                if (!sidebarTitle) return;
+                
+                // 重置字體大小為預設值（讓CSS決定）
+                sidebarTitle.style.fontSize = '';
+                
+                // 檢查文字是否溢出
+                const containerWidth = sidebarTitle.parentElement.offsetWidth - 120; // 減去語言選擇器的空間
+                const textWidth = sidebarTitle.scrollWidth;
+                
+                if (textWidth > containerWidth) {
+                    // 如果文字溢出，根據語言調整字體
+                    if (currentLanguage === 'ja') {
+                        sidebarTitle.style.fontSize = '18px'; // 日語溢出時稍微縮小
+                        
+                        // 如果還是溢出，進一步縮小
+                        if (sidebarTitle.scrollWidth > containerWidth) {
+                            sidebarTitle.style.fontSize = '16px';
+                        }
+                    } else {
+                        // 其他語言的處理
+                        sidebarTitle.style.fontSize = '14px';
+                        
+                        // 如果還是溢出，進一步縮小
+                        if (sidebarTitle.scrollWidth > containerWidth) {
+                            sidebarTitle.style.fontSize = '12px';
+                        }
+                    }
+                }
+            }
+
+            function initI18n() {
+                const languageSelector = document.getElementById('language-selector');
+                const savedLang = localStorage.getItem('preferredLanguage');
+                if (savedLang && translations[savedLang]) {
+                    languageSelector.value = savedLang;
+                    setLanguage(savedLang);
+                } else {
+                    setLanguage('zh-TW');
+                }
+                languageSelector.addEventListener('change', (e) => {
+                    setLanguage(e.target.value);
+                });
+            }
+
+        // 初始化多國語言功能
+        initI18n();
+
         // --- 動畫迴圈 ---
-        function animate() {
+         function animate() {
             requestAnimationFrame(animate);
             controls.target.y = 0;
             controls.update();
 
-            for (const point of monitoringPoints) {
+            // ★★★ 更新火警圖示的位置和可見性 ★★★
+            for (const point of fireAlarmPoints) {
                 if (point.targetObject) {
+                    // 如果圖示還沒被建立，就現在建立它
                     if (!point.element) {
-                        const label = document.createElement('div');
-                        label.className = 'status-label';
-                        labelsContainer.appendChild(label);
-                        point.element = label;
+                        const icon = document.createElement('div');
+                        icon.className = 'alarm-icon';
+                        icon.innerHTML = '!'; // 圖示中間的符號
+                        iconsContainer.appendChild(icon);
+                        point.element = icon;
                     }
-                    
-                    const position = new THREE.Vector3();
-                    new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
-                    
-                    const distance = camera.position.distanceTo(position);
-                    const distanceProgress = Math.max(0, Math.min(1, (distance - minDistance) / (maxDistance - minDistance)));
-                    const scale = maxScale - (maxScale - minScale) * distanceProgress;
 
-                    position.project(camera);
-                    const x = (position.x * 0.5 + 0.5) * window.innerWidth;
-                    const y = (position.y * -0.5 + 0.5) * window.innerHeight;
+                    // 根據 active 狀態決定是否顯示
+                    point.element.classList.toggle('visible', point.active);
                     
-                    point.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scale})`;
-                    point.element.innerHTML = `${point.text}: <span style="color:red;">${point.status}</span>`;
-                    
-                    // --- ★★★ 新增：根據狀態切換 CSS Class ★★★ ---
-                    if (point.status === '開啟') {
-                        point.element.className = 'status-label status-open';
-                    } else {
-                        point.element.className = 'status-label status-closed';
+                    if (point.active) {
+                        // 如果是作用中，才需要計算並更新位置
+                        const position = new THREE.Vector3();
+                        new THREE.Box3().setFromObject(point.targetObject).getCenter(position);
+                        position.project(camera);
+                        const x = (position.x * 0.5 + 0.5) * window.innerWidth;
+                        const y = (position.y * -0.5 + 0.5) * window.innerHeight;
+                        point.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
                     }
                 }
             }
@@ -553,8 +910,28 @@
             const now = new Date();
             const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' };
             const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-            const dateString = now.toLocaleDateString('zh-TW', dateOptions);
-            const timeString = now.toLocaleTimeString('zh-TW', timeOptions);
+            
+            // 根據當前語言設定對應的locale
+            let locale;
+            switch (currentLanguage) {
+                case 'zh-TW':
+                    locale = 'zh-TW';
+                    break;
+                case 'zh-CN':
+                    locale = 'zh-CN';
+                    break;
+                case 'en':
+                    locale = 'en-US';
+                    break;
+                case 'ja':
+                    locale = 'ja-JP';
+                    break;
+                default:
+                    locale = 'zh-TW';
+            }
+            
+            const dateString = now.toLocaleDateString(locale, dateOptions);
+            const timeString = now.toLocaleTimeString(locale, timeOptions);
             datetimeContainer.textContent = `${dateString} ${timeString}`;
         }
 
@@ -563,7 +940,7 @@
 
     </script>
     <footer id="page-footer">
-        <span>v1.3.1</span> | <span>Copyright © 2025 KL </span>
+        <span>v1.3.2</span> | <span>Copyright © 2025 KL </span>
     </footer>
 </body>
 </html>
