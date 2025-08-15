@@ -59,8 +59,8 @@
         }
         
         #sidebar-menu li a {
-            display: block; color: #ecf0f1; text-decoration: none;
-            padding: 15px 10px; border-radius: 4px; transition: background-color 0.2s;
+            display: flex; align-items: center;  color: #ecf0f1; text-decoration: none;
+            padding: 12px 10px; border-radius: 4px; transition: background-color 0.2s;
             position: relative; /* ★ 添加相對定位以支援絕對定位的圖示 */
             overflow: visible !important; /* ★ 確保內容不被隱藏 */
         }
@@ -74,12 +74,12 @@
         }
         /* 設定圖示的樣式 - 重新設計 */
         #sidebar-menu li a .menu-icon {
-        width: 20px;
-        height: 20px;
-        object-fit: contain; /* 確保圖片等比例縮放 */
-        vertical-align: middle; /* 讓圖片和文字垂直對齊 */
+        width: 30px;
+        height: 30px;
+        object-fit: contain; /* 確保圖片等比例縮放 */        
         margin-right: 8px;
-        filter: brightness(0.95); /* 稍微提亮，讓 icon 更柔和 */
+        filter: brightness(1.1); /* 稍微提亮，讓 icon 更柔和 */
+        opacity: 1;
         }
         /* 系統分類的樣式 */
         #sidebar-menu .system-category > a {
