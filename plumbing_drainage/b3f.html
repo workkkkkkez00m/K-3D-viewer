@@ -8,6 +8,16 @@
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
     <link rel="shortcut icon" href="../assets/favicon.ico">
+    <link rel="preload" as="image" href="/K-3D-viewer/assets/systemTheft.png">
+    <link rel="preload" as="image" href="/K-3D-viewer/assets/systemCCTV.png">
+    <link rel="preload" as="image" href="/K-3D-viewer/assets/systemAccess.png">
+    <link rel="preload" as="image" href="/K-3D-viewer/assets/systemPlumbing.png">
+    <link rel="preload" as="image" href="/K-3D-viewer/assets/systemAirConditioning.png">
+    <link rel="preload" as="image" href="/K-3D-viewer/assets/systemFire.png">
+    <link rel="preload" as="image" href="/K-3D-viewer/assets/systemIntercom.png">
+    <link rel="preload" as="image" href="/K-3D-viewer/assets/systemParking.png">
+    <link rel="preload" as="image" href="/K-3D-viewer/assets/dashboardEnergy.png">
+    <link rel="preload" as="image" href="/K-3D-viewer/assets/dashboardElevator.png">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -81,7 +91,11 @@
         filter: contrast(1.1);  
         image-rendering: -webkit-optimize-contrast; 
         image-rendering: crisp-edges;   
-        opacity: 1;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        }
+        #sidebar-menu li a .menu-icon.loaded {
+        opacity: 1; /* 當圖片載入完成後，讓它變得不透明 */
         }
         /* 系統分類的樣式 */
         #sidebar-menu .system-category > a {
@@ -781,6 +795,21 @@
             setInterval(updatePlumbingStatus, 4000);
             // ★ 啟動彈出面板功能
             setupInfoPanelToggle();
+            handleIconLoading(); 
+        }
+        function handleIconLoading() {
+            const menuIcons = document.querySelectorAll('#sidebar-menu .menu-icon');
+            menuIcons.forEach(icon => {
+                // 檢查圖片是否已經從快取中載入
+                if (icon.complete) {
+                icon.classList.add('loaded');
+                } else {
+                    // 如果尚未載入，則監聽 load 事件
+                    icon.addEventListener('load', () => {
+                        icon.classList.add('loaded');
+                    });
+                }
+            });
         }
         
         const translations = {
