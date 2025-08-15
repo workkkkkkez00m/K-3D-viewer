@@ -38,22 +38,31 @@
         }
         #sidebar-menu {
             position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
-            background-color: #2c3e50; padding: 20px; box-sizing: border-box;
-            z-index: 1000; transition: left 0.3s ease-in-out;display: flex;flex-direction: column;
+            background-color: #0d1016; padding: 20px; box-sizing: border-box;
+            z-index: 1000; transition: left 0.3s ease-in-out; display: flex; flex-direction: column;
+            border-right: 1px solid #434a52;
+            border-top-right-radius: 12px; /* 右上圓角 */
+            border-bottom-right-radius: 12px; /* 右下圓角 */
         }
         #sidebar-menu.open { left: 0; }
         #sidebar-menu h2 { color: white; margin-top: 50px; border-bottom: 1px solid #465a70; padding-bottom: 10px; }
-        #sidebar-menu ul { list-style: none; padding: 0; margin: 0px;flex-grow: 1; /* 讓列表填滿除了標題和語言選擇器之外的所有剩餘空間 */
-        overflow-y: auto; /* 當內容超出時，自動顯示垂直滾動條 */
-        padding-right: 10px;
-        scrollbar-width: thin;
-        scrollbar-color: #6e859fd4 transparent;
+        #sidebar-menu ul { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0px;
+            flex-grow: 1; /* 讓列表填滿除了標題和語言選擇器之外的所有剩餘空間 */
+            overflow-y: auto; /* 當內容超出時，自動顯示垂直滾動條 */
+            padding-right: 10px;
+            /* ★ 主選單保持精簡的滾動條 */
+            scrollbar-width: thin;
+            scrollbar-color: #0d1016 transparent;
         }
+        
         #sidebar-menu li a {
             display: block; color: #ecf0f1; text-decoration: none;
             padding: 15px 10px; border-radius: 4px; transition: background-color 0.2s;
         }
-        #sidebar-menu li a:hover { background-color: #34495e; }
+        #sidebar-menu li a:hover { background-color: #1e2f4194; }
         #sidebar-menu .system-category {
             margin-bottom: 20px;
         }
@@ -61,21 +70,50 @@
             position: absolute; top: 15px; right: 15px; background: none; border: none;
             color: white; font-size: 30px; font-weight: bold; line-height: 1; cursor: pointer;
         }
-        /* 系統分類的樣式 */
-        #sidebar-menu .system-category > a { 
-            font-weight: bold; 
-            background-color: #1bdbed; 
-            color: white; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding-right: 15px; /* 給箭頭留出空間 */
+        /* 設定圖示的樣式 */
+        #sidebar-menu li a .menu-icon {
+            width: 20px;  /* 設定固定寬度 */
+            height: 20px; /* 設定固定高度 */
+            object-fit: contain; /* 確保圖片等比例縮放 */
         }
-        #sidebar-menu .system-category > a::after { 
-            content: '▼'; 
-            transition: transform 0.3s; 
-            flex-shrink: 0; /* 防止箭頭被壓縮 */
-            margin-left: 8px; /* 與文字保持間距 */
+        /* 系統分類的樣式 */
+        #sidebar-menu .system-category > a {
+            font-weight: 600; /* 加粗 */
+            color: #c9d1d9;
+            padding: 15px 10px; 
+            background-color: transparent !important;
+            text-transform: uppercase; /* 字母大寫 (可選) */
+            font-size: 15px;
+            color: #d9dee3; /* 使用較暗的灰色 */
+        }
+        
+        /* ★ 儀表板項目的樣式 - 與系統分類項目完全相同 */
+        #sidebar-menu .dashboard-item > a {
+            font-weight: 600; /* 加粗 */
+            color: #d9dee3; /* ★ 與系統分類相同的灰色 */
+            padding: 15px 10px; /* 與系統分類相同的內距 */
+            background-color: transparent !important;
+            text-transform: uppercase; /* 字母大寫 */
+            font-size: 15px;
+            display: block;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        #sidebar-menu .dashboard-item > a:hover {
+            background-color: transparent !important; /* ★ 與系統分類相同的懸停效果 */
+            color: #c9d1d9; /* ★ 與系統分類相同的懸停顏色 */
+        }
+        #sidebar-menu .system-category > a:hover {
+            background-color: transparent !important;
+            color: #c9d1d9;
+        }
+        /* ★ 保留箭頭圖示 */
+        #sidebar-menu .system-category > a::after {
+            content: '▼';
+            float: right;
+            transition: transform 0.3s;
         }
         /* 當分類被展開時，讓箭頭朝上 */
         #sidebar-menu .system-category.active > a::after {
@@ -95,27 +133,78 @@
          background-color: #838b94;
         }        
         #sidebar-menu .system-category {
-            margin-bottom: 20px;
+            margin-bottom: 6px; /* ★ 底部間距6px */
         }
         #sidebar-menu .system-category:first-child {
-            margin-top: 20px;
+            margin-top: 6px; /* ★ 頂部間距6px */
         }
-        /* 樓層子選單的樣式 (預設隱藏) */
-        .floor-submenu {
+        
+        /* ★ 儀表板項目的邊距與系統分類相同 */
+        #sidebar-menu .dashboard-item {
+            margin-bottom: 6px; /* ★ 底部間距6px */
+        }
+        /* 樓層子選單的樣式 (保留收合功能但隱藏滑動條) */
+        #sidebar-menu .floor-submenu {
             list-style: none;
+            padding-left: 15px; /* 增加內縮 */
+            margin: 0;
             max-height: 0; /* 預設高度為 0 */
-            overflow: hidden; /* 隱藏超出的內容 */
+            overflow: hidden; /* 隱藏超出的內容，但不顯示滑動條 */
             transition: max-height 0.4s ease-in-out; /* 平滑的展開/收合動畫 */
-            padding: 0 0 0 20px; /* 預設狀態：只有左邊內縮，上下無間距 */
+            /* ★ Firefox 滑動條顏色隱藏 - 使用更高優先級 */
+            scrollbar-width: thin !important; /* 保持滑動條但設為細線 */
+            scrollbar-color: #0d1016 #0d1016 !important; /* ★ 拇指和軌道都是背景色 */
+            /* ★ IE/Edge 滑動條隱藏 */
+            -ms-overflow-style: none !important;
+            overflow-x: hidden !important; /* 強制隱藏水平滑動條 */
         }
-        /* ★ 當子選單被展開時，才為其加上下內邊距 */
-        .system-category.active .floor-submenu {
-            padding-top: 10px;
-            padding-bottom: 10px;
+        /* ★ Webkit 瀏覽器的滑動條顏色隱藏 - 使用更高優先級 */
+        #sidebar-menu .floor-submenu::-webkit-scrollbar {
+            width: 8px !important; /* 保持原有寬度 */
+            background: #0d1016 !important; /* 與側邊欄背景相同顏色 */
+        }
+        #sidebar-menu .floor-submenu::-webkit-scrollbar-track {
+            background: #0d1016 !important; /* ★ 與側邊欄背景相同顏色 */
+        }
+        #sidebar-menu .floor-submenu::-webkit-scrollbar-thumb {
+            background-color: #0d1016 !important; /* ★ 與側邊欄背景相同顏色 */
+            border-radius: 4px !important;
+        }
+        #sidebar-menu .floor-submenu::-webkit-scrollbar-thumb:hover {
+            background-color: #0d1016 !important; /* ★ 懸停時也保持相同顏色 */
+        }
+        .floor-submenu li a {
+            color: #c9d1d9;
+            padding: 8px 20px 8px 20px; /* 增加左側內距 */
+            font-size: 14px;
+            border-radius: 0; /* 移除圓角 */
+            position: relative;
+            border-left: 3px solid transparent; /* 3. 預留一個透明的左側邊框 */
+        }
+        /* 4. 滑鼠懸停效果 */
+        .floor-submenu li a:hover {
+            background-color: #d9dee3;
+            color: white;
+        }
+
+        /* ★★★ 5. 當前頁面的高亮樣式 ★★★ */
+        .floor-submenu li a.active {
+            background-color: rgba(88, 166, 255, 0.1);
+            color: white;
+            font-weight: 600;
+            border-left-color: #58a6ff; /* 將左側邊框變為藍色 */
+        }
+        /* ★ 當子選單被展開時的樣式調整 */
+        #sidebar-menu .system-category.active .floor-submenu {
+            padding-top: 4px; /* ★ 縮小頂部內間距從10px到4px */
+            padding-bottom: 5px; /* ★ 縮小底部內間距從10px到5px */
+            /* ★ 確保展開時內容正確顯示，並強制隱藏滑動條 */
+            overflow-y: auto !important; /* 允許垂直滾動 */
+            overflow-x: hidden !important; /* 隱藏水平滾動 */
         }
         /* ★ 為第一個樓層按鈕添加頂部間距 */
         .system-category.active .floor-submenu li:first-child a {
-            margin-top: 20px;
+            margin-top: 2px; /* ★ 縮小間距從5px到2px */
         }
         #ui-container {
             /*隱藏視圖按鈕*/display: none !important; position: absolute; top: 80px; right: 20px; display: flex;
@@ -252,6 +341,24 @@
             overflow-y: auto;
             transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             z-index: 500;
+            /* ★ Firefox 滑動條顏色隱藏 */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(60, 78, 101, 0.553) rgba(60, 78, 101, 0.553);
+        }
+
+        /* ★ 彈出面板的 Webkit 滑動條樣式隱藏 */
+        #info-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        #info-panel::-webkit-scrollbar-track {
+            background: rgba(60, 78, 101, 0.553); /* 與面板背景相同顏色 */
+        }
+        #info-panel::-webkit-scrollbar-thumb {
+            background: rgba(60, 78, 101, 0.553); /* 與面板背景相同顏色 */
+            border-radius: 4px;
+        }
+        #info-panel::-webkit-scrollbar-thumb:hover {
+            background: rgba(60, 78, 101, 0.553); /* 懸停時也保持相同顏色 */
         }
         #info-panel.open {
             right: 0; /* 彈入畫面 */
@@ -298,21 +405,34 @@
             right: 380px; /* 跟隨面板移動 */
         }
 
-        #back-to-home-btn {
-            margin-top: 20px; /* 與上方選單產生間距 */
-            padding-top: 20px !important; /* 增加頂部內邊距，並確保其優先級 */
-            border-top: 1px solid #465a70; /* 加上一條分隔線 */
-            font-weight: bold; /* 加粗字體 */
-            color: #1bdbed !important; /* 使用一個醒目的主題綠色 */
+        /* ★ 回首頁按鈕區域的分隔線 - 使用偽元素創建獨立分隔線 */
+        #back-to-home-btn::before {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 1px;
+            background-color: #465a70;
+            margin-top: -25px; /* ★ 向上偏移，讓分隔線回到原本位置 */
+            margin-bottom: 40px; /* ★ 增加底部間距，讓按鈕與分隔線保持距離 */
         }
 
-        #back-to-home-btn:hover {
-            background-color: #34495e !important; /* 維持懸停效果 */
-            color: #1fecff !important; /* 懸停時顏色更亮 */
+        #back-to-home-btn {
+            margin-top: 40px !important; /* ★ 增加上邊距從20px到40px，讓按鈕往下移動 */
+            margin-bottom: 40px !important; /* ★ 增加下邊距，與上邊距等高 */
+            padding: 15px 10px 15px 10px !important; /* ★ 移除頂部額外padding，使用標準內邊距 */
+            /* 移除 border-top，改用偽元素分隔線 */
+            font-weight: bold; /* 加粗字體 */
+            color: #1bdbed !important; /* 使用一個醒目的主題綠色 */
+            line-height: 1.2; /* ★ 設定行高確保文字垂直置中 */
+            display: block !important; /* ★ 確保按鈕為塊級元素 */
+            text-decoration: none !important; /* ★ 移除底線 */
+            border-radius: 4px !important; /* ★ 確保圓角與其他按鈕一致 */
         }
-        /* 為能源管理和電梯監控系統按鈕添加適當間距 */
-        #sidebar-menu li a[href*="energy"] {
-            margin-bottom: 18px; /* 能源管理按鈕下方間距 */
+
+        /* ★ 明確取消回首頁按鈕的懸停效果 */
+        #back-to-home-btn:hover {
+            background-color: transparent !important; /* 取消懸停背景色 */
+            color: #1bdbed !important; /* 保持原始文字顏色 */
         }
 
         /* 移除標題連結的預設樣式 */
@@ -412,6 +532,7 @@
             border-radius: 4px;
             font-size: 12px; /* 縮小字體 */
         }
+
     </style>
 </head>
 <body>
@@ -443,7 +564,7 @@
         </div>
         <ul>
             <li class="system-category">
-                <a href="#" data-i18n="systemTheft">防盜及求救系統</a>
+                <a href="#" data-i18n="systemTheft"><img class="menu-icon" src="../assets/systemTheft.png" alt="防盜">防盜及求救系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../theft_prevention/1f.html">1F</a></li>
                     <li><a href="../theft_prevention/2f.html">2F</a></li>
@@ -453,7 +574,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#" data-i18n="systemCCTV">攝影監視系統</a>
+                <a href="#" data-i18n="systemCCTV"><img class="menu-icon" src="../assets/systemCCTV.png" alt="攝影">攝影監視系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../cctv/1f.html">1F</a></li>
                     <li><a href="../cctv/2f.html">2F</a></li>
@@ -463,7 +584,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#" data-i18n="systemAccess">門禁保全系統</a>
+                <a href="#" data-i18n="systemAccess"><img class="menu-icon" src="../assets/systemAccess.png" alt="門禁">門禁保全系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../access_control/1f.html">1F</a></li>
                     <li><a href="../access_control/2f.html">2F</a></li>
@@ -473,7 +594,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#" data-i18n="systemIntercom">影像對講系統</a>
+                <a href="#" data-i18n="systemIntercom"><img class="menu-icon" src="../assets/systemIntercom.png" alt="影像">影像對講系統</a>
                 <ul class="floor-submenu">
                    <li><a href="../video_intercom/1f.html">1F</a></li>
                    <li><a href="../video_intercom/2f.html">2F</a></li>
@@ -483,7 +604,7 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#" data-i18n="systemFire">消防火警系統</a>
+                <a href="#" data-i18n="systemFire"><img class="menu-icon" src="../assets/systemFire.png" alt="消防">消防火警系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../fire_alarm/1f.html">1F</a></li>
                     <li><a href="../fire_alarm/2f.html">2F</a></li>
@@ -493,13 +614,13 @@
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#" data-i18n="systemPlumbing">給排水系統</a>
+                <a href="#" data-i18n="systemPlumbing"><img class="menu-icon" src="../assets/systemPlumbing.png" alt="給排水">給排水系統</a>
                 <ul class="floor-submenu">
                    <li><a href="../plumbing_drainage/b3f.html">B3F</a></li>                   
                 </ul>
             </li>
             <li class="system-category">
-                <a href="#" data-i18n="systemParking">停車管理系統</a>
+                <a href="#" data-i18n="systemParking"><img class="menu-icon" src="../assets/systemParking.png" alt="停車">停車管理系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../parking_management/b1f.html">B1F</a></li>
                     <li><a href="../parking_management/b2f.html">B2F</a></li>
@@ -507,13 +628,17 @@
                 </ul>
             </li>   
             <li class="system-category">
-                <a href="#" data-i18n="systemAirConditioning">空調控制系統</a>
+                <a href="#" data-i18n="systemAirConditioning"><img class="menu-icon" src="../assets/systemAirConditioning.png" alt="空調">空調控制系統</a>
                 <ul class="floor-submenu">
                     <li><a href="../air_conditioning_control/1f.html">1F</a></li>
                 </ul>
             </li>   
-            <li><a href="../energy/index.html" style="background-color: #007bff; font-weight: bold;" data-i18n="dashboardEnergy">能源管理儀表板</a></li>
-            <li><a href="../elevator_management/index.html" style="background-color: #007bff; font-weight: bold;" data-i18n="dashboardElevator">電梯監控系統</a></li>
+            <li class="dashboard-item">
+                <a href="../energy/index.html" data-i18n="dashboardEnergy"><img class="menu-icon" src="../assets/dashboardEnergy.png" alt="能源">能源管理儀表板</a>
+            </li>
+            <li class="dashboard-item">
+                <a href="../elevator_management/index.html" data-i18n="dashboardElevator"><img class="menu-icon" src="../assets/dashboardElevator.png" alt="電梯">電梯監控儀表板</a>
+            </li>
             <li>
                 <a id="back-to-home-btn" href="../index.html" data-i18n="backToHome">‹ 回首頁</a>
                 </li>
@@ -626,7 +751,7 @@
                 projectTitle: '智慧住宅中央監控系統',
                 systemMenu: '系統選單',
                 dashboardEnergy: '能源管理儀表板',
-                dashboardElevator: '電梯監控系統',
+                dashboardElevator: '電梯監控儀表板',
                 systemTheft: '防盜及求救系統',
                 systemCCTV: '攝影監視系統',
                 systemAccess: '門禁保全系統',
@@ -722,7 +847,7 @@
                 projectTitle: '智慧住宅中央监控系统',
                 systemMenu: '系统菜单',
                 dashboardEnergy: '能源管理仪表板',
-                dashboardElevator: '电梯监控系统',
+                dashboardElevator: '电梯监控仪表板',
                 systemTheft: '防盗系统',
                 systemTheft: '防盗及求救系统',
                 systemCCTV: '摄影监控系统',
