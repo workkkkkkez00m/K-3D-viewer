@@ -61,6 +61,8 @@
         #sidebar-menu li a {
             display: block; color: #ecf0f1; text-decoration: none;
             padding: 15px 10px; border-radius: 4px; transition: background-color 0.2s;
+            position: relative; /* ★ 添加相對定位以支援絕對定位的圖示 */
+            overflow: visible !important; /* ★ 確保內容不被隱藏 */
         }
         #sidebar-menu li a:hover { background-color: #1e2f4194; }
         #sidebar-menu .system-category {
@@ -70,11 +72,37 @@
             position: absolute; top: 15px; right: 15px; background: none; border: none;
             color: white; font-size: 30px; font-weight: bold; line-height: 1; cursor: pointer;
         }
-        /* 設定圖示的樣式 */
+        /* 設定圖示的樣式 - 重新設計 */
         #sidebar-menu li a .menu-icon {
-            width: 20px;  /* 設定固定寬度 */
-            height: 20px; /* 設定固定高度 */
-            object-fit: contain; /* 確保圖片等比例縮放 */
+            width: 20px !important;
+            height: 20px !important;
+            object-fit: contain !important;
+            display: inline-block !important;
+            vertical-align: middle !important;
+            margin-right: 8px !important;
+            filter: brightness(0.9) !important;
+            opacity: 1 !important;
+            border-radius: 2px !important;
+            max-width: 20px !important;
+            max-height: 20px !important;
+            visibility: visible !important;
+            position: relative !important;
+            z-index: 10 !important;
+            /* ★ 處理圖片載入失敗的情況 */
+            background: rgba(255, 255, 255, 0.1) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white"><circle cx="10" cy="10" r="8" fill="none" stroke="white" stroke-width="2"/><text x="10" y="14" text-anchor="middle" font-size="12" fill="white">?</text></svg>') center/contain no-repeat !important;
+        }
+
+        /* ★ 確保圖片能夠覆蓋預設背景 */
+        #sidebar-menu li a .menu-icon[src]:not([src=""]) {
+            background: transparent !important;
+        }
+
+        /* ★ 當圖示載入失敗時的通用處理 */
+        #sidebar-menu li a .menu-icon[src=""], 
+        #sidebar-menu li a .menu-icon:not([src]) {
+            background-color: #6e7681 !important;
+            border: 1px solid #30363d !important;
+            content: "?" !important;
         }
         /* 系統分類的樣式 */
         #sidebar-menu .system-category > a {
@@ -1354,8 +1382,49 @@
             }
         });
 
+        // ★ 檢測並修復圖示載入問題
+        function checkMenuIcons() {
+            console.log('檢查選單圖示載入狀態...');
+            const menuIcons = document.querySelectorAll('#sidebar-menu .menu-icon');
+            
+            menuIcons.forEach((icon, index) => {
+                const img = new Image();
+                img.onload = function() {
+                    console.log(`圖示 ${index + 1} 載入成功:`, icon.src);
+                    icon.style.background = 'transparent';
+                    icon.style.opacity = '1';
+                };
+                img.onerror = function() {
+                    console.error(`圖示 ${index + 1} 載入失敗:`, icon.src);
+                    // 嘗試添加快取破壞參數重新載入
+                    const cacheBustedSrc = icon.src + '?v=' + Date.now();
+                    const retryImg = new Image();
+                    retryImg.onload = function() {
+                        console.log(`圖示 ${index + 1} 重新載入成功:`, cacheBustedSrc);
+                        icon.src = cacheBustedSrc;
+                        icon.style.background = 'transparent';
+                    };
+                    retryImg.onerror = function() {
+                        console.error(`圖示 ${index + 1} 重新載入仍失敗，使用預設樣式`);
+                        // 設置錯誤時的樣式
+                        icon.style.background = '#ff6b6b';
+                        icon.style.border = '1px solid #ff4757';
+                        icon.alt = '載入失敗';
+                    };
+                    retryImg.src = cacheBustedSrc;
+                };
+                // 添加快取破壞參數
+                img.src = icon.src + '?v=' + Date.now();
+            });
+        }
+
         // --- 啟動 ---
         init();
+        
+        // ★ 頁面載入完成後檢查圖示
+        window.addEventListener('load', function() {
+            setTimeout(checkMenuIcons, 500); // 延遲執行以確保DOM完全載入
+        });
 
     </script>
     <footer id="page-footer">
