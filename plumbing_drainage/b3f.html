@@ -81,19 +81,6 @@
         margin-right: 8px;
         filter: brightness(0.95); /* 稍微提亮，讓 icon 更柔和 */
         }
-
-        /* ★ 確保圖片能夠覆蓋預設背景 */
-        #sidebar-menu li a .menu-icon[src]:not([src=""]) {
-            background: transparent !important;
-        }
-
-        /* ★ 當圖示載入失敗時的通用處理 */
-        #sidebar-menu li a .menu-icon[src=""], 
-        #sidebar-menu li a .menu-icon:not([src]) {
-            background-color: #6e7681 !important;
-            border: 1px solid #30363d !important;
-            content: "?" !important;
-        }
         /* 系統分類的樣式 */
         #sidebar-menu .system-category > a {
             font-weight: 600; /* 加粗 */
@@ -549,23 +536,7 @@
             padding: 4px 8px; /* 縮小內邊距 */
             border-radius: 4px;
             font-size: 12px; /* 縮小字體 */
-        }
-        .menu-icon.icon-load-error {
-            /* 顯示一個紅色的問號背景，而不是用 background-image */
-            background-color: #555;
-            border: 1px solid #888;
-            color: #fff;
-            font-weight: bold;
-            text-align: center;
-            line-height: 20px; /* 與 height 相同，使其垂直置中 */
-            /* 隱藏 alt 文字並顯示 content */
-            content: '?';
-            font-size: 14px;
-        }
-        .menu-icon.icon-load-error::before {
-            content: '?';
-        }
-
+        }        
     </style>
 </head>
 <body>
