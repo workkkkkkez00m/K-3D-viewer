@@ -78,7 +78,7 @@
         height: 30px;
         object-fit: contain; /* 確保圖片等比例縮放 */        
         margin-right: 8px;
-        filter: brightness(1.1); /* 稍微提亮，讓 icon 更柔和 */
+        filter: brightness(1.5);
         opacity: 1;
         }
         /* 系統分類的樣式 */
@@ -88,7 +88,7 @@
             padding: 15px 10px; 
             background-color: transparent !important;
             text-transform: uppercase; /* 字母大寫 (可選) */
-            font-size: 15px;
+            font-size: 14px;
             color: #d9dee3; /* 使用較暗的灰色 */
         }
         
@@ -99,8 +99,10 @@
             padding: 15px 10px; /* 與系統分類相同的內距 */
             background-color: transparent !important;
             text-transform: uppercase; /* 字母大寫 */
-            font-size: 15px;
-            display: block;
+            font-size: 14px;
+            display: flex; 
+            align-items: center; 
+            padding: 12px 10px; 
             text-decoration: none;
             border-radius: 4px;
             transition: background-color 0.2s;
